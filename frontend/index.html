@@ -1,0 +1,2692 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart House - IoT Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#2563EB', // Blue 600
+                            dark: '#0F172A', // Slate 900
+                            light: '#F8FAFC',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Smooth transition for page changes */
+        .page-transition {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUpBottom {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom Toggle Switch styling - CSS Only Interactive */
+        .toggle-checkbox {
+            right: 1.5rem;
+            border-color: #d1d5db;
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #2563EB;
+        }
+
+        .toggle-label {
+            background-color: #d1d5db;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #2563EB;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gray-50 text-gray-800 font-sans h-screen w-full overflow-hidden flex flex-col md:flex-row transition-colors duration-300">
+
+    <!-- Navigation: Bottom on Mobile, Sidebar on Desktop -->
+    <nav id="main-nav"
+        class="hidden md:w-64 md:flex-col bg-white border-r border-gray-200 fixed bottom-0 w-full md:relative z-50 transition-colors duration-300">
+        <!-- Desktop Logo -->
+        <div class="hidden md:flex items-center justify-center h-24 border-b border-gray-200">
+            <div class="w-14 h-10 mr-1 flex-shrink-0">
+                <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <!-- Chimney -->
+                    <rect x="65" y="20" width="10" height="25" fill="currentColor" class="text-brand-dark" />
+                    <!-- Roof -->
+                    <path d="M 45 65 L 100 20 L 160 70 L 145 70 L 100 32 L 60 65 Z" fill="currentColor"
+                        class="text-brand-dark" />
+                    <!-- Window (4 squares) -->
+                    <rect x="91" y="42" width="7" height="7" fill="#2563EB" />
+                    <rect x="100" y="42" width="7" height="7" fill="#2563EB" />
+                    <rect x="91" y="51" width="7" height="7" fill="#2563EB" />
+                    <rect x="100" y="51" width="7" height="7" fill="#2563EB" />
+                    <!-- Blue Swoosh -->
+                    <path d="M 25 80 C 15 45, 60 30, 150 60 C 110 40, 50 45, 35 80 Z" fill="#2563EB" />
+                </svg>
+            </div>
+            <div class="relative flex flex-col mt-1">
+                <span class="font-extrabold text-3xl text-brand-dark leading-none">Smart</span>
+                <span
+                    class="text-[0.65rem] tracking-[0.3em] text-brand-blue uppercase font-light absolute -bottom-3 right-0">HOUSE</span>
+            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <div class="flex flex-row md:flex-col justify-around md:justify-start flex-1 p-2 md:p-4 gap-2">
+            <button onclick="navigate('home')" id="nav-home"
+                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-brand-blue bg-blue-50 transition-all">
+                <i class="fas fa-home text-xl md:w-8"></i>
+                <span class="text-xs md:text-base font-medium mt-1 md:mt-0" data-i18n="nav_home">Beranda</span>
+            </button>
+            <button onclick="navigate('schedule')" id="nav-schedule"
+                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-gray-500 hover:text-brand-blue transition-all">
+                <i class="fas fa-clock text-xl md:w-8"></i>
+                <span class="text-xs md:text-base font-medium mt-1 md:mt-0" data-i18n="nav_schedule">Jadwal</span>
+            </button>
+            <button onclick="navigate('settings')" id="nav-settings"
+                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-gray-500 hover:text-brand-blue transition-all">
+                <i class="fas fa-cog text-xl md:w-8"></i>
+                <span class="text-xs md:text-base font-medium mt-1 md:mt-0" data-i18n="nav_settings">Pengaturan</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 h-full overflow-y-auto no-scrollbar relative">
+
+        <!-- ================= PAGE: SPLASH ================= -->
+        <div id="page-splash"
+            class="page flex flex-col items-center justify-center h-full p-6 text-center relative overflow-hidden bg-gradient-to-b from-sky-200 to-sky-300"
+            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+            <!-- Cloud overlay for faded effect -->
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+
+            <div class="mb-12 flex flex-col items-center relative z-10">
+                <!-- SVG Logo based on Design -->
+                <div class="w-64 h-32 mb-2 relative">
+                    <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-lg">
+                        <!-- Chimney -->
+                        <rect x="65" y="20" width="10" height="25" fill="currentColor" class="text-brand-dark" />
+                        <!-- Roof -->
+                        <path d="M 45 65 L 100 20 L 160 70 L 145 70 L 100 32 L 60 65 Z" fill="currentColor"
+                            class="text-brand-dark" />
+                        <!-- Window (4 squares) -->
+                        <rect x="91" y="42" width="7" height="7" fill="#2563EB" />
+                        <rect x="100" y="42" width="7" height="7" fill="#2563EB" />
+                        <rect x="91" y="51" width="7" height="7" fill="#2563EB" />
+                        <rect x="100" y="51" width="7" height="7" fill="#2563EB" />
+                        <!-- Blue Swoosh -->
+                        <path d="M 25 80 C 15 45, 60 30, 150 60 C 110 40, 50 45, 35 80 Z" fill="#2563EB" />
+                    </svg>
+                </div>
+                <div class="relative inline-block mt-0">
+                    <h1 class="text-7xl font-extrabold text-brand-dark tracking-tight leading-none">Smart</h1>
+                    <p class="text-xl tracking-[0.4em] text-brand-blue uppercase font-light absolute -bottom-6 right-0">
+                        HOUSE</p>
+                </div>
+            </div>
+            <p class="text-gray-600 mb-12 font-medium text-lg relative z-10" data-i18n="splash_subtitle">Rumah Anda.
+                Lebih Pintar. Lebih Aman.</p>
+            <button onclick="navigate('login')"
+                class="bg-brand-blue text-white w-full max-w-sm py-4 rounded-2xl font-semibold text-lg shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all transform hover:scale-105 active:scale-95 relative z-10">
+                <span data-i18n="splash_btn">MULAI</span>
+            </button>
+        </div>
+
+        <!-- ================= PAGE: LOGIN ================= -->
+        <div id="page-login"
+            class="page hidden flex flex-col h-full p-6 justify-center items-center relative overflow-hidden bg-sky-300"
+            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+            <!-- Cloud overlay for faded effect -->
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+            <div class="absolute top-6 right-6 flex bg-gray-100 rounded-full p-1 shadow-sm z-20">
+                <button onclick="setLanguage('en')" id="lang-btn-en"
+                    class="px-3 py-1 text-xs font-bold rounded-full transition-colors text-gray-500 hover:text-gray-800">EN</button>
+                <button onclick="setLanguage('id')" id="lang-btn-id"
+                    class="px-3 py-1 text-xs font-bold rounded-full transition-colors bg-white text-brand-blue shadow-sm">ID</button>
+            </div>
+            <div class="w-full max-w-md relative z-10">
+                <!-- Small Logo -->
+                <div class="flex justify-center mb-12 mt-4">
+                    <div class="text-center flex flex-col items-center">
+                        <div class="w-48 h-24 mb-0">
+                            <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                                <!-- Chimney -->
+                                <rect x="65" y="20" width="10" height="25" fill="currentColor"
+                                    class="text-brand-dark" />
+                                <!-- Roof -->
+                                <path d="M 45 65 L 100 20 L 160 70 L 145 70 L 100 32 L 60 65 Z" fill="currentColor"
+                                    class="text-brand-dark" />
+                                <!-- Window (4 squares) -->
+                                <rect x="91" y="42" width="7" height="7" fill="#2563EB" />
+                                <rect x="100" y="42" width="7" height="7" fill="#2563EB" />
+                                <rect x="91" y="51" width="7" height="7" fill="#2563EB" />
+                                <rect x="100" y="51" width="7" height="7" fill="#2563EB" />
+                                <!-- Blue Swoosh -->
+                                <path d="M 25 80 C 15 45, 60 30, 150 60 C 110 40, 50 45, 35 80 Z" fill="#2563EB" />
+                            </svg>
+                        </div>
+                        <div class="relative inline-block mt-0">
+                            <h2 class="text-6xl font-extrabold text-brand-dark tracking-tight leading-none">Smart</h2>
+                            <span
+                                class="text-lg tracking-[0.4em] text-brand-blue uppercase font-light absolute -bottom-5 right-0">HOUSE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center text-gray-500 mb-6" data-i18n="login_subtitle">Pilih rumah yang ingin Anda
+                    kontrol.</p>
+
+                <!-- Tabs -->
+                <div class="flex bg-gray-100 p-1 rounded-xl mb-6">
+                    <button id="tab-house" onclick="switchLoginTab('house')"
+                        class="flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm text-brand-blue transition-all"><span
+                            data-i18n="tab_house">ID Rumah</span></button>
+                    <button id="tab-qr" onclick="switchLoginTab('qr')"
+                        class="flex-1 py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-800 transition-all"><span
+                            data-i18n="tab_qr">Pindai QR</span></button>
+                </div>
+
+                <!-- Form House Number -->
+                <div id="form-house">
+                    <div class="space-y-4">
+                        <div>
+                            <input type="email" id="login-house-id" placeholder="Alamat Email"
+                                data-i18n-placeholder="email_placeholder"
+                                class="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 placeholder-gray-400 transition-all">
+                        </div>
+                        <div>
+                            <input type="password" placeholder="Kata Sandi" data-i18n-placeholder="password_placeholder"
+                                class="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 placeholder-gray-400 transition-all">
+                        </div>
+                    </div>
+                    <button onclick="login()"
+                        class="mt-8 bg-brand-dark text-white w-full py-4 rounded-2xl font-semibold shadow-lg hover:bg-gray-800 transition-all">
+                        <span data-i18n="login_btn">Masuk ke akun Anda</span>
+                    </button>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-gray-500" data-i18n="login_no_account">Belum punya Server Smart Home?</p>
+                        <button onclick="navigate('register')"
+                            class="mt-2 text-brand-blue font-semibold hover:underline transition-all">
+                            <span data-i18n="login_setup_btn">Atur &amp; Buat Akun Baru</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QR Scanner Mockup -->
+                <div id="form-qr" class="hidden">
+                    <div
+                        class="bg-gray-900 rounded-3xl aspect-square flex flex-col items-center justify-center border-4 border-brand-blue relative overflow-hidden shadow-2xl shadow-blue-500/20">
+                        <div
+                            class="absolute top-0 left-0 w-full h-1 bg-brand-blue shadow-[0_0_15px_#2563EB] animate-[scan_2s_ease-in-out_infinite]">
+                        </div>
+                        <i class="fas fa-camera text-4xl text-gray-500 mb-2"></i>
+                        <p class="text-white font-medium">Kamera On...</p>
+                    </div>
+                    <p class="text-center mt-4 text-sm text-gray-500" data-i18n="qr_instruction">Arahkan kamera ke kode
+                        QR</p>
+                    <button onclick="login()"
+                        class="mt-4 bg-gray-200 text-gray-800 w-full py-3 rounded-xl font-medium hover:bg-gray-300 transition-all">
+                        <span data-i18n="qr_simulate_btn">Simulasi Pemindaian</span>
+                    </button>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-gray-500" data-i18n="qr_no_account">Tidak punya QR Smart Home?</p>
+                        <button onclick="navigate('register')"
+                            class="mt-2 text-brand-blue font-semibold hover:underline transition-all">
+                            <span data-i18n="login_setup_btn">Atur &amp; Buat Akun Baru</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE: REGISTER ================= -->
+        <div id="page-register"
+            class="page hidden flex flex-col h-full p-6 justify-center items-center overflow-y-auto relative bg-sky-300"
+            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+            <!-- Cloud overlay for faded effect -->
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+            <div class="w-full max-w-md my-auto relative z-10">
+                <button onclick="navigate('login')"
+                    class="text-gray-500 hover:text-brand-blue transition-colors mb-8 flex items-center gap-2 font-medium">
+                    <i class="fas fa-arrow-left"></i> <span data-i18n="reg_back">Kembali ke Login</span>
+                </button>
+
+                <h2 class="text-3xl font-extrabold text-brand-dark mb-2" data-i18n="reg_title">Pengaturan Server</h2>
+                <p class="text-gray-500 mb-8" data-i18n="reg_subtitle">Daftar dan atur rumah pintar Anda ke dalam
+                    sistem.</p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="reg_home_name">Nama
+                            Rumah</label>
+                        <input type="text" id="reg-home-name" placeholder="mis., Keluarga Budi"
+                            data-i18n-placeholder="reg_home_name_ph"
+                            class="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 placeholder-gray-400 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Email</label>
+                        <input type="email" id="reg-house-id" placeholder="mis., anda@contoh.com"
+                            data-i18n-placeholder="reg_email_ph"
+                            class="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 placeholder-gray-400 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="reg_location">Lokasi /
+                            Kota</label>
+                        <input type="text" id="reg-location" placeholder="mis., Jakarta Selatan"
+                            data-i18n-placeholder="reg_location_ph"
+                            class="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 placeholder-gray-400 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="reg_password">Kata
+                            Sandi Admin</label>
+                        <input type="password" id="reg-password" placeholder="Min. 8 karakter"
+                            data-i18n-placeholder="reg_password_ph"
+                            class="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 placeholder-gray-400 transition-all">
+                    </div>
+                </div>
+
+                <button onclick="registerNewHome()"
+                    class="mt-8 bg-brand-blue text-white w-full py-4 rounded-2xl font-semibold shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition-all">
+                    <span data-i18n="reg_submit">Simpan &amp; Buat Server</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= PAGE: HOME (DASHBOARD) ================= -->
+        <div id="page-home" class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-sky-300"
+            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+            <!-- Cloud overlay for faded effect -->
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+            <div class="relative z-10">
+                <!-- Header: Profile (Left) | Smart House + Date (Center) | Notification (Right) -->
+                <header class="flex justify-between items-center mb-6 pt-4">
+                    <div class="w-12 h-12 rounded-full overflow-hidden shadow-sm border-2 border-gray-100 flex-shrink-0 cursor-pointer hover:border-brand-blue transition-colors"
+                        onclick="navigate('settings')">
+                        <img src="https://ui-avatars.com/api/?name=Miko&background=fff&color=2563EB" alt="Profile"
+                            class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
+                        <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0"
+                            data-i18n="home_title">BERANDA</h2>
+                    </div>
+
+                    <button
+                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors relative flex-shrink-0">
+                        <i class="far fa-bell text-xl"></i>
+                        <span
+                            class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+                    </button>
+                </header>
+
+                <!-- Search Bar -->
+                <div class="relative w-full mb-6">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" id="dashboard-search" oninput="handleSearch()"
+                        placeholder="Cari ruangan atau perangkat..." data-i18n-placeholder="search_ph"
+                        class="w-full pl-11 pr-4 py-4 rounded-3xl bg-white border border-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 placeholder-gray-400 transition-all shadow-sm">
+                </div>
+
+                <!-- Smart Home Illustration Carousel -->
+                <div class="w-full mb-8 rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-white relative"
+                    id="banner-carousel">
+                    <div class="relative w-full overflow-hidden" style="aspect-ratio: 16/9;">
+                        <div id="carousel-slides" class="flex transition-transform duration-500 ease-out"
+                            style="width: 100%;">
+                            <img src="https://i.pinimg.com/1200x/c4/e7/a3/c4e7a3aa6e61b9059f682e392a8e84d1.jpg"
+                                onerror="this.src='https://placehold.co/900x450/eff6ff/2563EB?text=Smart+Home'"
+                                alt="Smart Home Illustration" class="w-full h-full object-cover flex-shrink-0">
+                            <img src="https://i.pinimg.com/1200x/58/5e/6b/585e6b44184402766d7ead1457031f08.jpg"
+                                onerror="this.src='https://placehold.co/900x450/eff6ff/2563EB?text=Smart+Home+2'"
+                                alt="Smart Home Illustration 2" class="w-full h-full object-cover flex-shrink-0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Temperature Widgets -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <div class="bg-[#7fbbdd] rounded-3xl p-5 flex items-center justify-between shadow-sm text-white">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 bg-white/20 text-white rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                                <i class="fas fa-map-marker-alt text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-blue-100 text-xs font-medium uppercase tracking-wider"
+                                    data-i18n="weather_location">Lokasi</p>
+                                <p class="font-semibold text-lg" id="dashboard-location">Tembalang, Semarang</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#f58b05] rounded-3xl p-5 flex items-center justify-between shadow-sm text-white">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 bg-white/20 text-white rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                                <i class="fas fa-sun text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-orange-100 text-xs font-medium uppercase tracking-wider"
+                                    data-i18n="weather_title">Cuaca</p>
+                                <p class="font-semibold text-lg" data-i18n="weather_sunny">Cerah</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-3xl font-bold">28°</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rooms Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6" id="rooms-grid"></div>
+            </div>
+
+        </div>
+        <!-- ================= PAGE: SCHEDULE ================= -->
+        <div id="page-schedule"
+            class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-sky-300"
+            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+            <!-- Cloud overlay for faded effect -->
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+            <div class="relative z-10">
+                <!-- Header: Back Button (Left) | Schedule + Date (Center) | Notification (Right) -->
+                <header class="flex justify-between items-center mb-8 pt-4">
+                    <button onclick="navigate('home')"
+                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors flex-shrink-0">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+
+                    <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
+                        <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0.5"
+                            data-i18n="schedule_title">JADWAL</h2>
+                    </div>
+
+                    <button
+                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors relative flex-shrink-0">
+                        <i class="far fa-bell text-xl"></i>
+                        <span
+                            class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+                    </button>
+                </header>
+
+                <!-- Calendar & Routine Split Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-stretch mb-6">
+                    <!-- Calendar Widget -->
+                    <div
+                        class="bg-[#7fbbdd] rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-full min-h-[160px] w-full">
+                        <!-- Month/Year Selector -->
+                        <div class="flex items-center justify-between mb-2">
+                            <button
+                                class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-white hover:text-[#7fbbdd] hover:bg-white transition-colors">
+                                <i class="fas fa-chevron-left text-[10px]"></i>
+                            </button>
+                            <span class="font-bold text-white text-base sm:text-lg">Monday, 10 February 2026</span>
+                            <button
+                                class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-white hover:text-[#7fbbdd] hover:bg-white transition-colors">
+                                <i class="fas fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </div>
+
+                        <!-- Days Selector -->
+                        <div class="flex justify-between items-end w-full px-1">
+                            <!-- Unselected Day -->
+                            <div
+                                class="flex flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2">
+                                <span
+                                    class="text-[10px] sm:text-xs text-blue-100 font-medium mb-1 group-hover:text-white transition-colors">Min</span>
+                                <span
+                                    class="text-base sm:text-lg font-bold text-white group-hover:text-white transition-colors">09</span>
+                            </div>
+                            <!-- Unselected Day -->
+                            <div
+                                class="flex flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2">
+                                <span
+                                    class="text-[10px] sm:text-xs text-blue-100 font-medium mb-1 group-hover:text-white transition-colors">Sen</span>
+                                <span
+                                    class="text-base sm:text-lg font-bold text-white group-hover:text-white transition-colors">10</span>
+                            </div>
+                            <!-- Selected Day -->
+                            <div
+                                class="flex flex-col items-center justify-center cursor-pointer group py-1 px-2 bg-white rounded-xl shadow-sm">
+                                <span
+                                    class="text-[10px] sm:text-xs font-bold mb-1 text-[#7fbbdd] transition-colors">Sel</span>
+                                <span
+                                    class="text-base sm:text-lg font-extrabold text-[#7fbbdd] transition-colors scale-110">11</span>
+                            </div>
+                            <!-- Unselected Day -->
+                            <div
+                                class="flex flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2">
+                                <span
+                                    class="text-[10px] sm:text-xs text-blue-100 font-medium mb-1 group-hover:text-white transition-colors">Rab</span>
+                                <span
+                                    class="text-base sm:text-lg font-bold text-white group-hover:text-white transition-colors">12</span>
+                            </div>
+                            <!-- Unselected Day -->
+                            <div
+                                class="hidden sm:flex sm:flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2">
+                                <span
+                                    class="text-[10px] sm:text-xs text-blue-100 font-medium mb-1 group-hover:text-white transition-colors">Kam</span>
+                                <span
+                                    class="text-base sm:text-lg font-bold text-white group-hover:text-white transition-colors">13</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Routine Card -->
+                    <div
+                        class="bg-[#f58b05] rounded-3xl p-5 sm:p-6 shadow-sm flex items-center justify-between relative overflow-hidden text-gray-800 transition-all h-full min-h-[160px] w-full">
+                        <div class="max-w-[70%] z-10 flex flex-col justify-center h-full">
+                            <h3 class="font-bold text-lg sm:text-xl text-gray-900 mb-1" data-i18n="sched_title">Buat
+                                Rutinitas Pintar</h3>
+                            <p class="text-xs sm:text-sm font-semibold text-gray-700 mb-0.5"
+                                data-i18n="sched_subtitle1">Otomatiskan rumah Anda dengan mudah.</p>
+                            <p class="text-[10px] sm:text-xs text-gray-700/80 mb-4" data-i18n="sched_subtitle2">Atur
+                                jadwal untuk perangkat pintar Anda.</p>
+                            <button onclick="openAddRoutineModal()"
+                                class="bg-gray-900 text-white font-medium px-5 py-2.5 rounded-full text-xs sm:text-sm shadow-md hover:bg-black transition-all w-fit mt-auto">
+                                <span data-i18n="sched_create_btn">Buat Sekarang</span>
+                            </button>
+                        </div>
+                        <!-- Bell Illustration -->
+                        <div class="absolute -right-2 bottom-0 text-black/10 opacity-90 pointer-events-none">
+                            <i class="fas fa-bell text-7xl sm:text-8xl transform rotate-12 translate-y-2"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="routines-list" class="space-y-4">
+                    <div class="routine-card bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+                        onclick="this.querySelector('.toggle-checkbox').click()">
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 font-bold text-xl text-gray-800">22:00</div>
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800" data-i18n="sched_night">Mode Tidur Malam
+                                </h3>
+                                <p class="text-sm text-gray-500 line-clamp-1" data-i18n="sched_night_desc">Rumah Anda.
+                                    Lebih Pintar. Lebih Aman.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
+                                onclick="event.stopPropagation()">
+                                <input type="checkbox" checked
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                <label
+                                    class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
+                            </div>
+                            <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
+                                class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Hapus">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="routine-card bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+                        onclick="this.querySelector('.toggle-checkbox').click()">
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 font-bold text-xl text-gray-800">13:00</div>
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800" data-i18n="sched_studio">Pendinginan Studio
+                                </h3>
+                                <p class="text-sm text-gray-500 line-clamp-1" data-i18n="sched_studio_desc">Set AC Sharp
+                                    ke Mode Dingin 24°C</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
+                                onclick="event.stopPropagation()">
+                                <input type="checkbox" checked
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                <label
+                                    class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
+                            </div>
+                            <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
+                                class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Hapus">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="routine-card bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+                        onclick="this.querySelector('.toggle-checkbox').click()">
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 font-bold text-xl text-gray-800">07:00</div>
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800" data-i18n="sched_morning">Rutinitas Pagi
+                                </h3>
+                                <p class="text-sm text-gray-500 line-clamp-2" data-i18n="sched_morning_desc">Nyalakan
+                                    lampu ruang tamu & atur AC ke 24°C
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
+                                onclick="event.stopPropagation()">
+                                <input type="checkbox"
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                <label
+                                    class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
+                            </div>
+                            <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
+                                class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Hapus">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- ================= PAGE: SETTINGS ================= -->
+        <div id="page-settings"
+            class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-sky-300"
+            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+            <!-- Cloud overlay for faded effect -->
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+            <div class="relative z-10">
+                <header class="flex justify-between items-center mb-8 pt-4">
+                    <button onclick="navigate('home')"
+                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors flex-shrink-0">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+
+                    <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
+                        <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0"
+                            data-i18n="settings_title">PENGATURAN</h2>
+                    </div>
+
+                    <button
+                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors relative flex-shrink-0">
+                        <i class="far fa-bell text-xl"></i>
+                        <span
+                            class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+                    </button>
+                </header>
+
+                <!-- Profile Overview Card -->
+                <div
+                    class="bg-[#7fbbdd] rounded-3xl p-6 text-white mb-8 shadow-lg shadow-[#7fbbdd]/40 flex items-center gap-4">
+                    <div
+                        class="w-16 h-16 rounded-full bg-white/20 border-2 border-white/50 overflow-hidden flex-shrink-0">
+                        <img src="https://ui-avatars.com/api/?name=Miko&background=fff&color=2563EB" alt="Profile"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold" id="settings-home-name">MikoHome</h3>
+                        <p class="text-blue-100 text-sm flex items-center gap-1 mt-1">
+                            <i class="fas fa-map-marker-alt"></i> <span id="settings-location">Tembalang,
+                                Semarang</span>
+                        </p>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-gray-500 uppercase tracking-wider text-sm mb-4 ml-2"
+                    data-i18n="settings_other">Pengaturan Lainnya</h3>
+
+                <div
+                    class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-100">
+                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
+                        onclick="toggleProfileDetails()">
+                        <div class="flex items-center gap-4 text-gray-800 font-medium text-lg">
+                            <i class="far fa-user w-6 text-center text-xl text-gray-400"></i>
+                            <span data-i18n="set_profile">Detail profil</span>
+                        </div>
+                        <i id="profile-chevron"
+                            class="fas fa-chevron-right text-gray-400 transition-transform duration-300"></i>
+                    </div>
+                    <div id="profile-details-menu" class="hidden bg-gray-50 p-5 border-t border-gray-100">
+                        <p class="text-sm text-gray-500 mb-4" data-i18n="set_profile_desc">Kelola sesi akun dan koneksi
+                            rumah pintar Anda.</p>
+
+                        <div class="mb-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
+                            <div>
+                                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Nama Rumah /
+                                    Pemilik</p>
+                                <p id="profile-detail-name" class="font-medium text-gray-800">-</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Email</p>
+                                <p id="profile-detail-email" class="font-medium text-gray-800">-</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Lokasi</p>
+                                <p id="profile-detail-location" class="font-medium text-gray-800">-</p>
+                            </div>
+                        </div>
+
+                        <button onclick="logout()"
+                            class="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3 rounded-xl font-bold hover:bg-red-100 transition-colors border border-red-100">
+                            <i class="fas fa-sign-out-alt"></i> <span data-i18n="set_logout">Keluar</span>
+                        </button>
+                        <button onclick="resetData()"
+                            class="mt-3 w-full flex items-center justify-center gap-2 bg-gray-200 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-300 transition-colors">
+                            <i class="fas fa-trash-alt"></i> <span data-i18n="set_reset">Hapus Semua Data</span>
+                        </button>
+                    </div>
+                    <div
+                        class="p-5 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors" onclick="openModal('modal-show-password')">
+                        <div class="flex items-center gap-4 text-gray-800 font-medium text-lg">
+                            <i class="fas fa-key w-6 text-center text-xl text-gray-400"></i>
+                            <span data-i18n="set_password">Kata Sandi</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </div>
+                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
+                        onclick="this.querySelector('.toggle-checkbox').click()">
+                        <div class="flex items-center gap-4 text-gray-800 font-medium text-lg">
+                            <i class="far fa-bell w-6 text-center text-xl text-gray-400"></i>
+                            <span data-i18n="set_notifications">Notifikasi</span>
+                        </div>
+                        <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
+                            onclick="event.stopPropagation()">
+                            <input type="checkbox" checked
+                                class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                            <label
+                                class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
+                        </div>
+                    </div>
+                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center gap-4 text-gray-800 font-medium text-lg">
+                            <i class="fas fa-globe w-6 text-center text-xl text-gray-400"></i>
+                            <span data-i18n="set_language">Bahasa</span>
+                        </div>
+                        <div class="flex bg-gray-100 p-1 rounded-lg" onclick="event.stopPropagation()">
+                            <button onclick="setLanguageFromSettings('en')" id="settings-lang-en"
+                                class="px-3 py-1 text-xs font-bold rounded transition-colors text-gray-500 hover:text-gray-800">EN</button>
+                            <button onclick="setLanguageFromSettings('id')" id="settings-lang-id"
+                                class="px-3 py-1 text-xs font-bold rounded transition-colors bg-white text-brand-blue shadow-sm">ID</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- ================= PAGE: ROOM DETAIL (Converted to Modal) ================= -->
+        <div id="modal-room-detail"
+            class="fixed inset-0 z-[100] hidden flex-col justify-end bg-gray-900/60 backdrop-blur-sm transition-opacity">
+            <div
+                class="bg-white rounded-t-3xl w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-[slideUpBottom_0.3s_ease-out]">
+                <!-- Handle Bar -->
+                <div class="w-full flex justify-center pt-3 pb-1 bg-white relative z-20 cursor-pointer"
+                    onclick="closeModal('modal-room-detail')">
+                    <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+                </div>
+                <div class="p-6 overflow-y-auto no-scrollbar pb-12 relative flex-1">
+
+                    <header class="flex items-center justify-between mb-6 pt-0">
+                        <button onclick="closeModal('modal-room-detail')"
+                            class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors flex-shrink-0">
+                            <i class="fas fa-arrow-left text-xl"></i>
+                        </button>
+                        <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
+                            <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0" id="room-title">
+                                Living
+                                Room</h2>
+                        </div>
+                        <button
+                            class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors relative flex-shrink-0">
+                            <i class="far fa-bell text-xl"></i>
+                            <span
+                                class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+                        </button>
+                    </header>
+
+                    <div class="flex justify-between items-end mb-4">
+                        <p class="text-gray-500 font-medium" id="room-stats">0/3 Aktif • 3 perangkat terhubung</p>
+                    </div>
+
+                    <!-- Scene Card -->
+                    <div id="room-scene-card"
+                        class="bg-[#7fbbdd] rounded-3xl p-6 text-white mb-8 shadow-lg shadow-[#7fbbdd]/40 relative overflow-hidden">
+                        <div
+                            class="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl">
+                        </div>
+
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div
+                                class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/40 shadow-inner">
+                                <i id="scene-icon" class="fas fa-film text-2xl text-white"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold mb-1" id="scene-title">Movie Time</h2>
+                                <p class="text-blue-50 text-sm font-medium" id="scene-desc">Lampu redup MENYALA, TV &
+                                    Speaker aktif</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="font-bold text-gray-800 text-lg mb-4" data-i18n="room_dev_control">Kontrol Perangkat
+                        Kamar</h3>
+
+                    <!-- Devices Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="devices-list"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= MODALS ================= -->
+    <!-- Modal Add Routine -->
+    <div id="modal-add-routine"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4 sm:p-6 transition-opacity">
+        <div class="bg-white/95 backdrop-blur-xl rounded-[2rem] sm:rounded-3xl w-full max-w-md shadow-2xl overflow-y-auto no-scrollbar max-h-[90vh] border border-white/50 transform transition-transform translate-y-8 opacity-0 sm:translate-y-0 sm:opacity-100"
+            id="modal-add-routine-content" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+            <div
+                class="px-8 py-6 border-b border-gray-100/50 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-xl z-20">
+                <h3
+                    class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600">
+                    Buat Rutinitas Pintar</h3>
+                <button onclick="closeModal('modal-add-routine')"
+                    class="w-10 h-10 rounded-full bg-gray-100/80 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-all flex items-center justify-center">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="submitAddRoutine(event)" class="p-8 space-y-6">
+                <div class="space-y-4">
+                    <!-- Name Input -->
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Nama
+                            Rutinitas</label>
+                        <input type="text" id="new-routine-name" required placeholder="mis., Sleep"
+                            class="w-full px-5 py-4 rounded-2xl bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-brand-blue focus:bg-white text-gray-800 font-medium placeholder-gray-400 transition-all shadow-inner">
+                    </div>
+                    <!-- Room -->
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Kamar</label>
+                        <select id="new-routine-room" onchange="updateRoutineDevices(this.value)"
+                            class="w-full px-5 py-4 rounded-2xl bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-brand-blue focus:bg-white text-gray-800 font-medium transition-all appearance-none cursor-pointer shadow-inner">
+                        </select>
+                    </div>
+                    <!-- Start & End Time -->
+                    <div class="flex gap-4">
+                        <div class="flex-1 relative">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Jam Mulai</label>
+                            <input type="time" id="new-routine-time" required value="17:30"
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-brand-blue focus:bg-white text-gray-800 font-medium transition-all shadow-inner">
+                        </div>
+                        <div class="flex-1 relative">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Jam Selesai (Opsional)</label>
+                            <input type="time" id="new-routine-end-time"
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-brand-blue focus:bg-white text-gray-800 font-medium transition-all shadow-inner">
+                        </div>
+                    </div>
+                    <!-- Devices -->
+                    <div class="pt-2">
+                        <label
+                            class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">Perangkat &
+                            Aksi</label>
+                        <div id="new-routine-device" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar px-1 pb-1">
+                            <!-- Checkboxes populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('modal-add-routine')"
+                        class="flex-1 bg-gray-100/80 text-gray-700 py-4 rounded-2xl font-bold hover:bg-gray-200 transition-all">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-gradient-to-r from-blue-600 to-brand-blue text-white py-4 rounded-2xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-xl shadow-blue-500/30">
+                        Simpan Rutinitas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Add Room -->
+    <div id="modal-add-room"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800" data-i18n="add_room_title">Tambah Kamar Baru</h3>
+                <button onclick="closeModal('modal-add-room')"
+                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form onsubmit="submitAddRoom(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="add_room_name">Nama
+                        Kamar</label>
+                    <input type="text" id="new-room-name" required placeholder="mis., Halaman Belakang"
+                        data-i18n-placeholder="add_room_name_ph"
+                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="add_room_type">Tipe Kamar /
+                        Ikon</label>
+                    <select id="new-room-type"
+                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 transition-all appearance-none cursor-pointer">
+                        <option value="living">Ruang Tamu</option>
+                        <option value="bed">Kamar Tidur</option>
+                        <option value="kitchen">Dapur</option>
+                        <option value="bath">Kamar Mandi</option>
+                        <option value="garage">Garasi / Luar Ruangan</option>
+                        <option value="studio">Studio</option>
+                        <option value="office">Kantor / Ruang Kerja</option>
+                        <option value="dining">Ruang Makan</option>
+                        <option value="basement">Ruang Bawah Tanah</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('modal-add-room')"
+                        class="flex-1 py-3 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"><span
+                            data-i18n="cancel_btn">Batal</span></button>
+                    <button type="submit"
+                        class="flex-1 py-3 rounded-xl font-semibold bg-brand-blue text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition-all"><span
+                            data-i18n="save_btn">Simpan</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Add Device -->
+    <div id="modal-add-device"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800" data-i18n="add_device_title">Tambah Perangkat</h3>
+                <button onclick="closeModal('modal-add-device')"
+                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form onsubmit="submitAddDevice(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="add_device_name">Nama
+                        Perangkat</label>
+                    <input type="text" id="new-device-name" required placeholder="mis., Kipas Dinding"
+                        data-i18n-placeholder="add_device_name_ph"
+                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="add_device_type">Tipe
+                        Perangkat</label>
+                    <select id="new-device-type"
+                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 transition-all appearance-none cursor-pointer">
+                        <option value="LIGHT">Lampu Pintar (LIGHT)</option>
+                        <option value="AC">AC (AC)</option>
+                        <option value="TV">Televisi (TV)</option>
+                        <option value="FAN">Kipas Angin (FAN)</option>
+                        <option value="PLUG">Stopkontak Pintar (PLUG)</option>
+                        <option value="CAMERA">Kamera Keamanan (CAMERA)</option>
+                        <option value="COOKER">Penanak Nasi (COOKER)</option>
+                        <option value="DOOR">Pintu Pintar (DOOR)</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('modal-add-device')"
+                        class="flex-1 py-3 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"><span
+                            data-i18n="cancel_btn">Batal</span></button>
+                    <button type="submit"
+                        class="flex-1 py-3 rounded-xl font-semibold bg-brand-blue text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition-all"><span
+                            data-i18n="save_btn">Simpan</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Show Password -->
+    <div id="modal-show-password"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Kata Sandi</h3>
+                <button onclick="closeModal('modal-show-password')"
+                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Kata Sandi Saat Ini</label>
+                    <div class="relative">
+                        <input type="password" id="current-password-display" readonly
+                            value="********"
+                            class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800">
+                        <button onclick="togglePasswordVisibility()" type="button"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-blue">
+                            <i class="fas fa-eye" id="password-eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Ubah Kata Sandi</label>
+                    <input type="password" id="new-password-input" placeholder="Kata sandi baru (min. 8 karakter)"
+                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800">
+                </div>
+                <button onclick="changePassword()"
+                    class="w-full py-3 rounded-xl font-semibold bg-brand-blue text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition-all">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Schedule Detail -->
+    <div id="modal-schedule-detail"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Detail Jadwal</h3>
+                <button onclick="closeModal('modal-schedule-detail')"
+                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4" id="schedule-detail-content">
+                <!-- Content populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SMART ASSISTANT ================= -->
+    <button id="assistant-fab" onclick="toggleAssistant()"
+        class="fixed hidden bottom-24 md:bottom-8 right-4 md:right-8 w-14 h-14 bg-white rounded-full flex items-center justify-center text-brand-dark shadow-lg shadow-blue-500/30 border-2 border-brand-blue hover:scale-110 active:scale-95 transition-all z-40">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8">
+            <rect x="47" y="15" width="6" height="15" fill="#2563EB" />
+            <circle cx="50" cy="12" r="6" fill="#2563EB" />
+            <rect x="15" y="45" width="8" height="20" rx="4" fill="#2563EB" />
+            <rect x="77" y="45" width="8" height="20" rx="4" fill="#2563EB" />
+            <rect x="20" y="30" width="60" height="45" rx="22" fill="#F8FAFC" stroke="#2563EB" stroke-width="2" />
+            <rect x="27" y="38" width="46" height="30" rx="15" fill="#0F172A" />
+            <path d="M 35 55 Q 40 48 45 55" fill="none" stroke="#4ADE80" stroke-width="4" stroke-linecap="round" />
+            <path d="M 55 55 Q 60 48 65 55" fill="none" stroke="#4ADE80" stroke-width="4" stroke-linecap="round" />
+            <rect x="40" y="75" width="20" height="8" rx="3" fill="#2563EB" />
+        </svg>
+    </button>
+
+    <div id="assistant-panel"
+        class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl z-[60] transform translate-x-full transition-transform duration-300 flex flex-col md:rounded-l-3xl border-l border-gray-200">
+        <div
+            class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-tl-none md:rounded-tl-3xl">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-gray-200 shadow-sm">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
+                        <rect x="47" y="15" width="6" height="15" fill="#2563EB" />
+                        <circle cx="50" cy="12" r="6" fill="#2563EB" />
+                        <rect x="15" y="45" width="8" height="20" rx="4" fill="#2563EB" />
+                        <rect x="77" y="45" width="8" height="20" rx="4" fill="#2563EB" />
+                        <rect x="20" y="30" width="60" height="45" rx="22" fill="#F8FAFC" stroke="#2563EB"
+                            stroke-width="2" />
+                        <rect x="27" y="38" width="46" height="30" rx="15" fill="#0F172A" />
+                        <path d="M 35 55 Q 40 48 45 55" fill="none" stroke="#4ADE80" stroke-width="4"
+                            stroke-linecap="round" />
+                        <path d="M 55 55 Q 60 48 65 55" fill="none" stroke="#4ADE80" stroke-width="4"
+                            stroke-linecap="round" />
+                        <rect x="40" y="75" width="20" height="8" rx="3" fill="#2563EB" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 leading-tight" data-i18n="assistant_title">Asisten Pintar</h3>
+                    <p class="text-xs text-green-500 font-medium" data-i18n="assistant_online">Aktif</p>
+                </div>
+            </div>
+            <button onclick="toggleAssistant()"
+                class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-200 transition-colors">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+
+        <div id="chat-body" class="flex-1 p-5 overflow-y-auto flex flex-col gap-4 no-scrollbar">
+            <div class="flex items-start gap-3 w-5/6">
+                <div
+                    class="w-8 h-8 rounded-full bg-white flex-shrink-0 flex items-center justify-center mt-1 border border-gray-200">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
+                        <rect x="47" y="15" width="6" height="15" fill="#2563EB" />
+                        <circle cx="50" cy="12" r="6" fill="#2563EB" />
+                        <rect x="15" y="45" width="8" height="20" rx="4" fill="#2563EB" />
+                        <rect x="77" y="45" width="8" height="20" rx="4" fill="#2563EB" />
+                        <rect x="20" y="30" width="60" height="45" rx="22" fill="#F8FAFC" stroke="#2563EB"
+                            stroke-width="2" />
+                        <rect x="27" y="38" width="46" height="30" rx="15" fill="#0F172A" />
+                        <path d="M 35 55 Q 40 48 45 55" fill="none" stroke="#4ADE80" stroke-width="4"
+                            stroke-linecap="round" />
+                        <path d="M 55 55 Q 60 48 65 55" fill="none" stroke="#4ADE80" stroke-width="4"
+                            stroke-linecap="round" />
+                        <rect x="40" y="75" width="20" height="8" rx="3" fill="#2563EB" />
+                    </svg>
+                </div>
+                <div class="bg-gray-100 p-3 rounded-2xl rounded-tl-none text-sm text-gray-700 shadow-sm">
+                    <span data-i18n="assistant_hello">Halo! Saya Asisten Rumah Pintar Anda.</span> <span
+                        data-i18n="assistant_try">Coba ketik</span> <span class="font-bold text-brand-blue">"Nyalakan
+                        lampu tidur di kamar 1"</span> <span data-i18n="assistant_or">atau</span> <span
+                        class="font-bold text-brand-blue">"Matikan lampu ruang tamu"</span>.
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-white border-t border-gray-100">
+            <div class="relative flex items-center">
+                <input type="text" id="chat-input" onkeypress="handleChatEnter(event)" placeholder="Ketik perintah..."
+                    data-i18n-placeholder="assistant_ph"
+                    class="w-full bg-gray-100 text-gray-800 px-4 py-3 pl-4 pr-12 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-blue transition-shadow text-sm">
+                <button onclick="sendChatMessage()"
+                    class="absolute right-2 w-8 h-8 rounded-xl bg-brand-blue text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm">
+                    <i class="fas fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── API Configuration ──────────────────────────────────
+        const RAILWAY_BACKEND_URL = 'https://smart-ai-iot.up.railway.app';
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE = isLocal
+            ? 'http://localhost:8000/api/v1'
+            : RAILWAY_BACKEND_URL + '/api/v1';
+        let authToken = localStorage.getItem('auth_token') || '';
+        let refreshToken = localStorage.getItem('refresh_token') || '';
+        let chatSessionId = localStorage.getItem('chat_session_id') || '';
+        let currentUser = null;
+        let ws = null;
+
+        // ── Internationalization (i18n) ─────────────────────────
+        const translations = {
+            en: {
+                nav_home: "Home",
+                nav_schedule: "Schedule",
+                nav_settings: "Settings",
+                splash_subtitle: "Your Home. Smarter. Safer.",
+                splash_btn: "GET STARTED",
+                login_subtitle: "Select the home you want to control.",
+                tab_house: "House ID",
+                tab_qr: "Scan QR",
+                email_placeholder: "Email Address",
+                password_placeholder: "Password",
+                login_btn: "Log in to your account",
+                login_no_account: "Don't have a Smart Home Server?",
+                login_setup_btn: "Setup & Create New Account",
+                qr_instruction: "Point the camera at the QR code",
+                qr_simulate_btn: "Simulate Scan",
+                qr_no_account: "Don't have a Smart Home QR?",
+                reg_back: "Back to Login",
+                reg_title: "Server Setup",
+                reg_subtitle: "Register and configure your smart home into the system.",
+                reg_home_name: "Home Name",
+                reg_home_name_ph: "e.g., The Smiths Family",
+                reg_email_ph: "e.g., you@example.com",
+                reg_location: "Location / City",
+                reg_location_ph: "e.g., South Jakarta",
+                reg_password: "Admin Password",
+                reg_password_ph: "Min. 8 characters",
+                reg_submit: "Save & Create Server",
+                home_title: "HOME",
+                search_ph: "Search rooms or devices...",
+                weather_location: "Location",
+                weather_title: "Weather",
+                weather_sunny: "Sunny",
+                schedule_title: "SCHEDULE",
+                sched_title: "Create a Smart Routine",
+                sched_subtitle1: "Automate your home with ease.",
+                sched_subtitle2: "Set a schedule for your smart devices.",
+                sched_create_btn: "Create Now",
+                sched_night: "Night Sleep Mode",
+                sched_night_desc: "Your Home. Smarter. Safer.",
+                sched_studio: "Cool Down Studio",
+                sched_studio_desc: "Set Sharp AC to 24°C Cool Mode",
+                sched_morning: "Morning Routine",
+                sched_morning_desc: "Turn on living room lights & set AC to 24°C",
+                settings_title: "SETTINGS",
+                settings_other: "Other Settings",
+                set_profile: "Profile details",
+                set_profile_desc: "Manage your account sessions and smart home connection.",
+                set_logout: "Log Out",
+                set_reset: "Reset All Data",
+                set_password: "Password",
+                set_notifications: "Notifications",
+                set_language: "Language",
+                room_dev_control: "Room Device Control",
+                add_room_title: "Add New Room",
+                add_room_name: "Room Name",
+                add_room_name_ph: "e.g., Backyard",
+                add_room_type: "Room Type / Icon",
+                add_device_title: "Add Device",
+                add_device_name: "Device Name",
+                add_device_name_ph: "e.g., Wall Fan",
+                add_device_type: "Device Type",
+                cancel_btn: "Cancel",
+                save_btn: "Save",
+                assistant_title: "Smart Assistant",
+                assistant_online: "Online",
+                assistant_hello: "Hello! I'm your Smart Home Assistant.",
+                assistant_try: "Try typing",
+                assistant_or: "or",
+                assistant_ph: "Type a command..."
+            },
+            id: {
+                nav_home: "Beranda",
+                nav_schedule: "Jadwal",
+                nav_settings: "Pengaturan",
+                splash_subtitle: "Rumah Anda. Lebih Pintar. Lebih Aman.",
+                splash_btn: "MULAI",
+                login_subtitle: "Pilih rumah yang ingin Anda kontrol.",
+                tab_house: "ID Rumah",
+                tab_qr: "Pindai QR",
+                email_placeholder: "Alamat Email",
+                password_placeholder: "Kata Sandi",
+                login_btn: "Masuk ke akun Anda",
+                login_no_account: "Belum punya Server Smart Home?",
+                login_setup_btn: "Atur & Buat Akun Baru",
+                qr_instruction: "Arahkan kamera ke kode QR",
+                qr_simulate_btn: "Simulasi Pemindaian",
+                qr_no_account: "Tidak punya QR Smart Home?",
+                reg_back: "Kembali ke Login",
+                reg_title: "Pengaturan Server",
+                reg_subtitle: "Daftar dan atur rumah pintar Anda ke dalam sistem.",
+                reg_home_name: "Nama Rumah",
+                reg_home_name_ph: "mis., Keluarga Budi",
+                reg_email_ph: "mis., anda@contoh.com",
+                reg_location: "Lokasi / Kota",
+                reg_location_ph: "mis., Jakarta Selatan",
+                reg_password: "Kata Sandi Admin",
+                reg_password_ph: "Min. 8 karakter",
+                reg_submit: "Simpan & Buat Server",
+                home_title: "BERANDA",
+                search_ph: "Cari ruangan atau perangkat...",
+                weather_location: "Lokasi",
+                weather_title: "Cuaca",
+                weather_sunny: "Cerah",
+                schedule_title: "JADWAL",
+                sched_title: "Buat Rutinitas Pintar",
+                sched_subtitle1: "Otomatiskan rumah Anda dengan mudah.",
+                sched_subtitle2: "Atur jadwal untuk perangkat pintar Anda.",
+                sched_create_btn: "Buat Sekarang",
+                sched_night: "Mode Tidur Malam",
+                sched_night_desc: "Rumah Anda. Lebih Pintar. Lebih Aman.",
+                sched_studio: "Pendinginan Studio",
+                sched_studio_desc: "Set AC Sharp ke Mode Dingin 24°C",
+                sched_morning: "Rutinitas Pagi",
+                sched_morning_desc: "Nyalakan lampu ruang tamu & atur AC ke 24°C",
+                settings_title: "PENGATURAN",
+                settings_other: "Pengaturan Lainnya",
+                set_profile: "Detail profil",
+                set_profile_desc: "Kelola sesi akun dan koneksi rumah pintar Anda.",
+                set_logout: "Keluar",
+                set_reset: "Hapus Semua Data",
+                set_password: "Kata Sandi",
+                set_notifications: "Notifikasi",
+                set_language: "Bahasa",
+                room_dev_control: "Kontrol Perangkat Kamar",
+                add_room_title: "Tambah Kamar Baru",
+                add_room_name: "Nama Kamar",
+                add_room_name_ph: "mis., Halaman Belakang",
+                add_room_type: "Tipe Kamar / Ikon",
+                add_device_title: "Tambah Perangkat",
+                add_device_name: "Nama Perangkat",
+                add_device_name_ph: "mis., Kipas Dinding",
+                add_device_type: "Tipe Perangkat",
+                cancel_btn: "Batal",
+                save_btn: "Simpan",
+                assistant_title: "Asisten Pintar",
+                assistant_online: "Aktif",
+                assistant_hello: "Halo! Saya Asisten Rumah Pintar Anda.",
+                assistant_try: "Coba ketik",
+                assistant_or: "atau",
+                assistant_ph: "Ketik perintah..."
+            }
+        };
+
+        let currentLang = localStorage.getItem('app_lang') || 'id';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('app_lang', lang);
+
+            // Update UI toggle buttons
+            const btnEn = document.getElementById('lang-btn-en');
+            const btnId = document.getElementById('lang-btn-id');
+            if (btnEn && btnId) {
+                if (lang === 'en') {
+                    btnEn.className = "px-3 py-1 text-xs font-bold rounded-full transition-colors bg-white text-brand-blue shadow-sm";
+                    btnId.className = "px-3 py-1 text-xs font-bold rounded-full transition-colors text-gray-500 hover:text-gray-800";
+                } else {
+                    btnId.className = "px-3 py-1 text-xs font-bold rounded-full transition-colors bg-white text-brand-blue shadow-sm";
+                    btnEn.className = "px-3 py-1 text-xs font-bold rounded-full transition-colors text-gray-500 hover:text-gray-800";
+                }
+            }
+
+            // Apply translations to data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Apply translations to data-i18n-placeholder elements
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    el.setAttribute('placeholder', translations[lang][key]);
+                }
+            });
+
+            // Re-render rooms if we're inside the app (because room types might be translated, though we can skip this for now or rely on reload)
+        }
+
+        function setLanguageFromSettings(lang) {
+            currentLang = lang;
+            localStorage.setItem('app_lang', lang);
+
+            // Update settings page language buttons
+            const settingsEnBtn = document.getElementById('settings-lang-en');
+            const settingsIdBtn = document.getElementById('settings-lang-id');
+            if (settingsEnBtn && settingsIdBtn) {
+                if (lang === 'en') {
+                    settingsEnBtn.className = "px-3 py-1 text-xs font-bold rounded transition-colors bg-white text-brand-blue shadow-sm";
+                    settingsIdBtn.className = "px-3 py-1 text-xs font-bold rounded transition-colors text-gray-500 hover:text-gray-800";
+                } else {
+                    settingsIdBtn.className = "px-3 py-1 text-xs font-bold rounded transition-colors bg-white text-brand-blue shadow-sm";
+                    settingsEnBtn.className = "px-3 py-1 text-xs font-bold rounded transition-colors text-gray-500 hover:text-gray-800";
+                }
+            }
+
+            // Update login page language buttons
+            const loginEnBtn = document.getElementById('lang-btn-en');
+            const loginIdBtn = document.getElementById('lang-btn-id');
+            if (loginEnBtn && loginIdBtn) {
+                if (lang === 'en') {
+                    loginEnBtn.className = "px-3 py-1 text-xs font-bold rounded-full transition-colors bg-white text-brand-blue shadow-sm";
+                    loginIdBtn.className = "px-3 py-1 text-xs font-bold rounded-full transition-colors text-gray-500 hover:text-gray-800";
+                } else {
+                    loginIdBtn.className = "px-3 py-1 text-xs font-bold rounded-full transition-colors bg-white text-brand-blue shadow-sm";
+                    loginEnBtn.className = "px-3 py-1 text-xs font-bold rounded-full transition-colors text-gray-500 hover:text-gray-800";
+                }
+            }
+
+            // Apply translations to data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Apply translations to data-i18n-placeholder elements
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    el.setAttribute('placeholder', translations[lang][key]);
+                }
+            });
+        }
+
+        // ── State ──────────────────────────────────────────────
+        let state = {
+            activePage: 'splash',
+            loginTab: 'house',
+            currentHomeName: 'SmartHome',
+            currentLocation: 'Tembalang, Semarang',
+            rooms: [],
+            currentRoomId: null,
+            currentRoomUUID: null,
+            currentRoomDevices: []
+        };
+
+        // ── API Helper ─────────────────────────────────────────
+        async function api(method, path, body = null, retry = true) {
+            const opts = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (authToken) opts.headers['Authorization'] = 'Bearer ' + authToken;
+            if (body) opts.body = JSON.stringify(body);
+
+            let res = await fetch(API_BASE + path, opts);
+
+            // Auto-refresh token on 401
+            if (res.status === 401 && retry && refreshToken) {
+                const refreshed = await refreshAuthToken();
+                if (refreshed) return api(method, path, body, false);
+            }
+            return res;
+        }
+
+        async function apiForm(path, formData) {
+            const opts = {
+                method: 'POST',
+                body: formData
+            };
+            return fetch(API_BASE + path, opts);
+        }
+
+        async function refreshAuthToken() {
+            try {
+                const res = await fetch(API_BASE + '/auth/refresh', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refresh_token: refreshToken })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    authToken = data.access_token;
+                    refreshToken = data.refresh_token;
+                    localStorage.setItem('auth_token', authToken);
+                    localStorage.setItem('refresh_token', refreshToken);
+                    return true;
+                }
+            } catch (e) { }
+            logout();
+            return false;
+        }
+
+        // ── Toast Notification ─────────────────────────────────
+        function showToast(msg, type = 'info') {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-brand-blue'
+            };
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-[200] ${colors[type] || colors.info} text-white px-5 py-3 rounded-2xl shadow-lg text-sm font-medium transition-all transform translate-x-0 opacity-100`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100px)'; }, 2500);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ── Banner Carousel ────────────────────────────────────
+        let carouselCurrentIndex = 0;
+        const carouselTotalSlides = 2;
+        let carouselTouchStartX = 0;
+        let carouselTouchEndX = 0;
+
+        function carouselUpdateDots() {
+            for (let i = 0; i < carouselTotalSlides; i++) {
+                const dot = document.getElementById(`carousel-dot-${i}`);
+                if (dot) {
+                    if (i === carouselCurrentIndex) {
+                        dot.className = "w-2.5 h-2.5 rounded-full bg-brand-blue transition-all cursor-pointer";
+                    } else {
+                        dot.className = "w-2.5 h-2.5 rounded-full bg-gray-300 transition-all cursor-pointer hover:bg-gray-400";
+                    }
+                }
+            }
+        }
+
+        function carouselUpdateSlide() {
+            const slidesContainer = document.getElementById('carousel-slides');
+            if (slidesContainer) {
+                slidesContainer.style.transform = `translateX(-${carouselCurrentIndex * 100}%)`;
+            }
+            carouselUpdateDots();
+        }
+
+        function carouselNext() {
+            carouselCurrentIndex = (carouselCurrentIndex + 1) % carouselTotalSlides;
+            carouselUpdateSlide();
+        }
+
+        function carouselPrev() {
+            carouselCurrentIndex = (carouselCurrentIndex - 1 + carouselTotalSlides) % carouselTotalSlides;
+            carouselUpdateSlide();
+        }
+
+        function carouselGoTo(index) {
+            if (index >= 0 && index < carouselTotalSlides) {
+                carouselCurrentIndex = index;
+                carouselUpdateSlide();
+            }
+        }
+
+        function initCarouselSwipe() {
+            const carousel = document.getElementById('banner-carousel');
+            if (carousel) {
+                carousel.addEventListener('touchstart', (e) => {
+                    carouselTouchStartX = e.changedTouches[0].screenX;
+                });
+                carousel.addEventListener('touchend', (e) => {
+                    carouselTouchEndX = e.changedTouches[0].screenX;
+                    if (carouselTouchStartX - carouselTouchEndX > 50) {
+                        carouselNext();
+                    } else if (carouselTouchEndX - carouselTouchStartX > 50) {
+                        carouselPrev();
+                    }
+                });
+            }
+        }
+
+        // ── WebSocket Connection ───────────────────────────────
+        function connectWebSocket() {
+            if (ws && ws.readyState <= 1) return;
+            if (!authToken) return;
+            const isLocalWs = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+            const wsHost = isLocalWs ? 'localhost:8000' : new URL(RAILWAY_BACKEND_URL).host;
+            const protocol = RAILWAY_BACKEND_URL.startsWith('https') && !isLocalWs ? 'wss:' : (location.protocol === 'https:' ? 'wss:' : 'ws:');
+            const wsUrl = `${protocol}//${wsHost}/api/v1/ws?token=${authToken}`;
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                const statusEl = document.querySelector('#assistant-panel .text-green-500');
+                if (statusEl) statusEl.textContent = 'Online';
+            };
+            ws.onmessage = (evt) => {
+                try {
+                    const data = JSON.parse(evt.data);
+                    handleWsEvent(data);
+                } catch (e) { }
+            };
+            ws.onclose = () => {
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function handleWsEvent(data) {
+            const type = data.type || data.event;
+            if (type === 'device_status_update') {
+                // Refresh current room if viewing it
+                if (state.activePage === 'room' && state.currentRoomUUID) {
+                    loadRoomDevices(state.currentRoomUUID);
+                }
+                loadRooms();
+            } else if (type === 'telemetry_update') {
+                if (state.activePage === 'room' && state.currentRoomUUID) {
+                    loadRoomDevices(state.currentRoomUUID);
+                }
+            }
+        }
+
+        // ── DOMContentLoaded ───────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set current date displays
+            const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            document.querySelectorAll('.current-date-display').forEach(el => el.textContent = dateStr);
+
+            // Apply saved language
+            setLanguage(currentLang);
+
+            if (authToken) {
+                loadUserAndGo();
+            } else {
+                navigate('login');  // Skip splash, go straight to login
+            }
+        });
+
+        async function loadUserAndGo() {
+            try {
+                const res = await api('GET', '/auth/me');
+                if (res.ok) {
+                    currentUser = await res.json();
+                    state.currentHomeName = currentUser.full_name || currentUser.email.split('@')[0];
+                    updateProfileUI();
+                    navigate('home');
+                    await loadRooms();
+                    connectWebSocket();
+                    loadSystemStatus();
+                } else {
+                    navigate('login');  // Skip splash on auth failure
+                }
+            } catch (e) {
+                navigate('login');  // Skip splash on error
+            }
+        }
+
+        function updateProfileUI() {
+            const name = state.currentHomeName;
+            const settingsHomeEl = document.getElementById('settings-home-name');
+            if (settingsHomeEl) settingsHomeEl.textContent = name;
+            const settingsLocEl = document.getElementById('settings-location');
+            if (settingsLocEl) settingsLocEl.textContent = state.currentLocation;
+
+            // Populate profile details in menu
+            if (currentUser) {
+                const pdName = document.getElementById('profile-detail-name');
+                if (pdName) pdName.textContent = currentUser.full_name || name;
+
+                const pdEmail = document.getElementById('profile-detail-email');
+                if (pdEmail) pdEmail.textContent = currentUser.email || '-';
+            }
+            const pdLoc = document.getElementById('profile-detail-location');
+            if (pdLoc) pdLoc.textContent = state.currentLocation || 'Jakarta Selatan';
+            // Update avatar
+            document.querySelectorAll('img[alt="Profile"]').forEach(img => {
+                img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=fff&color=2563EB`;
+            });
+
+            // Update language button states in settings
+            const settingsEnBtn = document.getElementById('settings-lang-en');
+            const settingsIdBtn = document.getElementById('settings-lang-id');
+            if (settingsEnBtn && settingsIdBtn) {
+                if (currentLang === 'en') {
+                    settingsEnBtn.className = "px-3 py-1 text-xs font-bold rounded transition-colors bg-white text-brand-blue shadow-sm";
+                    settingsIdBtn.className = "px-3 py-1 text-xs font-bold rounded transition-colors text-gray-500 hover:text-gray-800";
+                } else {
+                    settingsIdBtn.className = "px-3 py-1 text-xs font-bold rounded transition-colors bg-white text-brand-blue shadow-sm";
+                    settingsEnBtn.className = "px-3 py-1 text-xs font-bold rounded transition-colors text-gray-500 hover:text-gray-800";
+                }
+            }
+        }
+
+        async function loadSystemStatus() {
+            try {
+                const res = await api('GET', '/system/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.avg_temperature) {
+                        // Update weather widget with actual sensor data
+                    }
+                }
+            } catch (e) { }
+        }
+
+        // ── Navigation ─────────────────────────────────────────
+        function navigate(pageId) {
+            state.activePage = pageId;
+            document.querySelectorAll('.page').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('page-transition');
+            });
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) {
+                target.classList.remove('hidden');
+                void target.offsetWidth;
+                target.classList.add('page-transition');
+            }
+            const nav = document.getElementById('main-nav');
+            const fab = document.getElementById('assistant-fab');
+            const panel = document.getElementById('assistant-panel');
+
+            if (['splash', 'login', 'register'].includes(pageId)) {
+                nav.classList.add('hidden');
+                nav.classList.remove('md:flex');
+                if (fab) fab.classList.add('hidden');
+                if (panel && !panel.classList.contains('translate-x-full')) {
+                    panel.classList.add('translate-x-full');
+                }
+            } else {
+                nav.classList.remove('hidden');
+                nav.classList.add('md:flex');
+                if (fab) fab.classList.remove('hidden');
+                updateNavStyles(pageId);
+                if (pageId === 'home') {
+                    setTimeout(initCarouselSwipe, 100);
+                }
+                if (pageId === 'schedule') {
+                    loadSchedules();
+                }
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function updateNavStyles(activePage) {
+            ['home', 'schedule', 'settings'].forEach(p => {
+                const btn = document.getElementById(`nav-${p}`);
+                if (!btn) return;
+                if (p === activePage || (activePage === 'room' && p === 'home')) {
+                    btn.className = 'nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-brand-blue bg-blue-50 transition-all';
+                } else {
+                    btn.className = 'nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-gray-500 hover:text-brand-blue transition-all';
+                }
+            });
+        }
+
+        // ── Login Tab Switch ───────────────────────────────────
+        function switchLoginTab(tab) {
+            state.loginTab = tab;
+            const btnHouse = document.getElementById('tab-house');
+            const btnQr = document.getElementById('tab-qr');
+            const formHouse = document.getElementById('form-house');
+            const formQr = document.getElementById('form-qr');
+            const inactiveClass = 'flex-1 py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-800 transition-all bg-transparent shadow-none';
+            const activeClass = 'flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm text-brand-blue transition-all';
+            if (tab === 'house') {
+                btnHouse.className = activeClass; btnQr.className = inactiveClass;
+                formHouse.classList.remove('hidden'); formQr.classList.add('hidden');
+            } else {
+                btnQr.className = activeClass; btnHouse.className = inactiveClass;
+                formQr.classList.remove('hidden'); formHouse.classList.add('hidden');
+            }
+        }
+
+        // ── Login (Backend Auth) ───────────────────────────────
+        async function login() {
+            const emailInput = document.getElementById('login-house-id');
+            const passInput = document.querySelector('#form-house input[type="password"]');
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passInput ? passInput.value.trim() : '';
+
+            if (!email || !password) {
+                showToast('Please enter email and password', 'error');
+                return;
+            }
+
+            // Backend uses OAuth2PasswordRequestForm (form-urlencoded)
+            const formData = new URLSearchParams();
+            formData.append('username', email);
+            formData.append('password', password);
+
+            try {
+                const res = await fetch(API_BASE + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    authToken = data.access_token;
+                    refreshToken = data.refresh_token;
+                    localStorage.setItem('auth_token', authToken);
+                    localStorage.setItem('refresh_token', refreshToken);
+                    showToast('Login successful!', 'success');
+                    if (emailInput) emailInput.value = '';
+                    if (passInput) passInput.value = '';
+                    await loadUserAndGo();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.detail || 'Invalid email or password', 'error');
+                }
+            } catch (e) {
+                showToast('Cannot connect to server', 'error');
+            }
+        }
+
+        // ── Register (Backend Auth) ────────────────────────────
+        async function registerNewHome() {
+            const nameInput = document.getElementById('reg-home-name').value.trim();
+            const emailInput = document.getElementById('reg-house-id').value.trim();
+            const locInput = document.getElementById('reg-location').value.trim();
+            const passInput = document.getElementById('reg-password').value.trim();
+
+            if (!emailInput || !passInput) {
+                showToast('Email and password are required', 'error');
+                return;
+            }
+            if (passInput.length < 8) {
+                showToast('Password must be at least 8 characters', 'error');
+                return;
+            }
+
+            try {
+                const res = await api('POST', '/auth/register', {
+                    email: emailInput,
+                    password: passInput,
+                    full_name: nameInput || null
+                });
+                if (res.ok || res.status === 201) {
+                    showToast('Account created! Logging in...', 'success');
+                    if (locInput) state.currentLocation = locInput;
+                    // Auto-login after register
+                    const formData = new URLSearchParams();
+                    formData.append('username', emailInput);
+                    formData.append('password', passInput);
+                    const loginRes = await fetch(API_BASE + '/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+                    if (loginRes.ok) {
+                        const data = await loginRes.json();
+                        authToken = data.access_token;
+                        refreshToken = data.refresh_token;
+                        localStorage.setItem('auth_token', authToken);
+                        localStorage.setItem('refresh_token', refreshToken);
+                        await loadUserAndGo();
+                    }
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.detail || 'Registration failed', 'error');
+                }
+            } catch (e) {
+                showToast('Cannot connect to server', 'error');
+            }
+        }
+
+        // ── Room type -> icon/color mapping ────────────────────
+        const roomMeta = {
+            living_room: { icon: 'fa-couch', color: 'bg-orange-100 text-orange-500' },
+            bedroom: { icon: 'fa-bed', color: 'bg-blue-100 text-blue-500' },
+            kitchen: { icon: 'fa-utensils', color: 'bg-red-100 text-red-500' },
+            bathroom: { icon: 'fa-bath', color: 'bg-teal-100 text-teal-500' },
+            garage: { icon: 'fa-car', color: 'bg-gray-200 text-gray-600' },
+            studio: { icon: 'fa-microphone', color: 'bg-purple-100 text-purple-500' },
+            kamar: { icon: 'fa-bed', color: 'bg-purple-100 text-purple-500' },
+            dapur: { icon: 'fa-utensils', color: 'bg-red-100 text-red-500' },
+            'ruang-tamu': { icon: 'fa-couch', color: 'bg-orange-100 text-orange-500' },
+            'ruang-rapat': { icon: 'fa-briefcase', color: 'bg-indigo-100 text-indigo-500' },
+            office: { icon: 'fa-briefcase', color: 'bg-slate-100 text-slate-600' },
+            dining: { icon: 'fa-utensils', color: 'bg-yellow-100 text-yellow-600' },
+            basement: { icon: 'fa-vault', color: 'bg-gray-600 text-gray-100' },
+        };
+
+        function getRoomMeta(room) {
+            const slug = (room.slug || room.room_type || '').toLowerCase();
+            for (const [key, val] of Object.entries(roomMeta)) {
+                if (slug.includes(key)) return val;
+            }
+            if (room.icon) return { icon: room.icon.replace('mdi:', 'fa-'), color: 'bg-gray-100 text-gray-500' };
+            return { icon: 'fa-door-closed', color: 'bg-gray-100 text-gray-500' };
+        }
+
+        const deviceIcons = {
+            light: 'fa-lightbulb', ac: 'fa-snowflake', tv: 'fa-tv', fan: 'fa-fan',
+            plug: 'fa-plug', camera: 'fa-video', cooker: 'fa-bowl-rice', door: 'fa-warehouse',
+            sensor: 'fa-temperature-half', lock: 'fa-lock', speaker: 'fa-volume-up'
+        };
+
+        function getDeviceIcon(type) {
+            return deviceIcons[(type || '').toLowerCase()] || 'fa-microchip';
+        }
+
+        // ── Load Rooms from Backend ────────────────────────────
+        async function loadRooms() {
+            try {
+                const res = await api('GET', '/rooms?page_size=50');
+                if (!res.ok) return;
+                const data = await res.json();
+                state.rooms = data.items || [];
+                renderDashboardRooms();
+            } catch (e) { }
+        }
+
+        function renderDashboardRooms(searchQuery = '') {
+            const container = document.getElementById('rooms-grid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let filtered = state.rooms;
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(r => r.name.toLowerCase().includes(q));
+            }
+
+            if (filtered.length === 0 && searchQuery) {
+                container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-8">No rooms found matching "${searchQuery}"</div>`;
+            }
+
+            filtered.forEach(room => {
+                const meta = getRoomMeta(room);
+                const activeCount = room.active_devices_count ?? 0;
+                const totalCount = room.devices?.length ?? 0;
+                const isActive = activeCount > 0;
+                const cardClass = isActive
+                    ? 'bg-[#EBFBF0] text-gray-900 border-[#B7F0C8] shadow-sm hover:border-[#86E7A4]'
+                    : 'bg-white text-gray-800 border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200';
+                const statusClass = isActive
+                    ? 'text-[#22C55E] font-semibold'
+                    : 'text-gray-400 font-medium';
+
+                // Device preview list (max 3 devices)
+                const devicePreview = (room.devices || []).slice(0, 3).map(d => {
+                    const icon = getDeviceIcon(d.device_type);
+                    const stateColor = d.state === 'on' ? 'text-green-500' : 'text-gray-400';
+                    return `<span class="${stateColor}" title="${d.name}"><i class="fas ${icon} text-xs"></i></span>`;
+                }).join(' ');
+
+                const cardHTML = `
+                    <div class="rounded-3xl p-5 border cursor-pointer transition-all duration-300 ${cardClass} relative overflow-hidden group">
+                        <div onclick="openRoom('${room.id}')" class="w-full">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${meta.color}">
+                                <i class="fas ${meta.icon} text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-lg leading-tight mb-1 transition-colors group-hover:text-brand-blue">${room.name}</h3>
+                            <p class="text-sm ${statusClass} mb-2">${activeCount}/${totalCount} active</p>
+                            ${devicePreview ? `<div class="flex gap-2 mb-2">${devicePreview}</div>` : ''}
+                        </div>
+                        <button onclick="event.stopPropagation(); openAddDeviceForRoom('${room.id}')" class="mt-2 w-full py-2 text-xs font-semibold rounded-lg border-2 border-dashed border-gray-300 text-gray-500 hover:border-brand-blue hover:text-brand-blue transition-all">
+                            <i class="fas fa-plus"></i> Add Device
+                        </button>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+
+            if (!searchQuery) {
+                container.innerHTML += `
+                    <div onclick="openModal('modal-add-room')" class="bg-white/70 backdrop-blur-sm rounded-3xl p-5 border-2 border-dashed border-gray-300 cursor-pointer flex flex-col items-center justify-center text-gray-500 hover:bg-gray-100 hover:border-brand-blue hover:text-brand-blue transition-all duration-300 min-h-[160px] group">
+                        <div class="w-12 h-12 rounded-2xl bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center mb-3 transition-colors">
+                            <i class="fas fa-plus text-xl group-hover:text-brand-blue transition-colors"></i>
+                        </div>
+                        <span class="font-semibold text-sm">Add Room</span>
+                    </div>`;
+            }
+        }
+
+        function handleSearch() {
+            renderDashboardRooms(document.getElementById('dashboard-search').value.trim());
+        }
+
+        // ── Open Room (load devices from backend) ──────────────
+        async function openRoom(roomId) {
+            state.currentRoomUUID = roomId;
+            openModal('modal-room-detail');
+            await loadRoomDevices(roomId);
+        }
+
+        async function loadRoomDevices(roomId) {
+            try {
+                const res = await api('GET', `/rooms/${roomId}`);
+                if (!res.ok) { showToast('Failed to load room', 'error'); return; }
+                const room = await res.json();
+                state.currentRoomDevices = room.devices || [];
+
+                document.getElementById('room-title').textContent = room.name;
+                const total = state.currentRoomDevices.length;
+                const active = state.currentRoomDevices.filter(d => d.state === 'on').length;
+                document.getElementById('room-stats').innerHTML = `<span class="${active > 0 ? 'text-brand-blue font-bold' : ''}">${active}/${total} Active</span> &bull; ${total} connected devices`;
+
+                // Scene card - generate based on room type
+                const sceneCard = document.getElementById('room-scene-card');
+                const meta = getRoomMeta(room);
+                document.getElementById('scene-icon').className = `fas ${meta.icon} text-2xl text-white`;
+                document.getElementById('scene-title').textContent = room.name;
+                document.getElementById('scene-desc').textContent = `${active} of ${total} devices active`;
+                sceneCard.classList.remove('hidden');
+
+                // Show avg temperature if available
+                const tempDevice = state.currentRoomDevices.find(d => d.temperature != null);
+                const existingBadge = sceneCard.querySelector('.temp-badge');
+                if (existingBadge) existingBadge.remove();
+                if (tempDevice && tempDevice.temperature) {
+                    const badge = document.createElement('div');
+                    badge.className = 'absolute top-6 right-6 text-2xl font-bold opacity-80 temp-badge';
+                    badge.textContent = tempDevice.temperature.toFixed(1) + '°C';
+                    sceneCard.appendChild(badge);
+                }
+
+                renderDevices();
+            } catch (e) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        function renderDevices() {
+            const container = document.getElementById('devices-list');
+            container.innerHTML = '';
+
+            state.currentRoomDevices.forEach(device => {
+                const isOn = device.state === 'on';
+                const icon = getDeviceIcon(device.device_type);
+                const checkboxStyle = isOn ? 'right-0 border-brand-blue' : 'right-6 border-gray-300';
+                const labelStyle = isOn ? 'bg-brand-blue' : 'bg-gray-300';
+
+                const extraInfo = [];
+                if (device.temperature != null) extraInfo.push(`${device.temperature.toFixed(1)}°C`);
+                if (device.humidity != null) extraInfo.push(`${device.humidity.toFixed(0)}%`);
+                if (device.brightness != null) extraInfo.push(`Brightness: ${device.brightness}%`);
+                const extraStr = extraInfo.length ? ` &bull; ${extraInfo.join(' &bull; ')}` : '';
+
+                // Device controls based on type
+                let deviceControls = '';
+                if (device.device_type.toLowerCase() === 'ac' && isOn) {
+                    const targetTemp = device.target_temperature || 24;
+                    const acMode = device.ac_mode || 'cool';
+                    const fanSpeed = device.fan_speed || 3;
+                    deviceControls = `
+                        <div class="mt-3 pt-3 border-t border-gray-100 space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Target Temp:</span>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="event.stopPropagation(); adjustTemp('${device.device_id}', -1, ${targetTemp})" class="w-6 h-6 rounded bg-gray-100 hover:bg-brand-blue hover:text-white transition-colors">-</button>
+                                    <span class="font-bold text-brand-blue w-8 text-center">${targetTemp}°C</span>
+                                    <button onclick="event.stopPropagation(); adjustTemp('${device.device_id}', 1, ${targetTemp})" class="w-6 h-6 rounded bg-gray-100 hover:bg-brand-blue hover:text-white transition-colors">+</button>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Mode:</span>
+                                <select onchange="setACMode('${device.device_id}', this.value)" class="text-xs px-2 py-1 rounded border border-gray-200" onclick="event.stopPropagation()">
+                                    <option value="cool" ${acMode === 'cool' ? 'selected' : ''}>Cool</option>
+                                    <option value="heat" ${acMode === 'heat' ? 'selected' : ''}>Heat</option>
+                                    <option value="fan" ${acMode === 'fan' ? 'selected' : ''}>Fan</option>
+                                    <option value="dry" ${acMode === 'dry' ? 'selected' : ''}>Dry</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Fan Speed:</span>
+                                <input type="range" min="1" max="5" value="${fanSpeed}" onchange="setFanSpeed('${device.device_id}', this.value)" onclick="event.stopPropagation()" class="w-20" />
+                                <span class="font-bold">${fanSpeed}</span>
+                            </div>
+                        </div>
+                    `;
+                } else if (device.device_type.toLowerCase() === 'light' && isOn) {
+                    const brightness = device.brightness || 100;
+                    deviceControls = `
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Brightness:</span>
+                                <input type="range" min="0" max="100" value="${brightness}" onchange="setBrightness('${device.device_id}', this.value)" onclick="event.stopPropagation()" class="w-32" />
+                                <span class="font-bold">${brightness}%</span>
+                            </div>
+                        </div>
+                    `;
+                } else if (device.device_type.toLowerCase() === 'fan' && isOn) {
+                    const fanSpeed = device.fan_speed || 3;
+                    deviceControls = `
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Speed:</span>
+                                <input type="range" min="1" max="5" value="${fanSpeed}" onchange="setFanSpeed('${device.device_id}', this.value)" onclick="event.stopPropagation()" class="w-32" />
+                                <span class="font-bold">${fanSpeed}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md" data-device-id="${device.device_id}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center ${isOn ? 'bg-blue-100 text-brand-blue' : 'bg-gray-100 text-gray-500'} transition-colors">
+                                    <i class="fas ${icon} text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">${device.name}</h4>
+                                    <p class="text-xs font-medium ${isOn ? 'text-brand-blue' : 'text-gray-400'} uppercase tracking-wider mt-1">${device.device_type} ${isOn ? 'Active' : 'Standby'}${extraStr}</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in cursor-pointer" onclick="toggleDevice(event, '${device.device_id}', ${isOn})">
+                                    <div class="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none transition-all duration-300 z-10 top-0 ${checkboxStyle}"></div>
+                                    <div class="block overflow-hidden h-6 rounded-full transition-colors duration-300 ${labelStyle}"></div>
+                                </div>
+                                <span class="text-xs font-bold text-gray-400 uppercase">${isOn ? 'on' : 'off'}</span>
+                            </div>
+                        </div>
+                        ${deviceControls}
+                    </div>`;
+            });
+
+            container.innerHTML += `
+                <div onclick="openModal('modal-add-device')" class="rounded-3xl p-5 border-2 border-dashed border-gray-300 cursor-pointer flex flex-col items-center justify-center text-gray-500 hover:bg-gray-100 hover:border-brand-blue hover:text-brand-blue transition-all duration-300 min-h-[100px] group">
+                    <div class="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center mb-2 transition-colors">
+                        <i class="fas fa-plus text-lg group-hover:text-brand-blue transition-colors"></i>
+                    </div>
+                    <span class="font-semibold text-sm">Add Device</span>
+                </div>`;
+        }
+
+        // ── Toggle Device (Backend Command) ────────────────────
+        // 🔵 Toggle Device (Backend Command) 🔵
+        async function toggleDevice(event, deviceId, currentlyOn) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const action = currentlyOn ? 'turn_off' : 'turn_on';
+            // Optimistic UI update
+            const card = document.querySelector(`[data-device-id="${deviceId}"]`);
+            if (card) card.style.opacity = '0.6';
+
+            try {
+                const res = await api('POST', `/commands/${deviceId}`, { action });
+                if (res.ok) {
+                    showToast(`${deviceId} ${action === 'turn_on' ? 'turned on' : 'turned off'}`, 'success');
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.detail || 'Command failed', 'error');
+                }
+            } catch (e) {
+                showToast('Connection error', 'error');
+            }
+
+            // Reload room data
+            if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
+            loadRooms();
+        }
+
+        // Device control functions
+        async function adjustTemp(deviceId, delta, currentTemp) {
+            const newTemp = Math.max(16, Math.min(30, currentTemp + delta));
+            try {
+                await api('POST', `/commands/${deviceId}`, { 
+                    action: 'turn_on', 
+                    target_temperature: newTemp 
+                });
+                if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
+            } catch (e) {
+                showToast('Failed to adjust temperature', 'error');
+            }
+        }
+
+        async function setACMode(deviceId, mode) {
+            try {
+                await api('POST', `/commands/${deviceId}`, { 
+                    action: 'turn_on', 
+                    ac_mode: mode 
+                });
+                if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
+            } catch (e) {
+                showToast('Failed to change AC mode', 'error');
+            }
+        }
+
+        async function setFanSpeed(deviceId, speed) {
+            try {
+                await api('POST', `/commands/${deviceId}`, { 
+                    action: 'turn_on', 
+                    fan_speed: parseInt(speed) 
+                });
+                if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
+            } catch (e) {
+                showToast('Failed to adjust fan speed', 'error');
+            }
+        }
+
+        async function setBrightness(deviceId, brightness) {
+            try {
+                await api('POST', `/commands/${deviceId}`, { 
+                    action: 'turn_on', 
+                    value: parseInt(brightness) 
+                });
+                if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
+            } catch (e) {
+                showToast('Failed to adjust brightness', 'error');
+            }
+        }
+
+        // ── Modals ─────────────────────────────────────────────
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.add('hidden'); modal.classList.remove('flex');
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+            }
+        }
+
+        // Open add device modal with room pre-selected
+        function openAddDeviceForRoom(roomId) {
+            state.currentRoomUUID = roomId;
+            openModal('modal-add-device');
+        }
+
+        // ── Add Room (Backend) ─────────────────────────────────
+        async function submitAddRoom(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-room-name').value.trim();
+            const type = document.getElementById('new-room-type').value;
+            if (!name) return;
+
+            const typeMap = { living: 'living_room', bed: 'bedroom', kitchen: 'kitchen', bath: 'bathroom', garage: 'garage' };
+            const roomType = typeMap[type] || type;
+            const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+            try {
+                const res = await api('POST', '/rooms', {
+                    name, slug, room_type: roomType,
+                    icon: null, description: null
+                });
+                if (res.ok || res.status === 201) {
+                    showToast('Room created!', 'success');
+                    closeModal('modal-add-room');
+                    await loadRooms();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.detail || 'Failed to create room', 'error');
+                }
+            } catch (e) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        // ── Add Routine ──────────────
+        async function openAddRoutineModal() {
+            const roomSelect = document.getElementById('new-routine-room');
+            roomSelect.innerHTML = '';
+
+            if (state.rooms && state.rooms.length > 0) {
+                state.rooms.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r.id;
+                    opt.textContent = r.name;
+                    roomSelect.appendChild(opt);
+                });
+                await updateRoutineDevices(state.rooms[0].id);
+            } else {
+                roomSelect.innerHTML = '<option value="">Tidak ada kamar</option>';
+                document.getElementById('new-routine-device').innerHTML = '<p class="text-sm text-gray-500 p-2">Tidak ada perangkat</p>';
+            }
+
+            openModal('modal-add-routine');
+            // Add slide and fade animation
+            setTimeout(() => {
+                const content = document.getElementById('modal-add-routine-content');
+                if (content) {
+                    content.classList.remove('translate-y-8', 'opacity-0');
+                    content.classList.add('translate-y-0', 'opacity-100');
+                }
+            }, 10);
+        }
+
+        async function updateRoutineDevices(roomId) {
+            const container = document.getElementById('new-routine-device');
+            container.innerHTML = '<div class="text-sm text-gray-500 p-2">Memuat perangkat...</div>';
+
+            try {
+                const res = await api('GET', `/rooms/${roomId}`);
+                if (!res.ok) throw new Error('Failed');
+                const room = await res.json();
+                const devices = room.devices || [];
+
+                if (devices.length === 0) {
+                    container.innerHTML = '<p class="text-sm text-gray-500 p-2">Kamar ini belum memiliki perangkat.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                devices.forEach(d => {
+                    // Turn On option
+                    container.insertAdjacentHTML('beforeend', `
+                        <label class="group relative flex items-center justify-between p-4 bg-white border border-gray-100 shadow-sm rounded-2xl cursor-pointer hover:shadow-md hover:border-brand-blue/30 transition-all">
+                            <input type="checkbox" name="routine-devices" value="Nyalakan ${d.name}" class="peer sr-only">
+                            <div class="absolute inset-0 bg-brand-blue/5 opacity-0 peer-checked:opacity-100 rounded-2xl transition-all"></div>
+                            <div class="absolute inset-0 border-2 border-transparent peer-checked:border-brand-blue rounded-2xl transition-all"></div>
+                            <span class="relative z-10 font-bold text-gray-700 peer-checked:text-brand-blue transition-colors">Nyalakan ${d.name}</span>
+                            <div class="relative z-10 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center peer-checked:border-brand-blue peer-checked:bg-brand-blue transition-all">
+                                <i class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100 scale-50 peer-checked:scale-100 transition-all"></i>
+                            </div>
+                        </label>
+                    `);
+                    // Turn Off option
+                    container.insertAdjacentHTML('beforeend', `
+                        <label class="group relative flex items-center justify-between p-4 bg-white border border-gray-100 shadow-sm rounded-2xl cursor-pointer hover:shadow-md hover:border-brand-blue/30 transition-all">
+                            <input type="checkbox" name="routine-devices" value="Matikan ${d.name}" class="peer sr-only">
+                            <div class="absolute inset-0 bg-brand-blue/5 opacity-0 peer-checked:opacity-100 rounded-2xl transition-all"></div>
+                            <div class="absolute inset-0 border-2 border-transparent peer-checked:border-brand-blue rounded-2xl transition-all"></div>
+                            <span class="relative z-10 font-bold text-gray-700 peer-checked:text-brand-blue transition-colors">Matikan ${d.name}</span>
+                            <div class="relative z-10 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center peer-checked:border-brand-blue peer-checked:bg-brand-blue transition-all">
+                                <i class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100 scale-50 peer-checked:scale-100 transition-all"></i>
+                            </div>
+                        </label>
+                    `);
+                });
+            } catch (e) {
+                container.innerHTML = '<p class="text-sm text-red-500 p-2">Gagal memuat perangkat.</p>';
+            }
+        }
+
+        // ── Load Schedules from Backend ────────────────────────
+        async function loadSchedules() {
+            try {
+                const res = await api('GET', '/schedules');
+                if (res.ok) {
+                    const schedules = await res.json();
+                    renderSchedules(schedules);
+                }
+            } catch (e) {
+                console.error('Failed to load schedules', e);
+            }
+        }
+
+        function renderSchedules(schedules) {
+            const container = document.getElementById('routines-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            schedules.forEach(schedule => {
+                const time = schedule.start_time;
+                const endTime = schedule.end_time ? ` - ${schedule.end_time}` : '';
+                const action = schedule.action === 'turn_on' ? 'Nyalakan' : 'Matikan';
+                
+                const routineHTML = `
+                    <div class="routine-card bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+                        onclick="openScheduleDetail('${schedule.id}')">
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 font-bold text-xl text-gray-800">${time}${endTime}</div>
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800">${schedule.name}</h3>
+                                <p class="text-sm text-gray-500 line-clamp-1">${schedule.room_name}: ${action} ${schedule.device_name}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
+                                onclick="event.stopPropagation(); toggleSchedule('${schedule.id}', ${schedule.is_active})">
+                                <input type="checkbox" ${schedule.is_active ? 'checked' : ''}
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                <label
+                                    class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
+                            </div>
+                            <button onclick="event.stopPropagation(); deleteSchedule('${schedule.id}')" class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Hapus">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += routineHTML;
+            });
+        }
+
+        async function toggleSchedule(scheduleId, currentlyActive) {
+            try {
+                await api('PATCH', `/schedules/${scheduleId}`, { is_active: !currentlyActive });
+                loadSchedules();
+            } catch (e) {
+                showToast('Failed to toggle schedule', 'error');
+            }
+        }
+
+        async function deleteSchedule(scheduleId) {
+            if (!confirm('Delete this schedule?')) return;
+            try {
+                await api('DELETE', `/schedules/${scheduleId}`);
+                showToast('Schedule deleted', 'success');
+                loadSchedules();
+            } catch (e) {
+                showToast('Failed to delete schedule', 'error');
+            }
+        }
+
+        function openScheduleDetail(scheduleId) {
+            // TODO: Open modal with schedule details
+            showToast('Schedule detail modal coming soon', 'info');
+        }
+
+        function submitAddRoutine(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-routine-name').value.trim();
+            const roomId = document.getElementById('new-routine-room').value;
+            const startTime = document.getElementById('new-routine-time').value;
+            const endTime = document.getElementById('new-routine-end-time')?.value || null;
+
+            const deviceCheckboxes = document.querySelectorAll('input[name="routine-devices"]:checked');
+            
+            if (!name || !startTime || deviceCheckboxes.length === 0) {
+                showToast('Please fill all fields and select at least one device action', 'error');
+                return;
+            }
+
+            // Create schedule for each selected device action
+            const promises = Array.from(deviceCheckboxes).map(async (cb) => {
+                const actionText = cb.value; // e.g., "Nyalakan lampu_1"
+                const action = actionText.startsWith('Nyalakan') ? 'turn_on' : 'turn_off';
+                const deviceName = actionText.replace('Nyalakan ', '').replace('Matikan ', '');
+                
+                // Find device ID from name
+                const device = state.currentRoomDevices?.find(d => d.name === deviceName);
+                if (!device) return;
+
+                try {
+                    await api('POST', '/schedules', {
+                        name,
+                        room_id: roomId,
+                        device_id: device.device_id,
+                        action,
+                        start_time: startTime,
+                        end_time: endTime,
+                        days: '1,2,3,4,5,6,7'
+                    });
+                } catch (e) {
+                    console.error('Failed to create schedule', e);
+                }
+            });
+
+            Promise.all(promises).then(() => {
+                showToast('Routines created!', 'success');
+                closeModal('modal-add-routine');
+                loadSchedules();
+            }).catch(() => {
+                showToast('Some routines failed to create', 'error');
+            });
+        }
+
+        // ── Add Device (Backend) ───────────────────────────────
+        async function submitAddDevice(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-device-name').value.trim();
+            const type = document.getElementById('new-device-type').value;
+            if (!name || !state.currentRoomUUID) return;
+
+            const deviceId = type.toLowerCase() + '_' + name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') + '_' + Math.random().toString(36).substr(2, 4);
+
+            try {
+                const res = await api('POST', '/devices', {
+                    device_id: deviceId,
+                    name,
+                    device_type: type.toLowerCase(),
+                    room_id: state.currentRoomUUID,
+                    state: 'off'
+                });
+                if (res.ok || res.status === 201) {
+                    showToast('Device added!', 'success');
+                    closeModal('modal-add-device');
+                    await loadRoomDevices(state.currentRoomUUID);
+                    loadRooms();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.detail || 'Failed to add device', 'error');
+                }
+            } catch (e) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        // ── AI Chat (Backend Gemini) ───────────────────────────
+        function toggleAssistant() {
+            const panel = document.getElementById('assistant-panel');
+            panel.classList.toggle('translate-x-full');
+        }
+
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            appendMessage('user', message);
+            input.value = '';
+            input.disabled = true;
+
+            // Show typing indicator
+            const typingId = showTypingIndicator();
+
+            try {
+                let currentRoomName = null;
+                if (state.activePage === 'room' && state.currentRoomUUID) {
+                    const r = state.rooms.find(x => x.id === state.currentRoomUUID);
+                    if (r) currentRoomName = r.name;
+                }
+
+                const body = { message };
+                if (chatSessionId) body.session_id = chatSessionId;
+                if (currentRoomName) body.room_context = currentRoomName;
+
+                const res = await api('POST', '/chat/message', body);
+
+                removeTypingIndicator(typingId);
+
+                if (res.ok) {
+                    const data = await res.json();
+                    chatSessionId = data.session_id;
+                    localStorage.setItem('chat_session_id', chatSessionId);
+
+                    appendMessage('assistant', data.reply);
+
+                    // Always refresh devices and rooms so UI immediately reflects changes
+                    if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
+                    await loadRooms();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    appendMessage('assistant', err.detail || 'Waduh error nih, coba lagi ya!');
+                }
+            } catch (e) {
+                removeTypingIndicator(typingId);
+                appendMessage('assistant', 'Ga bisa konek ke server nih, coba lagi ya!');
+            }
+
+            input.disabled = false;
+            input.focus();
+        }
+
+        function showTypingIndicator() {
+            const chatBody = document.getElementById('chat-body');
+            const id = 'typing-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'flex items-start gap-3 w-5/6';
+            div.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-white flex-shrink-0 flex items-center justify-center mt-1 border border-gray-200">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
+                        <rect x="20" y="30" width="60" height="45" rx="22" fill="#F8FAFC" stroke="#2563EB" stroke-width="2" />
+                        <rect x="27" y="38" width="46" height="30" rx="15" fill="#0F172A" />
+                    </svg>
+                </div>
+                <div class="bg-gray-100 p-3 rounded-2xl rounded-tl-none text-sm text-gray-400 shadow-sm flex items-center gap-1">
+                    <span class="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0ms"></span>
+                    <span class="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:150ms"></span>
+                    <span class="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:300ms"></span>
+                </div>`;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        const botSvgIcon = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
+            <rect x="47" y="15" width="6" height="15" fill="#2563EB" />
+            <circle cx="50" cy="12" r="6" fill="#2563EB" />
+            <rect x="15" y="45" width="8" height="20" rx="4" fill="#2563EB" />
+            <rect x="77" y="45" width="8" height="20" rx="4" fill="#2563EB" />
+            <rect x="20" y="30" width="60" height="45" rx="22" fill="#F8FAFC" stroke="#2563EB" stroke-width="2" />
+            <rect x="27" y="38" width="46" height="30" rx="15" fill="#0F172A" />
+            <path d="M 35 55 Q 40 48 45 55" fill="none" stroke="#4ADE80" stroke-width="4" stroke-linecap="round" />
+            <path d="M 55 55 Q 60 48 65 55" fill="none" stroke="#4ADE80" stroke-width="4" stroke-linecap="round" />
+            <rect x="40" y="75" width="20" height="8" rx="3" fill="#2563EB" />
+        </svg>`;
+
+        function appendMessage(sender, text) {
+            const chatBody = document.getElementById('chat-body');
+            const msgDiv = document.createElement('div');
+            if (sender === 'user') {
+                msgDiv.className = 'flex items-start gap-3 w-5/6 self-end justify-end';
+                msgDiv.innerHTML = `<div class="bg-brand-blue text-white p-3 rounded-2xl rounded-tr-none text-sm shadow-sm shadow-blue-500/20">${escapeHtml(text)}</div>`;
+            } else {
+                msgDiv.className = 'flex items-start gap-3 w-5/6';
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-white flex-shrink-0 flex items-center justify-center mt-1 border border-gray-200">${botSvgIcon}</div>
+                    <div class="bg-gray-100 p-3 rounded-2xl rounded-tl-none text-sm text-gray-700 shadow-sm">${escapeHtml(text)}</div>`;
+            }
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ── Settings ───────────────────────────────────────────
+        function toggleProfileDetails() {
+            const menu = document.getElementById('profile-details-menu');
+            const chevron = document.getElementById('profile-chevron');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                chevron.style.transform = 'rotate(90deg)';
+            } else {
+                menu.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function logout() {
+            authToken = '';
+            refreshToken = '';
+            chatSessionId = '';
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('chat_session_id');
+            if (ws) { ws.close(); ws = null; }
+            currentUser = null;
+            state.rooms = [];
+            const menu = document.getElementById('profile-details-menu');
+            if (menu) menu.classList.add('hidden');
+            const chevron = document.getElementById('profile-chevron');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+            navigate('login');  // Go to login instead of splash
+        }
+
+        async function resetData() {
+            if (!confirm("Are you sure you want to reset all rooms and devices? This cannot be undone.")) return;
+            try {
+                await api('POST', '/system/reset');
+                showToast('All data reset!', 'info');
+                chatSessionId = '';
+                localStorage.removeItem('chat_session_id');
+                await loadRooms();
+                navigate('home');
+            } catch (e) {
+                showToast('Reset failed', 'error');
+            }
+        }
+
+        // Password modal functions
+        function togglePasswordVisibility() {
+            const input = document.getElementById('current-password-display');
+            const icon = document.getElementById('password-eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                input.value = '********'; // Still masked, real password not shown for security
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        async function changePassword() {
+            const newPass = document.getElementById('new-password-input').value.trim();
+            if (!newPass) {
+                showToast('Enter new password', 'error');
+                return;
+            }
+            if (newPass.length < 8) {
+                showToast('Password must be at least 8 characters', 'error');
+                return;
+            }
+
+            try {
+                const res = await api('PATCH', '/auth/me', { password: newPass });
+                if (res.ok) {
+                    showToast('Password updated successfully!', 'success');
+                    closeModal('modal-show-password');
+                    document.getElementById('new-password-input').value = '';
+                } else {
+                    showToast('Failed to update password', 'error');
+                }
+            } catch (e) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        // Schedule detail modal
+        async function openScheduleDetail(scheduleId) {
+            try {
+                const res = await api('GET', `/schedules/${scheduleId}`);
+                if (res.ok) {
+                    const schedule = await res.json();
+                    const container = document.getElementById('schedule-detail-content');
+                    const endTime = schedule.end_time ? ` - ${schedule.end_time}` : '';
+                    const action = schedule.action === 'turn_on' ? 'Nyalakan' : 'Matikan';
+                    
+                    container.innerHTML = `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama Jadwal</label>
+                                <p class="text-lg font-bold text-gray-800 mt-1">${schedule.name}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Kamar</label>
+                                <p class="text-lg font-semibold text-gray-800 mt-1">${schedule.room_name || '-'}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Perangkat</label>
+                                <p class="text-lg font-semibold text-gray-800 mt-1">${schedule.device_name || '-'}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</label>
+                                <p class="text-lg font-semibold text-gray-800 mt-1">${action}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Waktu</label>
+                                <p class="text-lg font-semibold text-brand-blue mt-1">${schedule.start_time}${endTime}</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</label>
+                                <p class="text-lg font-semibold mt-1 ${schedule.is_active ? 'text-green-500' : 'text-gray-400'}">${schedule.is_active ? 'Aktif' : 'Nonaktif'}</p>
+                            </div>
+                        </div>
+                    `;
+                    openModal('modal-schedule-detail');
+                }
+            } catch (e) {
+                showToast('Failed to load schedule details', 'error');
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>

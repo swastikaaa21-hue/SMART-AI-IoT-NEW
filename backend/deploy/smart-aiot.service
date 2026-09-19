@@ -1,0 +1,28 @@
+[Unit]
+Description=SMART AI IoT Backend
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=smart-aiot
+Group=smart-aiot
+WorkingDirectory=/home/smart-aiot/backend
+Environment=PATH=/home/smart-aiot/backend/venv/bin:/usr/local/bin:/usr/bin
+EnvironmentFile=/home/smart-aiot/backend/.env
+ExecStart=/home/smart-aiot/backend/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=smart-aiot
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/smart-aiot/backend/logs
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

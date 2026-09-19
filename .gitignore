@@ -1,0 +1,108 @@
+# ========================================
+# SMART AI IoT - Root .gitignore
+# Covers: Backend (Python/FastAPI) + Hardware (ESP32)
+# ========================================
+
+# ========== Python Backend ==========
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Environment variables (SECRETS - NEVER COMMIT)
+.env
+.env.*
+!.env.example
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Alembic
+alembic/versions/*.pyc
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+nosetests.xml
+
+# Logs
+logs/
+*.log
+log/
+
+# ========== Hardware (ESP32/Arduino) ==========
+# Configuration files with credentials
+Hardware/config.py
+Hardware/**/config.py
+*.ino.globals.h
+
+# Build artifacts
+Hardware/**/.pio/
+Hardware/**/.pioenvs/
+Hardware/**/.piolibdeps/
+Hardware/**/build/
+Hardware/**/.vscode/
+Hardware/**/.clang_complete
+Hardware/**/.gcc-flags.json
+
+# ========== IDE & Editors ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.cproject
+.settings/
+*.code-workspace
+
+# ========== OS ==========
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ========== Node.js (if frontend added later) ==========
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+*.tsbuildinfo
+
+# ========== Temporary & Cache ==========
+*.tmp
+*.temp
+*.bak
+*.swp
+*~.nib
+.cache/
+
+# ========== Documentation Build ==========
+docs/_build/
+site/
