@@ -28,15 +28,15 @@ class RoomUpdate(BaseModel):
 
 
 class RoomResponse(BaseModel):
-    id: uuid.UUID
+    id: str | uuid.UUID
     name: str
     slug: str
     room_type: str
-    description: str | None
-    icon: str | None
-    owner_id: uuid.UUID
-    created_at: datetime
-    updated_at: datetime
+    description: str | None = None
+    icon: str | None = None
+    owner_id: str | uuid.UUID
+    created_at: datetime | str | None = None
+    updated_at: datetime | str | None = None
     total_devices_count: int = 0
     active_devices_count: int = 0
 

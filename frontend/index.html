@@ -771,6 +771,17 @@
                                 class="px-3 py-1 text-xs font-bold rounded transition-colors bg-white text-brand-blue shadow-sm">ID</button>
                         </div>
                     </div>
+                    <div class="p-5 flex flex-col gap-2 hover:bg-gray-50 transition-colors border-t border-gray-100">
+                        <div class="flex items-center gap-4 text-gray-800 font-medium text-base">
+                            <i class="fas fa-server w-6 text-center text-xl text-gray-400"></i>
+                            <span>Server Backend URL</span>
+                        </div>
+                        <div class="flex gap-2 mt-1">
+                            <input type="text" id="custom-backend-input" placeholder="https://smart-ai-iot-backend.onrender.com"
+                                class="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue" />
+                            <button onclick="saveBackendUrl()" class="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-blue-600 transition">Save</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1148,11 +1159,27 @@
 
     <script>
         // ── API Configuration ──────────────────────────────────
-        const RAILWAY_BACKEND_URL = 'https://smart-ai-iot.up.railway.app';
+        const DEFAULT_PROD_BACKEND_URL = 'https://smart-ai-iot-backend.onrender.com';
+        const RENDER_BACKEND_URL = localStorage.getItem('custom_backend_url') || DEFAULT_PROD_BACKEND_URL;
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         const API_BASE = isLocal
             ? 'http://localhost:8000/api/v1'
-            : RAILWAY_BACKEND_URL + '/api/v1';
+            : RENDER_BACKEND_URL.replace(/\/+$/, '') + '/api/v1';
+
+        function initBackendUrlSetting() {
+            const el = document.getElementById('custom-backend-input');
+            if (el) el.value = localStorage.getItem('custom_backend_url') || DEFAULT_PROD_BACKEND_URL;
+        }
+
+        function saveBackendUrl() {
+            const el = document.getElementById('custom-backend-input');
+            if (el && el.value.trim()) {
+                const val = el.value.trim().replace(/\/+$/, '');
+                localStorage.setItem('custom_backend_url', val);
+                showToast('Backend URL updated! Reloading...', 'success');
+                setTimeout(() => window.location.reload(), 600);
+            }
+        }
         let authToken = localStorage.getItem('auth_token') || '';
         let refreshToken = localStorage.getItem('refresh_token') || '';
         let chatSessionId = localStorage.getItem('chat_session_id') || '';
@@ -1530,8 +1557,9 @@
             if (ws && ws.readyState <= 1) return;
             if (!authToken) return;
             const isLocalWs = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-            const wsHost = isLocalWs ? 'localhost:8000' : new URL(RAILWAY_BACKEND_URL).host;
-            const protocol = RAILWAY_BACKEND_URL.startsWith('https') && !isLocalWs ? 'wss:' : (location.protocol === 'https:' ? 'wss:' : 'ws:');
+            const targetBackend = isLocalWs ? 'http://localhost:8000' : RENDER_BACKEND_URL;
+            const wsHost = isLocalWs ? 'localhost:8000' : new URL(targetBackend).host;
+            const protocol = targetBackend.startsWith('https') && !isLocalWs ? 'wss:' : (location.protocol === 'https:' ? 'wss:' : 'ws:');
             const wsUrl = `${protocol}//${wsHost}/api/v1/ws?token=${authToken}`;
             ws = new WebSocket(wsUrl);
 
@@ -1571,8 +1599,9 @@
             const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
             document.querySelectorAll('.current-date-display').forEach(el => el.textContent = dateStr);
 
-            // Apply saved language
+            // Apply saved language & backend url
             setLanguage(currentLang);
+            initBackendUrlSetting();
 
             if (authToken) {
                 loadUserAndGo();
@@ -2039,6 +2068,35 @@
                             </div>
                         </div>
                     `;
+                } else if (device.device_type.toLowerCase() === 'tv') {
+                    deviceControls = `
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <div class="flex items-center justify-between gap-1.5 mb-2">
+                                <button onclick="event.stopPropagation(); sendTvCommand('${device.device_id}', 'power')" class="flex-1 py-1.5 px-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+                                    <i class="fas fa-power-off"></i> Power
+                                </button>
+                                <button onclick="event.stopPropagation(); sendTvCommand('${device.device_id}', 'mute')" class="flex-1 py-1.5 px-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
+                                    <i class="fas fa-volume-mute"></i> Mute
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div class="flex items-center justify-between bg-gray-50 rounded-xl p-1.5 border border-gray-100">
+                                    <span class="text-gray-500 font-medium ml-1">Vol</span>
+                                    <div class="flex gap-1">
+                                        <button onclick="event.stopPropagation(); sendTvCommand('${device.device_id}', 'vol_down')" class="w-7 h-7 bg-white shadow-xs rounded-lg hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700"><i class="fas fa-minus text-[10px]"></i></button>
+                                        <button onclick="event.stopPropagation(); sendTvCommand('${device.device_id}', 'vol_up')" class="w-7 h-7 bg-white shadow-xs rounded-lg hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700"><i class="fas fa-plus text-[10px]"></i></button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between bg-gray-50 rounded-xl p-1.5 border border-gray-100">
+                                    <span class="text-gray-500 font-medium ml-1">Ch</span>
+                                    <div class="flex gap-1">
+                                        <button onclick="event.stopPropagation(); sendTvCommand('${device.device_id}', 'ch_down')" class="w-7 h-7 bg-white shadow-xs rounded-lg hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700"><i class="fas fa-chevron-down text-[10px]"></i></button>
+                                        <button onclick="event.stopPropagation(); sendTvCommand('${device.device_id}', 'ch_up')" class="w-7 h-7 bg-white shadow-xs rounded-lg hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700"><i class="fas fa-chevron-up text-[10px]"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 }
 
                 container.innerHTML += `
@@ -2150,6 +2208,23 @@
                 if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
             } catch (e) {
                 showToast('Failed to adjust brightness', 'error');
+            }
+        }
+
+        async function sendTvCommand(deviceId, btn) {
+            try {
+                const res = await api('POST', `/commands/${deviceId}`, { 
+                    action: btn,
+                    value: btn 
+                });
+                if (res.ok) {
+                    showToast(`TV Command: ${btn.toUpperCase()}`, 'success');
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.detail || 'Command failed', 'error');
+                }
+            } catch (e) {
+                showToast('Connection error', 'error');
             }
         }
 

@@ -135,6 +135,8 @@ class DeviceManager:
         if not room:
             return {"success": False, "error": f"Device '{device_id}' has no associated room"}
 
+        extra: dict[str, Any] = {}
+
         # Determine target state
         if action == CommandAction.TURN_ON.value:
             target_state = DeviceState.ON.value
@@ -157,10 +159,11 @@ class DeviceManager:
                 "last_seen_at": device.get("last_seen_at"),
             }
         else:
-            return {"success": False, "error": f"Unknown action: {action}"}
+            # Custom / TV Remote actions (e.g. vol_up, vol_down, mute, ch_up, ch_down, ir_send)
+            target_state = device.get("state", "on")
+            extra["button"] = action
 
-        extra: dict[str, Any] = {}
-        if value is not None and action == CommandAction.SET_VALUE.value:
+        if value is not None:
             extra["value"] = value
         
         # Add AC/device controls to payload

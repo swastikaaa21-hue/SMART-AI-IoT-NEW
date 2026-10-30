@@ -6,7 +6,7 @@ import uuid
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.db.supabase_session import get_db
+from app.db.session import get_db
 from app.middleware.auth import get_current_user
 from app.schemas.schedule import ScheduleCreate, ScheduleResponse, ScheduleUpdate
 from app.services.supabase_service import supabase_service

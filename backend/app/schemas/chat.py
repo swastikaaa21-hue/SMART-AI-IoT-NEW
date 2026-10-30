@@ -15,12 +15,12 @@ class ChatSessionCreate(BaseModel):
 
 
 class ChatSessionResponse(BaseModel):
-    id: uuid.UUID
-    user_id: uuid.UUID
+    id: str | uuid.UUID
+    user_id: str | uuid.UUID
     title: str
     is_active: bool
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime | str | None = None
+    updated_at: datetime | str | None = None
 
     class Config:
         from_attributes = True
@@ -32,13 +32,13 @@ class ChatMessageCreate(BaseModel):
 
 
 class ChatMessageResponse(BaseModel):
-    id: uuid.UUID
-    session_id: uuid.UUID
+    id: str | uuid.UUID
+    session_id: str | uuid.UUID
     role: str
     content: str
-    function_call: str | None
-    function_response: str | None
-    created_at: datetime
+    function_call: str | None = None
+    function_response: str | None = None
+    created_at: datetime | str | None = None
 
     class Config:
         from_attributes = True
@@ -47,7 +47,7 @@ class ChatMessageResponse(BaseModel):
 class AIChatRequest(BaseModel):
     """Request from frontend to the AI chat endpoint."""
     message: str = Field(..., min_length=1, max_length=5000)
-    session_id: uuid.UUID | None = None
+    session_id: str | uuid.UUID | None = None
     room_context: str | None = None
 
 

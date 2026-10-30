@@ -40,8 +40,8 @@ class Settings(BaseSettings):
     PORT: int = 8000
     WORKERS: int = 1
 
-    # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./smart_aiot.db"
+    # Database (MySQL XAMPP)
+    DATABASE_URL: str = "mysql+aiomysql://root:@localhost:3306/smart_aiot"
 
     # MQTT / HiveMQ Cloud
     MQTT_BROKER: str = ""
@@ -70,17 +70,6 @@ class Settings(BaseSettings):
     # ── Logging ──────────────────────────────────────────────
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "json"
-
-    # ── Supabase ─────────────────────────────────────────────
-    SUPABASE_URL: str = ""
-    SUPABASE_KEY: str = ""
-    SUPABASE_SERVICE_KEY: str = ""
-
-    @field_validator("SUPABASE_KEY", mode="before")
-    @classmethod
-    def resolve_supabase_key(cls, v: str, info: any) -> str:
-        # Prefer service key if provided or if key is publishable
-        return v
 
     # ── Validators ───────────────────────────────────────────
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")

@@ -28,13 +28,16 @@ class UserUpdate(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: uuid.UUID
+    id: str | uuid.UUID
     email: str
-    full_name: str | None
-    is_active: bool
-    is_superuser: bool
-    created_at: datetime
-    updated_at: datetime
+    full_name: str | None = None
+    home_name: str | None = None
+    location: str | None = None
+    avatar_url: str | None = None
+    is_active: bool = True
+    is_superuser: bool = False
+    created_at: datetime | str | None = None
+    updated_at: datetime | str | None = None
 
     class Config:
         from_attributes = True

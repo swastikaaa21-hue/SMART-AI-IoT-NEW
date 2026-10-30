@@ -14,7 +14,7 @@ class DeviceCreate(BaseModel):
     device_id: str = Field(..., max_length=100, examples=["esp32_light_01"])
     name: str = Field(..., max_length=150, examples=["Living Room Light"])
     device_type: str = Field(..., max_length=50, examples=["light"])
-    room_id: uuid.UUID
+    room_id: str
     state: str | None = "off"
     firmware_version: str | None = None
     description: str | None = None
@@ -24,33 +24,33 @@ class DeviceCreate(BaseModel):
 class DeviceUpdate(BaseModel):
     name: str | None = None
     device_type: str | None = None
-    room_id: uuid.UUID | None = None
+    room_id: str | None = None
     firmware_version: str | None = None
     description: str | None = None
     extra_metadata: dict | None = None
 
 
 class DeviceResponse(BaseModel):
-    id: uuid.UUID
+    id: str | uuid.UUID
     device_id: str
     name: str
     device_type: str
-    room_id: uuid.UUID
+    room_id: str | uuid.UUID
     state: str
-    brightness: int | None
-    temperature: float | None
-    humidity: float | None
-    target_temperature: int | None
-    ac_mode: str | None
-    fan_speed: int | None
-    timer_minutes: int | None
-    extra_metadata: dict | None
-    is_online: bool
-    firmware_version: str | None
-    description: str | None
-    last_seen_at: datetime | None
-    created_at: datetime
-    updated_at: datetime
+    brightness: int | None = None
+    temperature: float | None = None
+    humidity: float | None = None
+    target_temperature: float | int | None = None
+    ac_mode: str | None = None
+    fan_speed: str | int | None = None
+    timer_minutes: int | None = None
+    extra_metadata: dict | None = None
+    is_online: bool = False
+    firmware_version: str | None = None
+    description: str | None = None
+    last_seen_at: datetime | str | None = None
+    created_at: datetime | str | None = None
+    updated_at: datetime | str | None = None
 
     class Config:
         from_attributes = True

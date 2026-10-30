@@ -12,7 +12,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 
 from app.core.security import decode_token
-from app.db.supabase_session import get_db
+from app.db.session import get_db
 from app.services.supabase_service import supabase_service
 from app.utils.exceptions import UnauthorizedError
 

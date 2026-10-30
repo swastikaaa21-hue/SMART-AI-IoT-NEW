@@ -10,7 +10,7 @@ from datetime import timezone
 from fastapi import APIRouter, Depends
 
 from app.core.config import settings
-from app.db.supabase_session import get_db
+from app.db.session import get_db
 from app.middleware.auth import get_current_user, get_current_user_optional
 from app.schemas.system import (
     SeedResponse,

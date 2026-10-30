@@ -7,7 +7,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Query
 
 from app.core.constants import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
-from app.db.supabase_session import get_db
+from app.db.session import get_db
 from app.middleware.auth import get_current_user
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.device import DeviceCreate, DeviceResponse, DeviceUpdate

@@ -13,7 +13,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
 
 from app.api.v1.endpoints.chat import _execute_function
-from app.db.supabase_session import get_db
+from app.db.session import get_db
 from app.middleware.auth import get_current_user
 from app.schemas.voice import (
     VoiceChatResponse,

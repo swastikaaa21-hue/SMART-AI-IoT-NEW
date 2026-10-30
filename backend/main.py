@@ -2,7 +2,7 @@
 SMART AI IoT Backend - Main Application Entry Point
 
 This is the central FastAPI application factory that wires together:
-- Database engine (SQLite via async SQLAlchemy)
+- Database engine (MySQL via async SQLAlchemy)
 - MQTT service (HiveMQ Cloud on TLS port 8883)
 - Google Gemini AI service (Function Calling)
 - WebSocket manager (real-time frontend updates)
@@ -14,6 +14,9 @@ from __future__ import annotations
 
 import sys
 import asyncio
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -39,8 +42,8 @@ from app.services.gemini_service import gemini_service
 from app.services.mqtt_handler import handle_device_status, handle_device_telemetry
 from app.services.mqtt_service import mqtt_service
 from app.services.websocket_manager import ws_manager
-from app.services.supabase_service import supabase_service
 from app.services.scheduler_service import scheduler_service
+from app.services.supabase_service import supabase_service
 
 logger = get_logger("main")
 
@@ -84,14 +87,8 @@ async def lifespan(app: FastAPI):
 
     # 1. Initialise Gemini AI
     gemini_service.initialise()
-    
-    # 2. Initialise Supabase
-    try:
-        supabase_service.initialize()
-    except Exception as e:
-        logger.warning("supabase_init_skipped", reason=str(e))
 
-    # 3. Register MQTT message handlers
+    # 2. Register MQTT message handlers
     mqtt_service.on_status(handle_device_status)
     mqtt_service.on_telemetry(handle_device_telemetry)
 
@@ -203,7 +200,7 @@ def create_app() -> FastAPI:
                 "mqtt": "connected" if mqtt_service.is_connected else "disconnected",
                 "gemini": "ready" if gemini_service._initialised else "not_configured",
                 "websocket": f"{ws_manager.active_count} connections",
-                "supabase": "connected" if supabase_service._initialized else "not_configured",
+                "database": "connected" if supabase_service._initialized else "ready",
             },
         )
 

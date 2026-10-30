@@ -19,13 +19,13 @@ class TelemetryCreate(BaseModel):
 
 
 class TelemetryResponse(BaseModel):
-    id: uuid.UUID
+    id: str | uuid.UUID
     device_id: str
-    temperature: float | None
-    humidity: float | None
-    power_watts: float | None
-    extra_data: dict | None
-    recorded_at: datetime
+    temperature: float | None = None
+    humidity: float | None = None
+    power_watts: float | None = None
+    extra_data: dict | None = None
+    recorded_at: datetime | str | None = None
 
     class Config:
         from_attributes = True
