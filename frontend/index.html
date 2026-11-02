@@ -74,6 +74,10 @@
             border-color: #d1d5db;
         }
 
+        .dark .toggle-checkbox {
+            border-color: #4b5563;
+        }
+
         .toggle-checkbox:checked {
             right: 0;
             border-color: #2563EB;
@@ -83,8 +87,16 @@
             background-color: #d1d5db;
         }
 
+        .dark .toggle-label {
+            background-color: #4b5563;
+        }
+
         .toggle-checkbox:checked+.toggle-label {
             background-color: #2563EB;
+        }
+
+        .dark .toggle-checkbox:checked+.toggle-label {
+            background-color: #3b82f6;
         }
 
         @keyframes scan {
@@ -106,56 +118,228 @@
                 opacity: 0;
             }
         }
+
+        /* UI/UX Improvements */
+        
+        /* Card hover lift effect */
+        .room-card, .device-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .room-card:hover, .device-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -10px rgba(37, 99, 235, 0.2);
+        }
+
+        .dark .room-card:hover, .dark .device-card:hover {
+            box-shadow: 0 12px 24px -10px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Status dots */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .status-dot.active {
+            background-color: #10B981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+        
+        .status-dot.inactive {
+            background-color: #D1D5DB;
+        }
+        
+        /* Connection status indicator */
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .connection-dot.connected {
+            background-color: #10B981;
+        }
+        
+        .connection-dot.disconnected {
+            background-color: #EF4444;
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        /* Badge counter */
+        .badge-counter {
+            background-color: #2563EB;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        
+        /* Card stagger animation */
+        .card-stagger {
+            animation: fadeInUp 0.4s ease-out backwards;
+        }
+        
+        .card-stagger:nth-child(1) { animation-delay: 0.05s; }
+        .card-stagger:nth-child(2) { animation-delay: 0.1s; }
+        .card-stagger:nth-child(3) { animation-delay: 0.15s; }
+        .card-stagger:nth-child(4) { animation-delay: 0.2s; }
+        .card-stagger:nth-child(5) { animation-delay: 0.25s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Button pulse on hover */
+        .btn-pulse:hover {
+            animation: btnPulse 0.5s ease;
+        }
+        
+        @keyframes btnPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Fan spin animation */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-spin-slow {
+            animation: spin-slow 2s linear infinite;
+        }
+        
+        /* Responsive Media Queries */
+        @media (max-width: 640px) {
+            /* Mobile: smaller cards */
+            .room-card, .device-card {
+                padding: 1rem;
+            }
+            
+            /* Mobile: smaller icons */
+            .room-card i, .device-card i {
+                font-size: 1.25rem;
+            }
+            
+            /* Mobile: optimize modals */
+            #modal-add-routine-content,
+            #modal-add-room > div,
+            #modal-add-device > div,
+            #modal-show-password > div,
+            #modal-schedule-detail > div {
+                max-width: calc(100vw - 2rem);
+            }
+        }
+        
+        @media (min-width: 641px) and (max-width: 1024px) {
+            /* Tablet: 2 columns for rooms */
+            #rooms-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1025px) {
+            /* Desktop: sidebar visible when not hidden */
+            #main-nav:not(.hidden) {
+                display: flex;
+            }
+            
+            /* Desktop: optimize grid spacing */
+            #rooms-grid {
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Landscape phone fix */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .page {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+        }
     </style>
 </head>
 
 <body
-    class="bg-gray-50 text-gray-800 font-sans h-screen w-full overflow-hidden flex flex-col md:flex-row transition-colors duration-300">
+    class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans h-screen w-full overflow-hidden flex flex-col md:flex-row transition-colors duration-300">
 
     <!-- Navigation: Bottom on Mobile, Sidebar on Desktop -->
+    <!-- Hidden by default, shown only after login -->
     <nav id="main-nav"
-        class="hidden md:w-64 md:flex-col bg-white border-r border-gray-200 fixed bottom-0 w-full md:relative z-50 transition-colors duration-300">
+        class="hidden bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <!-- Desktop Logo -->
-        <div class="hidden md:flex items-center justify-center h-24 border-b border-gray-200">
-            <div class="w-14 h-10 mr-1 flex-shrink-0">
-                <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                    <!-- Chimney -->
-                    <rect x="65" y="20" width="10" height="25" fill="currentColor" class="text-brand-dark" />
-                    <!-- Roof -->
-                    <path d="M 45 65 L 100 20 L 160 70 L 145 70 L 100 32 L 60 65 Z" fill="currentColor"
-                        class="text-brand-dark" />
-                    <!-- Window (4 squares) -->
-                    <rect x="91" y="42" width="7" height="7" fill="#2563EB" />
-                    <rect x="100" y="42" width="7" height="7" fill="#2563EB" />
-                    <rect x="91" y="51" width="7" height="7" fill="#2563EB" />
-                    <rect x="100" y="51" width="7" height="7" fill="#2563EB" />
-                    <!-- Blue Swoosh -->
-                    <path d="M 25 80 C 15 45, 60 30, 150 60 C 110 40, 50 45, 35 80 Z" fill="#2563EB" />
-                </svg>
-            </div>
-            <div class="relative flex flex-col mt-1">
-                <span class="font-extrabold text-3xl text-brand-dark leading-none">Smart</span>
-                <span
-                    class="text-[0.65rem] tracking-[0.3em] text-brand-blue uppercase font-light absolute -bottom-3 right-0">HOUSE</span>
+        <div class="hidden md:flex items-center justify-center h-24 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-2 dark:bg-white dark:px-4 dark:py-2 dark:rounded-2xl">
+                <div class="w-14 h-10 flex-shrink-0">
+                    <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <!-- Chimney -->
+                        <rect x="65" y="20" width="10" height="25" fill="#0F172A" />
+                        <!-- Roof -->
+                        <path d="M 45 65 L 100 20 L 160 70 L 145 70 L 100 32 L 60 65 Z" fill="#0F172A" />
+                        <!-- Window (4 squares) -->
+                        <rect x="91" y="42" width="7" height="7" fill="#2563EB" />
+                        <rect x="100" y="42" width="7" height="7" fill="#2563EB" />
+                        <rect x="91" y="51" width="7" height="7" fill="#2563EB" />
+                        <rect x="100" y="51" width="7" height="7" fill="#2563EB" />
+                        <!-- Blue Swoosh -->
+                        <path d="M 25 80 C 15 45, 60 30, 150 60 C 110 40, 50 45, 35 80 Z" fill="#2563EB" />
+                    </svg>
+                </div>
+                <div class="relative flex flex-col mt-1">
+                    <span class="font-extrabold text-3xl text-brand-dark leading-none">Smart</span>
+                    <span class="text-[0.65rem] tracking-[0.3em] text-brand-blue uppercase font-light absolute -bottom-3 right-0">HOUSE</span>
+                </div>
             </div>
         </div>
 
         <!-- Nav Links -->
         <div class="flex flex-row md:flex-col justify-around md:justify-start flex-1 p-2 md:p-4 gap-2">
             <button onclick="navigate('home')" id="nav-home"
-                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-brand-blue bg-blue-50 transition-all">
+                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-brand-blue bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400 transition-all">
                 <i class="fas fa-home text-xl md:w-8"></i>
-                <span class="text-xs md:text-base font-medium mt-1 md:mt-0" data-i18n="nav_home">Beranda</span>
+                <span class="text-xs md:text-base font-medium mt-1 md:mt-0 md:ml-3 flex-1" data-i18n="nav_home">Beranda</span>
             </button>
             <button onclick="navigate('schedule')" id="nav-schedule"
-                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-gray-500 hover:text-brand-blue transition-all">
+                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-gray-500 dark:text-gray-400 hover:text-brand-blue dark:hover:text-blue-400 transition-all">
                 <i class="fas fa-clock text-xl md:w-8"></i>
-                <span class="text-xs md:text-base font-medium mt-1 md:mt-0" data-i18n="nav_schedule">Jadwal</span>
+                <span class="text-xs md:text-base font-medium mt-1 md:mt-0 md:ml-3 flex-1" data-i18n="nav_schedule">Jadwal</span>
             </button>
             <button onclick="navigate('settings')" id="nav-settings"
-                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-gray-500 hover:text-brand-blue transition-all">
+                class="nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-gray-500 dark:text-gray-400 hover:text-brand-blue dark:hover:text-blue-400 transition-all">
                 <i class="fas fa-cog text-xl md:w-8"></i>
-                <span class="text-xs md:text-base font-medium mt-1 md:mt-0" data-i18n="nav_settings">Pengaturan</span>
+                <span class="text-xs md:text-base font-medium mt-1 md:mt-0 md:ml-3 flex-1" data-i18n="nav_settings">Pengaturan</span>
             </button>
         </div>
     </nav>
@@ -365,88 +549,72 @@
         </div>
 
         <!-- ================= PAGE: HOME (DASHBOARD) ================= -->
-        <div id="page-home" class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-sky-300"
-            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+        <div id="page-home" class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             <!-- Cloud overlay for faded effect -->
-            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40 dark:from-gray-900/60 dark:to-gray-800/60"></div>
             <div class="relative z-10">
                 <!-- Header: Profile (Left) | Smart House + Date (Center) | Notification (Right) -->
                 <header class="flex justify-between items-center mb-6 pt-4">
-                    <div class="w-12 h-12 rounded-full overflow-hidden shadow-sm border-2 border-gray-100 flex-shrink-0 cursor-pointer hover:border-brand-blue transition-colors"
+                    <div class="w-12 h-12 rounded-full overflow-hidden shadow-sm border-2 border-gray-100 dark:border-gray-700 flex-shrink-0 cursor-pointer hover:border-brand-blue dark:hover:border-blue-400 transition-colors"
                         onclick="navigate('settings')">
                         <img src="https://ui-avatars.com/api/?name=Miko&background=fff&color=2563EB" alt="Profile"
                             class="w-full h-full object-cover">
                     </div>
 
                     <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
-                        <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0"
+                        <h2 class="text-brand-blue dark:text-blue-400 font-bold text-xl tracking-wide uppercase mb-0"
                             data-i18n="home_title">BERANDA</h2>
+                        <div class="connection-status text-gray-500 dark:text-gray-400 mt-1">
+                            <span class="connection-dot connected" id="connection-indicator"></span>
+                            <span id="connection-text">Connected</span>
+                        </div>
                     </div>
 
-                    <button
-                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors relative flex-shrink-0">
-                        <i class="far fa-bell text-xl"></i>
-                        <span
-                            class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button id="theme-toggle" onclick="toggleTheme()"
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
+                            <i class="fas fa-moon text-xl dark-hide"></i>
+                            <i class="fas fa-sun text-xl light-hide hidden"></i>
+                        </button>
+                        <button
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors relative flex-shrink-0">
+                            <i class="far fa-bell text-xl"></i>
+                            <span
+                                class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
+                        </button>
+                    </div>
                 </header>
 
                 <!-- Search Bar -->
                 <div class="relative w-full mb-6">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <i class="fas fa-search text-gray-400"></i>
+                        <i class="fas fa-search text-gray-400 dark:text-gray-500"></i>
                     </div>
                     <input type="text" id="dashboard-search" oninput="handleSearch()"
                         placeholder="Cari ruangan atau perangkat..." data-i18n-placeholder="search_ph"
-                        class="w-full pl-11 pr-4 py-4 rounded-3xl bg-white border border-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-blue text-gray-800 placeholder-gray-400 transition-all shadow-sm">
+                        class="w-full pl-11 pr-4 py-4 rounded-3xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-blue dark:focus:ring-blue-500 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all shadow-sm">
                 </div>
 
-                <!-- Smart Home Illustration Carousel -->
-                <div class="w-full mb-8 rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-white relative"
-                    id="banner-carousel">
-                    <div class="relative w-full overflow-hidden" style="aspect-ratio: 16/9;">
-                        <div id="carousel-slides" class="flex transition-transform duration-500 ease-out"
-                            style="width: 100%;">
-                            <img src="https://i.pinimg.com/1200x/c4/e7/a3/c4e7a3aa6e61b9059f682e392a8e84d1.jpg"
-                                onerror="this.src='https://placehold.co/900x450/eff6ff/2563EB?text=Smart+Home'"
-                                alt="Smart Home Illustration" class="w-full h-full object-cover flex-shrink-0">
-                            <img src="https://i.pinimg.com/1200x/58/5e/6b/585e6b44184402766d7ead1457031f08.jpg"
-                                onerror="this.src='https://placehold.co/900x450/eff6ff/2563EB?text=Smart+Home+2'"
-                                alt="Smart Home Illustration 2" class="w-full h-full object-cover flex-shrink-0">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Location & Temperature Widgets -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                    <div class="bg-[#7fbbdd] rounded-3xl p-5 flex items-center justify-between shadow-sm text-white">
+                <!-- Location & Weather Widget (Merged) -->
+                <div class="bg-gradient-to-r from-[#7fbbdd] to-[#f58b05] dark:from-blue-900 dark:to-orange-900 rounded-3xl p-5 mb-8 shadow-lg text-white">
+                    <div class="flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div
-                                class="w-12 h-12 bg-white/20 text-white rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                            <div class="w-12 h-12 bg-white/20 text-white rounded-2xl flex items-center justify-center backdrop-blur-sm">
                                 <i class="fas fa-map-marker-alt text-xl"></i>
                             </div>
                             <div>
-                                <p class="text-blue-100 text-xs font-medium uppercase tracking-wider"
-                                    data-i18n="weather_location">Lokasi</p>
+                                <p class="text-white/80 text-xs font-medium uppercase tracking-wider" data-i18n="weather_location">Lokasi</p>
                                 <p class="font-semibold text-lg" id="dashboard-location">Tembalang, Semarang</p>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="bg-[#f58b05] rounded-3xl p-5 flex items-center justify-between shadow-sm text-white">
                         <div class="flex items-center gap-4">
-                            <div
-                                class="w-12 h-12 bg-white/20 text-white rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                                <i class="fas fa-sun text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="text-orange-100 text-xs font-medium uppercase tracking-wider"
-                                    data-i18n="weather_title">Cuaca</p>
+                            <div class="text-right">
+                                <p class="text-white/80 text-xs font-medium uppercase tracking-wider" data-i18n="weather_title">Cuaca</p>
                                 <p class="font-semibold text-lg" data-i18n="weather_sunny">Cerah</p>
                             </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-3xl font-bold">28°</p>
+                            <div class="text-right">
+                                <p class="text-4xl font-bold">28°</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -458,125 +626,92 @@
         </div>
         <!-- ================= PAGE: SCHEDULE ================= -->
         <div id="page-schedule"
-            class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-sky-300"
-            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+            class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             <!-- Cloud overlay for faded effect -->
-            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40 dark:from-gray-900/60 dark:to-gray-800/60"></div>
             <div class="relative z-10">
                 <!-- Header: Back Button (Left) | Schedule + Date (Center) | Notification (Right) -->
                 <header class="flex justify-between items-center mb-8 pt-4">
                     <button onclick="navigate('home')"
-                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors flex-shrink-0">
+                        class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
                         <i class="fas fa-arrow-left text-xl"></i>
                     </button>
 
                     <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
-                        <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0.5"
+                        <h2 class="text-brand-blue dark:text-blue-400 font-bold text-xl tracking-wide uppercase mb-0.5"
                             data-i18n="schedule_title">JADWAL</h2>
                     </div>
 
-                    <button
-                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors relative flex-shrink-0">
-                        <i class="far fa-bell text-xl"></i>
-                        <span
-                            class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button id="theme-toggle-schedule" onclick="toggleTheme()"
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
+                            <i class="fas fa-moon text-xl dark-hide"></i>
+                            <i class="fas fa-sun text-xl light-hide hidden"></i>
+                        </button>
+                        <button
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors relative flex-shrink-0">
+                            <i class="far fa-bell text-xl"></i>
+                            <span
+                                class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
+                        </button>
+                    </div>
                 </header>
 
                 <!-- Calendar & Routine Split Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-stretch mb-6">
                     <!-- Calendar Widget -->
                     <div
-                        class="bg-[#7fbbdd] rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-full min-h-[160px] w-full">
+                        class="bg-[#7fbbdd] dark:bg-gradient-to-r dark:from-blue-900 dark:to-blue-800 rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between h-full min-h-[160px] w-full">
                         <!-- Month/Year Selector -->
                         <div class="flex items-center justify-between mb-2">
-                            <button
+                            <button onclick="changeCalendarMonth(-1)"
                                 class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-white hover:text-[#7fbbdd] hover:bg-white transition-colors">
                                 <i class="fas fa-chevron-left text-[10px]"></i>
                             </button>
-                            <span class="font-bold text-white text-base sm:text-lg">Monday, 10 February 2026</span>
-                            <button
+                            <span class="font-bold text-white text-base sm:text-lg" id="calendar-month-year"></span>
+                            <button onclick="changeCalendarMonth(1)"
                                 class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-white hover:text-[#7fbbdd] hover:bg-white transition-colors">
                                 <i class="fas fa-chevron-right text-[10px]"></i>
                             </button>
                         </div>
 
                         <!-- Days Selector -->
-                        <div class="flex justify-between items-end w-full px-1">
-                            <!-- Unselected Day -->
-                            <div
-                                class="flex flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2">
-                                <span
-                                    class="text-[10px] sm:text-xs text-blue-100 font-medium mb-1 group-hover:text-white transition-colors">Min</span>
-                                <span
-                                    class="text-base sm:text-lg font-bold text-white group-hover:text-white transition-colors">09</span>
-                            </div>
-                            <!-- Unselected Day -->
-                            <div
-                                class="flex flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2">
-                                <span
-                                    class="text-[10px] sm:text-xs text-blue-100 font-medium mb-1 group-hover:text-white transition-colors">Sen</span>
-                                <span
-                                    class="text-base sm:text-lg font-bold text-white group-hover:text-white transition-colors">10</span>
-                            </div>
-                            <!-- Selected Day -->
-                            <div
-                                class="flex flex-col items-center justify-center cursor-pointer group py-1 px-2 bg-white rounded-xl shadow-sm">
-                                <span
-                                    class="text-[10px] sm:text-xs font-bold mb-1 text-[#7fbbdd] transition-colors">Sel</span>
-                                <span
-                                    class="text-base sm:text-lg font-extrabold text-[#7fbbdd] transition-colors scale-110">11</span>
-                            </div>
-                            <!-- Unselected Day -->
-                            <div
-                                class="flex flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2">
-                                <span
-                                    class="text-[10px] sm:text-xs text-blue-100 font-medium mb-1 group-hover:text-white transition-colors">Rab</span>
-                                <span
-                                    class="text-base sm:text-lg font-bold text-white group-hover:text-white transition-colors">12</span>
-                            </div>
-                            <!-- Unselected Day -->
-                            <div
-                                class="hidden sm:flex sm:flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2">
-                                <span
-                                    class="text-[10px] sm:text-xs text-blue-100 font-medium mb-1 group-hover:text-white transition-colors">Kam</span>
-                                <span
-                                    class="text-base sm:text-lg font-bold text-white group-hover:text-white transition-colors">13</span>
-                            </div>
+                        <div class="flex justify-between items-end w-full px-1" id="calendar-days-container">
+                            <!-- Days akan di-generate oleh JavaScript -->
                         </div>
                     </div>
 
                     <!-- Routine Card -->
                     <div
-                        class="bg-[#f58b05] rounded-3xl p-5 sm:p-6 shadow-sm flex items-center justify-between relative overflow-hidden text-gray-800 transition-all h-full min-h-[160px] w-full">
+                        class="bg-[#f58b05] dark:bg-gradient-to-r dark:from-orange-900 dark:to-orange-800 rounded-3xl p-5 sm:p-6 shadow-sm flex items-center justify-between relative overflow-hidden text-gray-800 dark:text-gray-100 transition-all h-full min-h-[160px] w-full">
                         <div class="max-w-[70%] z-10 flex flex-col justify-center h-full">
-                            <h3 class="font-bold text-lg sm:text-xl text-gray-900 mb-1" data-i18n="sched_title">Buat
+                            <h3 class="font-bold text-lg sm:text-xl text-gray-900 dark:text-white mb-1" data-i18n="sched_title">Buat
                                 Rutinitas Pintar</h3>
-                            <p class="text-xs sm:text-sm font-semibold text-gray-700 mb-0.5"
+                            <p class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-0.5"
                                 data-i18n="sched_subtitle1">Otomatiskan rumah Anda dengan mudah.</p>
-                            <p class="text-[10px] sm:text-xs text-gray-700/80 mb-4" data-i18n="sched_subtitle2">Atur
+                            <p class="text-[10px] sm:text-xs text-gray-700/80 dark:text-gray-300/80 mb-4" data-i18n="sched_subtitle2">Atur
                                 jadwal untuk perangkat pintar Anda.</p>
                             <button onclick="openAddRoutineModal()"
-                                class="bg-gray-900 text-white font-medium px-5 py-2.5 rounded-full text-xs sm:text-sm shadow-md hover:bg-black transition-all w-fit mt-auto">
+                                class="bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-medium px-5 py-2.5 rounded-full text-xs sm:text-sm shadow-md hover:bg-black dark:hover:bg-gray-100 transition-all w-fit mt-auto">
                                 <span data-i18n="sched_create_btn">Buat Sekarang</span>
                             </button>
                         </div>
                         <!-- Bell Illustration -->
-                        <div class="absolute -right-2 bottom-0 text-black/10 opacity-90 pointer-events-none">
+                        <div class="absolute -right-2 bottom-0 text-black/10 dark:text-white/10 opacity-90 pointer-events-none">
                             <i class="fas fa-bell text-7xl sm:text-8xl transform rotate-12 translate-y-2"></i>
                         </div>
                     </div>
                 </div>
 
                 <div id="routines-list" class="space-y-4">
-                    <div class="routine-card bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+                    <div class="routine-card bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
                         onclick="this.querySelector('.toggle-checkbox').click()">
                         <div class="flex items-start gap-4">
-                            <div class="mt-1 font-bold text-xl text-gray-800">22:00</div>
+                            <div class="mt-1 font-bold text-xl text-gray-800 dark:text-gray-100">22:00</div>
                             <div>
-                                <h3 class="font-bold text-lg text-gray-800" data-i18n="sched_night">Mode Tidur Malam
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100" data-i18n="sched_night">Mode Tidur Malam
                                 </h3>
-                                <p class="text-sm text-gray-500 line-clamp-1" data-i18n="sched_night_desc">Rumah Anda.
+                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1" data-i18n="sched_night_desc">Rumah Anda.
                                     Lebih Pintar. Lebih Aman.</p>
                             </div>
                         </div>
@@ -584,25 +719,25 @@
                             <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
                                 onclick="event.stopPropagation()">
                                 <input type="checkbox" checked
-                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-700 border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
                                 <label
                                     class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
                             </div>
                             <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
-                                class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Hapus">
+                                class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Hapus">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                     </div>
 
-                    <div class="routine-card bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+                    <div class="routine-card bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
                         onclick="this.querySelector('.toggle-checkbox').click()">
                         <div class="flex items-start gap-4">
-                            <div class="mt-1 font-bold text-xl text-gray-800">13:00</div>
+                            <div class="mt-1 font-bold text-xl text-gray-800 dark:text-gray-100">13:00</div>
                             <div>
-                                <h3 class="font-bold text-lg text-gray-800" data-i18n="sched_studio">Pendinginan Studio
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100" data-i18n="sched_studio">Pendinginan Studio
                                 </h3>
-                                <p class="text-sm text-gray-500 line-clamp-1" data-i18n="sched_studio_desc">Set AC Sharp
+                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1" data-i18n="sched_studio_desc">Set AC Sharp
                                     ke Mode Dingin 24°C</p>
                             </div>
                         </div>
@@ -610,25 +745,25 @@
                             <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
                                 onclick="event.stopPropagation()">
                                 <input type="checkbox" checked
-                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-700 border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
                                 <label
                                     class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
                             </div>
                             <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
-                                class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Hapus">
+                                class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Hapus">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                     </div>
 
-                    <div class="routine-card bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+                    <div class="routine-card bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
                         onclick="this.querySelector('.toggle-checkbox').click()">
                         <div class="flex items-start gap-4">
-                            <div class="mt-1 font-bold text-xl text-gray-800">07:00</div>
+                            <div class="mt-1 font-bold text-xl text-gray-800 dark:text-gray-100">07:00</div>
                             <div>
-                                <h3 class="font-bold text-lg text-gray-800" data-i18n="sched_morning">Rutinitas Pagi
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100" data-i18n="sched_morning">Rutinitas Pagi
                                 </h3>
-                                <p class="text-sm text-gray-500 line-clamp-2" data-i18n="sched_morning_desc">Nyalakan
+                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2" data-i18n="sched_morning_desc">Nyalakan
                                     lampu ruang tamu & atur AC ke 24°C
                                 </p>
                             </div>
@@ -637,12 +772,12 @@
                             <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
                                 onclick="event.stopPropagation()">
                                 <input type="checkbox"
-                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-700 border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
                                 <label
                                     class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
                             </div>
                             <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
-                                class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Hapus">
+                                class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Hapus">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
@@ -653,33 +788,39 @@
         </div>
         <!-- ================= PAGE: SETTINGS ================= -->
         <div id="page-settings"
-            class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-sky-300"
-            style="background-image: linear-gradient(rgba(224, 242, 254, 0.85), rgba(186, 230, 253, 0.85)), url('https://i.pinimg.com/736x/85/e1/d9/85e1d926bea7e80ed65d60c91b0c65c7.jpg'); background-size: 300px; background-repeat: repeat; background-position: center; background-attachment: fixed;">
+            class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             <!-- Cloud overlay for faded effect -->
-            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40 dark:from-gray-900/60 dark:to-gray-800/60"></div>
             <div class="relative z-10">
                 <header class="flex justify-between items-center mb-8 pt-4">
                     <button onclick="navigate('home')"
-                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors flex-shrink-0">
+                        class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
                         <i class="fas fa-arrow-left text-xl"></i>
                     </button>
 
                     <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
-                        <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0"
+                        <h2 class="text-brand-blue dark:text-blue-400 font-bold text-xl tracking-wide uppercase mb-0"
                             data-i18n="settings_title">PENGATURAN</h2>
                     </div>
 
-                    <button
-                        class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors relative flex-shrink-0">
-                        <i class="far fa-bell text-xl"></i>
-                        <span
-                            class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button id="theme-toggle-settings" onclick="toggleTheme()"
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
+                            <i class="fas fa-moon text-xl dark-hide"></i>
+                            <i class="fas fa-sun text-xl light-hide hidden"></i>
+                        </button>
+                        <button
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors relative flex-shrink-0">
+                            <i class="far fa-bell text-xl"></i>
+                            <span
+                                class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
+                        </button>
+                    </div>
                 </header>
 
                 <!-- Profile Overview Card -->
                 <div
-                    class="bg-[#7fbbdd] rounded-3xl p-6 text-white mb-8 shadow-lg shadow-[#7fbbdd]/40 flex items-center gap-4">
+                    class="bg-[#7fbbdd] dark:bg-gradient-to-r dark:from-blue-900 dark:to-blue-800 rounded-3xl p-6 text-white mb-8 shadow-lg shadow-[#7fbbdd]/40 dark:shadow-blue-900/40 flex items-center gap-4">
                     <div
                         class="w-16 h-16 rounded-full bg-white/20 border-2 border-white/50 overflow-hidden flex-shrink-0">
                         <img src="https://ui-avatars.com/api/?name=Miko&background=fff&color=2563EB" alt="Profile"
@@ -694,158 +835,180 @@
                     </div>
                 </div>
 
-                <h3 class="font-bold text-gray-500 uppercase tracking-wider text-sm mb-4 ml-2"
+                <h3 class="font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-sm mb-4 ml-2"
                     data-i18n="settings_other">Pengaturan Lainnya</h3>
 
                 <div
-                    class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-100">
-                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
+                    class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden divide-y divide-gray-100 dark:divide-gray-700">
+                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                         onclick="toggleProfileDetails()">
-                        <div class="flex items-center gap-4 text-gray-800 font-medium text-lg">
+                        <div class="flex items-center gap-4 text-gray-800 dark:text-gray-100 font-medium text-lg">
                             <i class="far fa-user w-6 text-center text-xl text-gray-400"></i>
                             <span data-i18n="set_profile">Detail profil</span>
                         </div>
                         <i id="profile-chevron"
                             class="fas fa-chevron-right text-gray-400 transition-transform duration-300"></i>
                     </div>
-                    <div id="profile-details-menu" class="hidden bg-gray-50 p-5 border-t border-gray-100">
-                        <p class="text-sm text-gray-500 mb-4" data-i18n="set_profile_desc">Kelola sesi akun dan koneksi
+                    <div id="profile-details-menu" class="hidden bg-gray-50 dark:bg-gray-700 p-5 border-t border-gray-100 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4" data-i18n="set_profile_desc">Kelola sesi akun dan koneksi
                             rumah pintar Anda.</p>
 
-                        <div class="mb-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
+                        <div class="mb-4 bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-600 shadow-sm space-y-3">
                             <div>
                                 <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Nama Rumah /
                                     Pemilik</p>
-                                <p id="profile-detail-name" class="font-medium text-gray-800">-</p>
+                                <p id="profile-detail-name" class="font-medium text-gray-800 dark:text-gray-100">-</p>
                             </div>
                             <div>
                                 <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Email</p>
-                                <p id="profile-detail-email" class="font-medium text-gray-800">-</p>
+                                <p id="profile-detail-email" class="font-medium text-gray-800 dark:text-gray-100">-</p>
                             </div>
                             <div>
                                 <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Lokasi</p>
-                                <p id="profile-detail-location" class="font-medium text-gray-800">-</p>
+                                <p id="profile-detail-location" class="font-medium text-gray-800 dark:text-gray-100">-</p>
                             </div>
                         </div>
 
                         <button onclick="logout()"
-                            class="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3 rounded-xl font-bold hover:bg-red-100 transition-colors border border-red-100">
+                            class="w-full flex items-center justify-center gap-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 py-3 rounded-xl font-bold hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors border border-red-100 dark:border-red-800">
                             <i class="fas fa-sign-out-alt"></i> <span data-i18n="set_logout">Keluar</span>
                         </button>
                         <button onclick="resetData()"
-                            class="mt-3 w-full flex items-center justify-center gap-2 bg-gray-200 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-300 transition-colors">
+                            class="mt-3 w-full flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 py-3 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
                             <i class="fas fa-trash-alt"></i> <span data-i18n="set_reset">Hapus Semua Data</span>
                         </button>
                     </div>
                     <div
-                        class="p-5 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors" onclick="openModal('modal-show-password')">
-                        <div class="flex items-center gap-4 text-gray-800 font-medium text-lg">
+                        class="p-5 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors" onclick="openModal('modal-show-password')">
+                        <div class="flex items-center gap-4 text-gray-800 dark:text-gray-100 font-medium text-lg">
                             <i class="fas fa-key w-6 text-center text-xl text-gray-400"></i>
                             <span data-i18n="set_password">Kata Sandi</span>
                         </div>
                         <i class="fas fa-chevron-right text-gray-400"></i>
                     </div>
-                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
+                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                         onclick="this.querySelector('.toggle-checkbox').click()">
-                        <div class="flex items-center gap-4 text-gray-800 font-medium text-lg">
+                        <div class="flex items-center gap-4 text-gray-800 dark:text-gray-100 font-medium text-lg">
                             <i class="far fa-bell w-6 text-center text-xl text-gray-400"></i>
                             <span data-i18n="set_notifications">Notifikasi</span>
                         </div>
                         <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
                             onclick="event.stopPropagation()">
                             <input type="checkbox" checked
-                                class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-700 border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
                             <label
                                 class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
                         </div>
                     </div>
-                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center gap-4 text-gray-800 font-medium text-lg">
+                    <div class="p-5 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <div class="flex items-center gap-4 text-gray-800 dark:text-gray-100 font-medium text-lg">
                             <i class="fas fa-globe w-6 text-center text-xl text-gray-400"></i>
                             <span data-i18n="set_language">Bahasa</span>
                         </div>
-                        <div class="flex bg-gray-100 p-1 rounded-lg" onclick="event.stopPropagation()">
+                        <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg" onclick="event.stopPropagation()">
                             <button onclick="setLanguageFromSettings('en')" id="settings-lang-en"
-                                class="px-3 py-1 text-xs font-bold rounded transition-colors text-gray-500 hover:text-gray-800">EN</button>
+                                class="px-3 py-1 text-xs font-bold rounded transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">EN</button>
                             <button onclick="setLanguageFromSettings('id')" id="settings-lang-id"
-                                class="px-3 py-1 text-xs font-bold rounded transition-colors bg-white text-brand-blue shadow-sm">ID</button>
+                                class="px-3 py-1 text-xs font-bold rounded transition-colors bg-white dark:bg-gray-600 text-brand-blue dark:text-blue-400 shadow-sm">ID</button>
                         </div>
                     </div>
-                    <div class="p-5 flex flex-col gap-2 hover:bg-gray-50 transition-colors border-t border-gray-100">
-                        <div class="flex items-center gap-4 text-gray-800 font-medium text-base">
+                    <div class="p-5 flex flex-col gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-t border-gray-100 dark:border-gray-600">
+                        <div class="flex items-center gap-4 text-gray-800 dark:text-gray-100 font-medium text-base">
                             <i class="fas fa-server w-6 text-center text-xl text-gray-400"></i>
                             <span>Server Backend URL</span>
                         </div>
                         <div class="flex gap-2 mt-1">
                             <input type="text" id="custom-backend-input" placeholder="https://smart-ai-iot-backend.onrender.com"
-                                class="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue" />
-                            <button onclick="saveBackendUrl()" class="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-blue-600 transition">Save</button>
+                                class="flex-1 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-blue dark:focus:ring-blue-500" />
+                            <button onclick="saveBackendUrl()" class="px-4 py-2 bg-brand-blue hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition">Save</button>
                         </div>
                     </div>
                 </div>
             </div>
 
         </div>
-        <!-- ================= PAGE: ROOM DETAIL (Converted to Modal) ================= -->
-        <div id="modal-room-detail"
-            class="fixed inset-0 z-[100] hidden flex-col justify-end bg-gray-900/60 backdrop-blur-sm transition-opacity">
-            <div
-                class="bg-white rounded-t-3xl w-full max-w-2xl mx-auto shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-[slideUpBottom_0.3s_ease-out]">
-                <!-- Handle Bar -->
-                <div class="w-full flex justify-center pt-3 pb-1 bg-white relative z-20 cursor-pointer"
-                    onclick="closeModal('modal-room-detail')">
-                    <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
-                </div>
-                <div class="p-6 overflow-y-auto no-scrollbar pb-12 relative flex-1">
 
-                    <header class="flex items-center justify-between mb-6 pt-0">
-                        <button onclick="closeModal('modal-room-detail')"
-                            class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors flex-shrink-0">
-                            <i class="fas fa-arrow-left text-xl"></i>
+        <!-- ================= PAGE: ROOM DETAIL ================= -->
+        <div id="page-room-detail"
+            class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+            <!-- Cloud overlay for faded effect -->
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40 dark:from-gray-900/60 dark:to-gray-800/60"></div>
+            <div class="relative z-10">
+                <header class="flex justify-between items-center mb-6 pt-4">
+                    <button onclick="navigate('home')"
+                        class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+                    <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
+                        <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0" id="room-title">
+                            Living Room</h2>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="theme-toggle-room" onclick="toggleTheme()"
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
+                            <i class="fas fa-moon text-xl dark-hide"></i>
+                            <i class="fas fa-sun text-xl light-hide hidden"></i>
                         </button>
-                        <div class="flex flex-col items-center justify-center flex-1 px-2 text-center">
-                            <h2 class="text-brand-blue font-bold text-xl tracking-wide uppercase mb-0" id="room-title">
-                                Living
-                                Room</h2>
-                        </div>
                         <button
-                            class="w-12 h-12 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-500 hover:text-brand-blue shadow-sm transition-colors relative flex-shrink-0">
+                            class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors relative flex-shrink-0">
                             <i class="far fa-bell text-xl"></i>
                             <span
-                                class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+                                class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
                         </button>
-                    </header>
-
-                    <div class="flex justify-between items-end mb-4">
-                        <p class="text-gray-500 font-medium" id="room-stats">0/3 Aktif • 3 perangkat terhubung</p>
                     </div>
+                </header>
 
-                    <!-- Scene Card -->
-                    <div id="room-scene-card"
-                        class="bg-[#7fbbdd] rounded-3xl p-6 text-white mb-8 shadow-lg shadow-[#7fbbdd]/40 relative overflow-hidden">
-                        <div
-                            class="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl">
-                        </div>
-
-                        <div class="flex items-center gap-4 relative z-10">
-                            <div
-                                class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/40 shadow-inner">
-                                <i id="scene-icon" class="fas fa-film text-2xl text-white"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-2xl font-bold mb-1" id="scene-title">Movie Time</h2>
-                                <p class="text-blue-50 text-sm font-medium" id="scene-desc">Lampu redup MENYALA, TV &
-                                    Speaker aktif</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h3 class="font-bold text-gray-800 text-lg mb-4" data-i18n="room_dev_control">Kontrol Perangkat
-                        Kamar</h3>
-
-                    <!-- Devices Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="devices-list"></div>
+                <div class="flex justify-between items-end mb-4">
+                    <p class="text-gray-500 dark:text-gray-400 font-medium" id="room-stats">0/3 Aktif • 3 perangkat terhubung</p>
                 </div>
+
+                <!-- Scene Card -->
+                <div id="room-scene-card"
+                    class="bg-[#7fbbdd] dark:bg-gradient-to-r dark:from-blue-900 dark:to-blue-800 rounded-3xl p-6 text-white mb-8 shadow-lg shadow-[#7fbbdd]/40 dark:shadow-blue-900/40 relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl">
+                    </div>
+
+                    <div class="flex items-center gap-4 relative z-10">
+                        <div
+                            class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/40 shadow-inner">
+                            <i id="scene-icon" class="fas fa-film text-2xl text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold mb-1" id="scene-title">Movie Time</h2>
+                            <p class="text-blue-50 text-sm font-medium" id="scene-desc">Lampu redup MENYALA, TV &
+                                Speaker aktif</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-gray-800 dark:text-gray-100 text-lg mb-4" data-i18n="room_dev_control">Kontrol Perangkat
+                    Kamar</h3>
+
+                <!-- Devices Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="devices-list"></div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE: DEVICE REMOTE ================= -->
+        <div id="page-device-remote"
+            class="page hidden p-4 md:p-6 pb-24 md:pb-6 h-full flex flex-col bg-gray-900 dark:bg-black text-white overflow-y-auto no-scrollbar">
+            <div class="max-w-md lg:max-w-2xl mx-auto w-full flex-1 flex flex-col">
+                <!-- Header -->
+                <header class="flex justify-between items-center mb-6 md:mb-8 pt-2 md:pt-4">
+                    <button onclick="backToRoom()"
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
+                        <i class="fas fa-arrow-left text-lg md:text-xl"></i>
+                    </button>
+                    <h2 class="text-lg md:text-xl font-bold" id="device-remote-title">Device Name</h2>
+                    <button onclick="openDeviceMenu()"
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
+                        <i class="fas fa-ellipsis-v text-lg md:text-xl"></i>
+                    </button>
+                </header>
+
+                <!-- Remote Content (Dynamic based on device type) -->
+                <div id="remote-content" class="flex-1 flex flex-col justify-center"></div>
             </div>
         </div>
     </main>
@@ -882,6 +1045,26 @@
                             class="w-full px-5 py-4 rounded-2xl bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-brand-blue focus:bg-white text-gray-800 font-medium transition-all appearance-none cursor-pointer shadow-inner">
                         </select>
                     </div>
+                    
+                    <!-- Schedule Type -->
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Tipe Jadwal</label>
+                        <select id="new-routine-schedule-type" onchange="toggleScheduleOptions(this.value)"
+                            class="w-full px-5 py-4 rounded-2xl bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-brand-blue focus:bg-white text-gray-800 font-medium transition-all appearance-none cursor-pointer shadow-inner">
+                            <option value="daily">Setiap Hari</option>
+                            <option value="specific">Tanggal Tertentu</option>
+                            <option value="weekdays">Hari Kerja (Senin-Jumat)</option>
+                            <option value="weekend">Akhir Pekan (Sabtu-Minggu)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Specific Date (hidden by default) -->
+                    <div id="specific-date-container" class="relative hidden">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Pilih Tanggal</label>
+                        <input type="date" id="new-routine-date"
+                            class="w-full px-5 py-4 rounded-2xl bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-brand-blue focus:bg-white text-gray-800 font-medium transition-all shadow-inner">
+                    </div>
+                    
                     <!-- Start & End Time -->
                     <div class="flex gap-4">
                         <div class="flex-1 relative">
@@ -1161,7 +1344,7 @@
         // ── API Configuration ──────────────────────────────────
         const DEFAULT_PROD_BACKEND_URL = 'https://smart-ai-iot-backend.onrender.com';
         const RENDER_BACKEND_URL = localStorage.getItem('custom_backend_url') || DEFAULT_PROD_BACKEND_URL;
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('10.') || window.location.hostname.startsWith('192.168.');
         const API_BASE = isLocal
             ? 'http://localhost:8000/api/v1'
             : RENDER_BACKEND_URL.replace(/\/+$/, '') + '/api/v1';
@@ -1424,6 +1607,7 @@
             currentHomeName: 'SmartHome',
             currentLocation: 'Tembalang, Semarang',
             rooms: [],
+            allDevices: [],
             currentRoomId: null,
             currentRoomUUID: null,
             currentRoomDevices: []
@@ -1566,6 +1750,15 @@
             ws.onopen = () => {
                 const statusEl = document.querySelector('#assistant-panel .text-green-500');
                 if (statusEl) statusEl.textContent = 'Online';
+                
+                // Update connection indicator
+                const connDot = document.getElementById('connection-indicator');
+                const connText = document.getElementById('connection-text');
+                if (connDot) {
+                    connDot.classList.remove('disconnected');
+                    connDot.classList.add('connected');
+                }
+                if (connText) connText.textContent = 'Connected';
             };
             ws.onmessage = (evt) => {
                 try {
@@ -1574,6 +1767,15 @@
                 } catch (e) { }
             };
             ws.onclose = () => {
+                // Update connection indicator
+                const connDot = document.getElementById('connection-indicator');
+                const connText = document.getElementById('connection-text');
+                if (connDot) {
+                    connDot.classList.remove('connected');
+                    connDot.classList.add('disconnected');
+                }
+                if (connText) connText.textContent = 'Reconnecting...';
+                
                 setTimeout(connectWebSocket, 3000);
             };
         }
@@ -1599,6 +1801,9 @@
             const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
             document.querySelectorAll('.current-date-display').forEach(el => el.textContent = dateStr);
 
+            // Initialize calendar
+            renderCalendar();
+
             // Apply saved language & backend url
             setLanguage(currentLang);
             initBackendUrlSetting();
@@ -1612,19 +1817,25 @@
 
         async function loadUserAndGo() {
             try {
+                console.log('[DEBUG] loadUserAndGo: fetching /auth/me');
                 const res = await api('GET', '/auth/me');
                 if (res.ok) {
                     currentUser = await res.json();
+                    console.log('[DEBUG] User loaded:', currentUser);
                     state.currentHomeName = currentUser.full_name || currentUser.email.split('@')[0];
                     updateProfileUI();
                     navigate('home');
+                    console.log('[DEBUG] Calling loadRooms...');
                     await loadRooms();
+                    console.log('[DEBUG] loadRooms completed');
                     connectWebSocket();
                     loadSystemStatus();
                 } else {
+                    console.log('[DEBUG] Auth failed, redirecting to login');
                     navigate('login');  // Skip splash on auth failure
                 }
             } catch (e) {
+                console.error('[ERROR] loadUserAndGo failed:', e);
                 navigate('login');  // Skip splash on error
             }
         }
@@ -1702,8 +1913,9 @@
                     panel.classList.add('translate-x-full');
                 }
             } else {
+                // Show navigation for authenticated pages
                 nav.classList.remove('hidden');
-                nav.classList.add('md:flex');
+                nav.classList.add('md:flex', 'md:w-64', 'md:flex-col', 'fixed', 'bottom-0', 'w-full', 'md:relative', 'z-50');
                 if (fab) fab.classList.remove('hidden');
                 updateNavStyles(pageId);
                 if (pageId === 'home') {
@@ -1711,6 +1923,7 @@
                 }
                 if (pageId === 'schedule') {
                     loadSchedules();
+                    renderCalendar();
                 }
             }
             window.scrollTo(0, 0);
@@ -1720,7 +1933,7 @@
             ['home', 'schedule', 'settings'].forEach(p => {
                 const btn = document.getElementById(`nav-${p}`);
                 if (!btn) return;
-                if (p === activePage || (activePage === 'room' && p === 'home')) {
+                if (p === activePage || (activePage === 'room-detail' && p === 'home')) {
                     btn.className = 'nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-brand-blue bg-blue-50 transition-all';
                 } else {
                     btn.className = 'nav-btn flex flex-col md:flex-row items-center p-3 rounded-xl text-gray-500 hover:text-brand-blue transition-all';
@@ -1876,6 +2089,27 @@
             return deviceIcons[(type || '').toLowerCase()] || 'fa-microchip';
         }
 
+        function getDeviceMeta(device) {
+            const type = (device.device_type || '').toLowerCase();
+            const colorMap = {
+                light: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
+                ac: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+                tv: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+                fan: 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400',
+                plug: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
+                camera: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+                cooker: 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400',
+                door: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+                sensor: 'bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400',
+                lock: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+                speaker: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
+            };
+            return {
+                icon: getDeviceIcon(type),
+                color: colorMap[type] || 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+            };
+        }
+
         // ── Load Rooms from Backend ────────────────────────────
         async function loadRooms() {
             try {
@@ -1883,57 +2117,127 @@
                 if (!res.ok) return;
                 const data = await res.json();
                 state.rooms = data.items || [];
-                renderDashboardRooms();
-            } catch (e) { }
+                
+                console.log('[DEBUG] Rooms loaded:', state.rooms);
+                
+                // Flatten devices from all rooms
+                state.allDevices = [];
+                state.rooms.forEach(room => {
+                    console.log('[DEBUG] Room:', room.name, 'Devices:', room.devices);
+                    if (room.devices && room.devices.length > 0) {
+                        room.devices.forEach(device => {
+                            state.allDevices.push({
+                                ...device,
+                                room_name: room.name,
+                                room_id: room.id
+                            });
+                        });
+                    }
+                });
+                
+                console.log('[DEBUG] All devices flattened:', state.allDevices);
+                
+                renderDashboardDevices();
+                updateBadgeCounters();
+            } catch (e) { 
+                console.error('[ERROR] loadRooms failed:', e);
+            }
+        }
+        
+        // ── Update Badge Counters ───────────────────────────────
+        function updateBadgeCounters() {
+            // Count total devices
+            const totalDevices = state.rooms.reduce((sum, room) => sum + (room.devices?.length || 0), 0);
+            const homeBadge = document.getElementById('nav-home-badge');
+            if (homeBadge) homeBadge.textContent = totalDevices;
+            
+            // Count active schedules (will be updated when schedules loaded)
+            const scheduleBadge = document.getElementById('nav-schedule-badge');
+            if (scheduleBadge && state.schedules) {
+                const activeSchedules = state.schedules.filter(s => s.is_active).length;
+                scheduleBadge.textContent = activeSchedules;
+            }
         }
 
         function renderDashboardRooms(searchQuery = '') {
+            // Deprecated: redirect to device view
+            renderDashboardDevices(searchQuery);
+        }
+
+        function renderDashboardDevices(searchQuery = '') {
             const container = document.getElementById('rooms-grid');
             if (!container) return;
+            
+            console.log('[DEBUG] renderDashboardDevices called, searchQuery:', searchQuery);
+            console.log('[DEBUG] state.allDevices:', state.allDevices);
+            
             container.innerHTML = '';
 
-            let filtered = state.rooms;
+            let filtered = state.allDevices || [];
             if (searchQuery) {
                 const q = searchQuery.toLowerCase();
-                filtered = filtered.filter(r => r.name.toLowerCase().includes(q));
+                filtered = filtered.filter(d => 
+                    d.name.toLowerCase().includes(q) || 
+                    (d.room_name && d.room_name.toLowerCase().includes(q))
+                );
             }
+            
+            console.log('[DEBUG] Filtered devices:', filtered);
 
             if (filtered.length === 0 && searchQuery) {
-                container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-8">No rooms found matching "${searchQuery}"</div>`;
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-search text-3xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold text-lg mb-2">Tidak ditemukan</p>
+                        <p class="text-gray-400 text-sm">Tidak ada perangkat yang cocok dengan "<span class="font-semibold">${searchQuery}</span>"</p>
+                    </div>`;
+                return;
             }
 
-            filtered.forEach(room => {
-                const meta = getRoomMeta(room);
-                const activeCount = room.active_devices_count ?? 0;
-                const totalCount = room.devices?.length ?? 0;
-                const isActive = activeCount > 0;
-                const cardClass = isActive
-                    ? 'bg-[#EBFBF0] text-gray-900 border-[#B7F0C8] shadow-sm hover:border-[#86E7A4]'
-                    : 'bg-white text-gray-800 border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200';
-                const statusClass = isActive
-                    ? 'text-[#22C55E] font-semibold'
-                    : 'text-gray-400 font-medium';
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-lightbulb text-3xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold text-lg mb-2">Belum ada perangkat</p>
+                        <p class="text-gray-400 text-sm mb-4">Tambahkan perangkat untuk memulai</p>
+                        <button onclick="openAddDeviceModal()" class="px-6 py-3 bg-brand-blue text-white rounded-xl font-semibold hover:bg-blue-600 transition-all">
+                            <i class="fas fa-plus mr-2"></i>Tambah Perangkat
+                        </button>
+                    </div>`;
+                return;
+            }
 
-                // Device preview list (max 3 devices)
-                const devicePreview = (room.devices || []).slice(0, 3).map(d => {
-                    const icon = getDeviceIcon(d.device_type);
-                    const stateColor = d.state === 'on' ? 'text-green-500' : 'text-gray-400';
-                    return `<span class="${stateColor}" title="${d.name}"><i class="fas ${icon} text-xs"></i></span>`;
-                }).join(' ');
+            filtered.forEach((device, index) => {
+                const isOn = device.state === 'on';
+                const deviceMeta = getDeviceMeta(device);
+                const cardClass = isOn
+                    ? 'bg-[#EBFBF0] dark:bg-green-900/20 text-gray-900 dark:text-gray-100 border-[#B7F0C8] dark:border-green-700 shadow-sm'
+                    : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md';
 
                 const cardHTML = `
-                    <div class="rounded-3xl p-5 border cursor-pointer transition-all duration-300 ${cardClass} relative overflow-hidden group">
-                        <div onclick="openRoom('${room.id}')" class="w-full">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${meta.color}">
-                                <i class="fas ${meta.icon} text-xl"></i>
+                    <div class="device-card card-stagger rounded-3xl p-6 border cursor-pointer transition-all duration-300 ${cardClass} relative overflow-hidden group" 
+                         style="animation-delay: ${index * 0.05}s"
+                         onclick="openDeviceRemote('${device.id}', '${device.device_type}', '${device.name}', ${device.room_id ? `'${device.room_id}'` : 'null'})">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center ${deviceMeta.color} group-hover:scale-110 transition-transform">
+                                <i class="fas ${deviceMeta.icon} text-2xl"></i>
                             </div>
-                            <h3 class="font-bold text-lg leading-tight mb-1 transition-colors group-hover:text-brand-blue">${room.name}</h3>
-                            <p class="text-sm ${statusClass} mb-2">${activeCount}/${totalCount} active</p>
-                            ${devicePreview ? `<div class="flex gap-2 mb-2">${devicePreview}</div>` : ''}
+                            <span class="status-dot ${isOn ? 'active' : 'inactive'}"></span>
                         </div>
-                        <button onclick="event.stopPropagation(); openAddDeviceForRoom('${room.id}')" class="mt-2 w-full py-2 text-xs font-semibold rounded-lg border-2 border-dashed border-gray-300 text-gray-500 hover:border-brand-blue hover:text-brand-blue transition-all">
-                            <i class="fas fa-plus"></i> Add Device
-                        </button>
+                        
+                        <h3 class="font-bold text-xl leading-tight mb-2 transition-colors group-hover:text-brand-blue dark:group-hover:text-blue-400">${device.name}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                            <i class="fas fa-door-open text-xs mr-1"></i>${device.room_name || 'No Room'}
+                        </p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold uppercase tracking-wide ${isOn ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}">${isOn ? 'AKTIF' : 'MATI'}</span>
+                            ${device.temperature ? `<span class="text-sm font-bold text-gray-600 dark:text-gray-300">${device.temperature.toFixed(1)}°C</span>` : ''}
+                        </div>
                     </div>
                 `;
                 container.innerHTML += cardHTML;
@@ -1941,23 +2245,24 @@
 
             if (!searchQuery) {
                 container.innerHTML += `
-                    <div onclick="openModal('modal-add-room')" class="bg-white/70 backdrop-blur-sm rounded-3xl p-5 border-2 border-dashed border-gray-300 cursor-pointer flex flex-col items-center justify-center text-gray-500 hover:bg-gray-100 hover:border-brand-blue hover:text-brand-blue transition-all duration-300 min-h-[160px] group">
-                        <div class="w-12 h-12 rounded-2xl bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center mb-3 transition-colors">
-                            <i class="fas fa-plus text-xl group-hover:text-brand-blue transition-colors"></i>
+                    <div onclick="openAddDeviceModal()" class="device-card btn-pulse bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 cursor-pointer flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-brand-blue dark:hover:border-blue-500 hover:text-brand-blue dark:hover:text-blue-400 transition-all duration-300 min-h-[220px] group">
+                        <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-800 flex items-center justify-center mb-4 transition-all group-hover:scale-110">
+                            <i class="fas fa-plus text-3xl group-hover:text-brand-blue dark:group-hover:text-blue-400 transition-colors"></i>
                         </div>
-                        <span class="font-semibold text-sm">Add Room</span>
+                        <span class="font-bold text-base mb-1">Tambah Perangkat</span>
+                        <span class="text-xs text-gray-400 text-center px-4">Tambah perangkat baru (TV, AC, Lampu, dll)</span>
                     </div>`;
             }
         }
 
         function handleSearch() {
-            renderDashboardRooms(document.getElementById('dashboard-search').value.trim());
+            renderDashboardDevices(document.getElementById('dashboard-search').value.trim());
         }
 
         // ── Open Room (load devices from backend) ──────────────
         async function openRoom(roomId) {
             state.currentRoomUUID = roomId;
-            openModal('modal-room-detail');
+            navigate('room-detail');
             await loadRoomDevices(roomId);
         }
 
@@ -2100,7 +2405,7 @@
                 }
 
                 container.innerHTML += `
-                    <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md" data-device-id="${device.device_id}">
+                    <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md cursor-pointer" data-device-id="${device.device_id}" onclick="openDeviceRemote('${device.device_id}')">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center ${isOn ? 'bg-blue-100 text-brand-blue' : 'bg-gray-100 text-gray-500'} transition-colors">
@@ -2119,7 +2424,6 @@
                                 <span class="text-xs font-bold text-gray-400 uppercase">${isOn ? 'on' : 'off'}</span>
                             </div>
                         </div>
-                        ${deviceControls}
                     </div>`;
             });
 
@@ -2228,6 +2532,831 @@
             }
         }
 
+        // ── Device Remote Functions ────────────────────────────
+        let currentDevice = null;
+
+        function openDeviceRemote(deviceId) {
+            const device = state.currentRoomDevices.find(d => d.device_id === deviceId);
+            if (!device) return;
+            
+            currentDevice = device;
+            state.activePage = 'device-remote';
+            
+            document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
+            const remotePage = document.getElementById('page-device-remote');
+            if (remotePage) {
+                remotePage.classList.remove('hidden');
+                document.getElementById('device-remote-title').textContent = device.name;
+                renderDeviceRemote(device);
+            }
+        }
+
+        function backToRoom() {
+            if (state.currentRoomUUID) {
+                navigate('room-detail');
+                loadRoomDevices(state.currentRoomUUID);
+            }
+        }
+
+        function openDeviceMenu() {
+            // Placeholder for device settings menu
+            showToast('Device menu coming soon', 'info');
+        }
+
+        async function sendRemoteCommand(deviceId, action, params = {}) {
+            try {
+                const res = await api('POST', `/commands/${deviceId}`, { action, ...params });
+                if (res.ok) {
+                    // Refresh device state
+                    if (state.currentRoomUUID) {
+                        const roomRes = await api('GET', `/rooms/${state.currentRoomUUID}`);
+                        if (roomRes.ok) {
+                            const room = await roomRes.json();
+                            state.currentRoomDevices = room.devices || [];
+                            currentDevice = state.currentRoomDevices.find(d => d.device_id === deviceId);
+                            if (currentDevice) renderDeviceRemote(currentDevice);
+                        }
+                    }
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.detail || 'Command failed', 'error');
+                }
+            } catch (e) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        // Learn Mode Function
+        async function openLearnMode(deviceId) {
+            const buttons = ['power', 'vol_up', 'vol_down', 'ch_up', 'ch_down', 'mute', 'source', 'menu', 'ok', 'up', 'down', 'left', 'right', 'home', 'back'];
+            
+            showToast('Learn Mode: Arahkan remote ke ESP32 dan tekan tombol', 'info');
+            
+            for (let btn of buttons) {
+                const confirmed = confirm(`Learn tombol: ${btn.toUpperCase()}\n\nArahkan remote fisik ke sensor TSOP38238, lalu tekan tombol ${btn.toUpperCase()}.\n\nKlik OK jika sudah siap.`);
+                
+                if (!confirmed) break;
+                
+                try {
+                    const res = await api('POST', `/commands/${deviceId}`, { 
+                        action: 'learn_mode',
+                        button: btn,
+                        target_button: btn
+                    });
+                    
+                    if (res.ok) {
+                        showToast(`Menunggu sinyal untuk tombol: ${btn.toUpperCase()}`, 'info');
+                        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+                    }
+                } catch (e) {
+                    showToast('Learn mode error', 'error');
+                    break;
+                }
+            }
+            
+            showToast('Learn mode selesai! Kode tersimpan di ESP32', 'success');
+        }
+
+        function renderDeviceRemote(device) {
+            const container = document.getElementById('remote-content');
+            const deviceType = (device.device_type || '').toLowerCase();
+            
+            if (deviceType === 'ac') {
+                renderACRemote(device, container);
+            } else if (deviceType === 'tv') {
+                renderTVRemote(device, container);
+            } else if (deviceType === 'light') {
+                renderLightRemote(device, container);
+            } else if (deviceType === 'fan') {
+                renderFanRemote(device, container);
+            } else if (deviceType === 'plug') {
+                renderPlugRemote(device, container);
+            } else if (deviceType === 'camera') {
+                renderCameraRemote(device, container);
+            } else if (deviceType === 'door') {
+                renderDoorRemote(device, container);
+            } else if (deviceType === 'cooker') {
+                renderCookerRemote(device, container);
+            } else {
+                renderGenericRemote(device, container);
+            }
+        }
+
+        function renderACRemote(device, container) {
+            const isOn = device.state === 'on';
+            const temp = device.target_temperature || 24;
+            const mode = device.ac_mode || 'cool';
+            const fanSpeed = device.fan_speed || 3;
+            const currentTemp = device.temperature || temp;
+            
+            container.innerHTML = `
+                <div class="space-y-4 md:space-y-6">
+                    <!-- Temperature Display -->
+                    <div class="text-center mb-4 md:mb-8">
+                        <div class="text-6xl md:text-8xl lg:text-9xl font-bold mb-2">${temp}<span class="text-3xl md:text-5xl lg:text-6xl">°C</span></div>
+                        <div class="flex items-center justify-center gap-2 md:gap-3 text-gray-400">
+                            <i class="fas fa-snowflake text-xl md:text-2xl"></i>
+                            <span class="text-lg md:text-xl font-semibold">${mode.charAt(0).toUpperCase() + mode.slice(1)}</span>
+                        </div>
+                        ${currentTemp !== temp ? `<div class="text-gray-500 mt-2 text-sm md:text-base">Current: ${currentTemp.toFixed(1)}°C</div>` : ''}
+                    </div>
+
+                    <!-- Status Indicators -->
+                    <div class="grid grid-cols-3 gap-2 md:gap-3 mb-4 md:mb-6">
+                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-2 md:p-3 text-center">
+                            <i class="fas fa-wind text-base md:text-lg mb-1 text-gray-400"></i>
+                            <div class="text-xs text-gray-500">Speed</div>
+                            <div class="font-bold text-sm md:text-base">${fanSpeed === 1 ? 'Low' : fanSpeed === 5 ? 'High' : 'Mid'}</div>
+                        </div>
+                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-2 md:p-3 text-center">
+                            <i class="fas fa-compass text-base md:text-lg mb-1 text-gray-400"></i>
+                            <div class="text-xs text-gray-500">Direction</div>
+                            <div class="font-bold text-sm md:text-base">Fixed</div>
+                        </div>
+                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-2 md:p-3 text-center">
+                            <i class="fas fa-certificate text-base md:text-lg mb-1 text-gray-400"></i>
+                            <div class="text-xs text-gray-500">Swing</div>
+                            <div class="font-bold text-sm md:text-base">Off</div>
+                        </div>
+                    </div>
+
+                    <!-- Power Button -->
+                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                        class="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-4 md:mb-6">
+                        <i class="fas fa-power-off text-2xl md:text-3xl lg:text-4xl"></i>
+                    </button>
+
+                    <!-- Mode Button -->
+                    <button onclick="cycleACMode('${device.device_id}', '${mode}')" 
+                        class="w-full bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg transition-colors">
+                        Mode
+                    </button>
+
+                    <!-- Control Grid -->
+                    <div class="grid grid-cols-3 gap-2 md:gap-3">
+                        <button onclick="adjustACSpeed('${device.device_id}', ${fanSpeed})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 md:py-8 rounded-xl md:rounded-2xl transition-colors">
+                            <div class="text-xs md:text-sm text-gray-400 mb-1">Speed</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {swing: true})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 md:py-8 rounded-xl md:rounded-2xl transition-colors">
+                            <div class="text-xs md:text-sm text-gray-400 mb-1">Direction</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {swing: true})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 md:py-8 rounded-xl md:rounded-2xl transition-colors">
+                            <div class="text-xs md:text-sm text-gray-400 mb-1">Swing</div>
+                        </button>
+                    </div>
+
+                    <!-- Temperature Control -->
+                    <div class="flex items-center justify-between bg-gray-800 rounded-xl md:rounded-2xl p-3 md:p-4">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {target_temperature: ${Math.max(16, temp - 1)}})" 
+                            class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg md:rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-2xl md:text-3xl transition-colors">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div class="text-center">
+                            <div class="text-xs md:text-sm text-gray-400">Temp</div>
+                        </div>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {target_temperature: ${Math.min(30, temp + 1)}})" 
+                            class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg md:rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-2xl md:text-3xl transition-colors">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Extra Controls -->
+                    <div class="grid grid-cols-3 gap-2 md:gap-3">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 60})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-colors">
+                            <div class="text-xs md:text-sm">Timer</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {sleep_mode: true})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-colors">
+                            <div class="text-xs md:text-sm">Sleep</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on')" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-colors">
+                            <div class="text-xs md:text-sm">···</div>
+                        </button>
+                    </div>
+
+                    <div class="text-center text-xs md:text-sm text-gray-600 mt-4">1 of 2</div>
+                </div>
+            `;
+        }
+
+        async function cycleACMode(deviceId, currentMode) {
+            const modes = ['cool', 'heat', 'fan', 'dry'];
+            const currentIndex = modes.indexOf(currentMode);
+            const nextMode = modes[(currentIndex + 1) % modes.length];
+            await sendRemoteCommand(deviceId, 'turn_on', { ac_mode: nextMode });
+        }
+
+        async function adjustACSpeed(deviceId, currentSpeed) {
+            const nextSpeed = (currentSpeed % 5) + 1;
+            await sendRemoteCommand(deviceId, 'turn_on', { fan_speed: nextSpeed });
+        }
+
+        function renderTVRemote(device, container) {
+            const isOn = device.state === 'on';
+            
+            container.innerHTML = `
+                <div class="space-y-4 md:space-y-6">
+                    <!-- Top Buttons -->
+                    <div class="grid grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-8">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'power')" 
+                            class="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 mx-auto rounded-full ${isOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 hover:bg-gray-600'} flex items-center justify-center transition-all">
+                            <i class="fas fa-power-off text-xl md:text-2xl lg:text-3xl"></i>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'source')" 
+                            class="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                            <i class="fas fa-tv text-xl md:text-2xl lg:text-3xl"></i>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'menu')" 
+                            class="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                            <i class="fas fa-bars text-xl md:text-2xl lg:text-3xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'home')" 
+                            class="w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                            <i class="fas fa-home text-lg md:text-xl"></i>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'info')" 
+                            class="w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                            <i class="fas fa-info-circle text-lg md:text-xl"></i>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'back')" 
+                            class="w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                            <i class="fas fa-undo text-lg md:text-xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- D-Pad -->
+                    <div class="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 mx-auto mb-4 md:mb-8">
+                        <div class="absolute inset-0 bg-gray-800 rounded-full flex items-center justify-center">
+                            <!-- Center OK Button -->
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'ok')" 
+                                class="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-lg md:text-xl font-bold transition-all z-10">
+                                OK
+                            </button>
+                            
+                            <!-- Up -->
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'up')" 
+                                class="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-chevron-up text-lg md:text-xl"></i>
+                            </button>
+                            
+                            <!-- Down -->
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'down')" 
+                                class="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-chevron-down text-lg md:text-xl"></i>
+                            </button>
+                            
+                            <!-- Left -->
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'left')" 
+                                class="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-chevron-left text-lg md:text-xl"></i>
+                            </button>
+                            
+                            <!-- Right -->
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'right')" 
+                                class="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-chevron-right text-lg md:text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Volume & Channel -->
+                    <div class="grid grid-cols-2 gap-3 md:gap-4">
+                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-3 md:p-4">
+                            <div class="flex flex-col items-center gap-2">
+                                <button onclick="sendRemoteCommand('${device.device_id}', 'vol_up')" 
+                                    class="w-full py-4 md:py-6 rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                    <i class="fas fa-plus text-xl md:text-2xl"></i>
+                                </button>
+                                <div class="text-center text-xs md:text-sm text-gray-400 py-1">Volume</div>
+                                <button onclick="sendRemoteCommand('${device.device_id}', 'vol_down')" 
+                                    class="w-full py-4 md:py-6 rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                    <i class="fas fa-minus text-xl md:text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-3 md:p-4">
+                            <div class="flex flex-col items-center gap-2">
+                                <button onclick="sendRemoteCommand('${device.device_id}', 'ch_up')" 
+                                    class="w-full py-4 md:py-6 rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                    <i class="fas fa-chevron-up text-xl md:text-2xl"></i>
+                                </button>
+                                <div class="text-center text-xs md:text-sm text-gray-400 py-1">Channel</div>
+                                <button onclick="sendRemoteCommand('${device.device_id}', 'ch_down')" 
+                                    class="w-full py-4 md:py-6 rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                    <i class="fas fa-chevron-down text-xl md:text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Controls -->
+                    <div class="grid grid-cols-3 gap-3 md:gap-4 mt-3 md:mt-4">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'mute')" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-volume-mute text-lg md:text-xl"></i>
+                            <span class="text-sm md:text-base">Mute</span>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'settings')" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-cog text-lg md:text-xl"></i>
+                            <span class="text-sm md:text-base">···</span>
+                        </button>
+                        <button onclick="openLearnMode('${device.device_id}')" 
+                            class="bg-blue-600 hover:bg-blue-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-graduation-cap text-lg md:text-xl"></i>
+                            <span class="text-sm md:text-base">Learn</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLightRemote(device, container) {
+            const isOn = device.state === 'on';
+            const brightness = device.brightness || 100;
+            
+            container.innerHTML = `
+                <div class="space-y-4 md:space-y-6">
+                    <!-- Light Icon -->
+                    <div class="text-center mb-4 md:mb-8">
+                        <div class="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mx-auto rounded-full ${isOn ? 'bg-yellow-500' : 'bg-gray-700'} flex items-center justify-center mb-4 transition-all">
+                            <i class="fas fa-lightbulb text-5xl md:text-7xl lg:text-8xl ${isOn ? 'text-white' : 'text-gray-500'}"></i>
+                        </div>
+                        <div class="text-4xl md:text-6xl font-bold mb-2">${brightness}<span class="text-2xl md:text-3xl">%</span></div>
+                        <div class="text-gray-400 text-sm md:text-base">Brightness</div>
+                    </div>
+
+                    <!-- Power Button -->
+                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                        class="w-20 h-20 md:w-24 md:h-24 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-4 md:mb-8">
+                        <i class="fas fa-power-off text-3xl md:text-4xl"></i>
+                    </button>
+
+                    <!-- Brightness Slider -->
+                    <div class="bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-6">
+                        <label class="text-xs md:text-sm text-gray-400 mb-3 md:mb-4 block">Brightness</label>
+                        <input type="range" min="0" max="100" value="${brightness}" 
+                            oninput="this.nextElementSibling.textContent = this.value + '%'"
+                            onchange="sendRemoteCommand('${device.device_id}', 'turn_on', {value: parseInt(this.value)})" 
+                            class="w-full h-2 md:h-3 bg-gray-700 rounded-full appearance-none cursor-pointer accent-yellow-500">
+                        <div class="text-right text-xl md:text-2xl font-bold mt-3 md:mt-4">${brightness}%</div>
+                    </div>
+
+                    <!-- Color Temperature -->
+                    <div class="bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-6">
+                        <label class="text-xs md:text-sm text-gray-400 mb-3 md:mb-4 block">Color Temperature</label>
+                        <div class="grid grid-cols-3 gap-2 md:gap-3">
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'warm'})" 
+                                class="bg-orange-200 hover:bg-orange-300 text-orange-900 py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all">
+                                Warm
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'neutral'})" 
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-900 py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all">
+                                Neutral
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'cool'})" 
+                                class="bg-blue-200 hover:bg-blue-300 text-blue-900 py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all">
+                                Cool
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Presets -->
+                    <div class="grid grid-cols-2 gap-2 md:gap-3">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {value: 25})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all">
+                            <div class="text-xs md:text-sm">Night (25%)</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {value: 50})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all">
+                            <div class="text-xs md:text-sm">Relax (50%)</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {value: 75})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all">
+                            <div class="text-xs md:text-sm">Work (75%)</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {value: 100})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all">
+                            <div class="text-xs md:text-sm">Max (100%)</div>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFanRemote(device, container) {
+            const isOn = device.state === 'on';
+            const speed = device.fan_speed || 3;
+            
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Fan Icon -->
+                    <div class="text-center mb-8">
+                        <div class="w-40 h-40 mx-auto rounded-full ${isOn ? 'bg-blue-500' : 'bg-gray-700'} flex items-center justify-center mb-4 transition-all ${isOn ? 'animate-spin-slow' : ''}">
+                            <i class="fas fa-fan text-7xl text-white"></i>
+                        </div>
+                        <div class="text-gray-400 text-xl">Speed: ${speed}</div>
+                    </div>
+
+                    <!-- Power Button -->
+                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                        class="w-24 h-24 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-8">
+                        <i class="fas fa-power-off text-4xl"></i>
+                    </button>
+
+                    <!-- Speed Buttons -->
+                    <div class="grid grid-cols-5 gap-2 mb-6">
+                        ${[1,2,3,4,5].map(s => `
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {fan_speed: ${s}})" 
+                                class="py-8 rounded-2xl font-bold text-2xl ${speed === s ? 'bg-blue-500' : 'bg-gray-800 hover:bg-gray-700'} transition-all">
+                                ${s}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Speed Slider -->
+                    <div class="bg-gray-800 rounded-3xl p-6">
+                        <label class="text-sm text-gray-400 mb-4 block">Fan Speed</label>
+                        <input type="range" min="1" max="5" value="${speed}" 
+                            oninput="this.nextElementSibling.textContent = 'Speed: ' + this.value"
+                            onchange="sendRemoteCommand('${device.device_id}', 'turn_on', {fan_speed: parseInt(this.value)})" 
+                            class="w-full h-3 bg-gray-700 rounded-full appearance-none cursor-pointer accent-blue-500">
+                        <div class="text-right text-xl font-bold mt-4">Speed: ${speed}</div>
+                    </div>
+
+                    <!-- Modes -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {mode: 'normal'})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-4 rounded-2xl transition-all">
+                            <i class="fas fa-wind text-xl mb-1"></i>
+                            <div class="text-sm">Normal</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {mode: 'natural'})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-4 rounded-2xl transition-all">
+                            <i class="fas fa-leaf text-xl mb-1"></i>
+                            <div class="text-sm">Natural</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {mode: 'sleep'})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-4 rounded-2xl transition-all">
+                            <i class="fas fa-moon text-xl mb-1"></i>
+                            <div class="text-sm">Sleep</div>
+                        </button>
+                    </div>
+
+                    <!-- Oscillation & Timer -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {oscillate: true})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-arrows-alt-h text-2xl mb-2"></i>
+                            <div class="text-sm">Oscillate</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 60})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-clock text-2xl mb-2"></i>
+                            <div class="text-sm">Timer</div>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlugRemote(device, container) {
+            const isOn = device.state === 'on';
+            const power = device.power_consumption || 0;
+            
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Plug Icon -->
+                    <div class="text-center mb-8">
+                        <div class="w-40 h-40 mx-auto rounded-full ${isOn ? 'bg-green-500' : 'bg-gray-700'} flex items-center justify-center mb-4 transition-all">
+                            <i class="fas fa-plug text-7xl text-white"></i>
+                        </div>
+                        <div class="text-4xl font-bold mb-2">${isOn ? 'ON' : 'OFF'}</div>
+                        ${power > 0 ? `<div class="text-gray-400">${power.toFixed(1)}W</div>` : ''}
+                    </div>
+
+                    <!-- Power Button -->
+                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                        class="w-32 h-32 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-8">
+                        <i class="fas fa-power-off text-5xl"></i>
+                    </button>
+
+                    <!-- Power Info -->
+                    <div class="bg-gray-800 rounded-3xl p-6">
+                        <div class="text-sm text-gray-400 mb-4">Power Consumption</div>
+                        <div class="text-5xl font-bold text-center mb-2">${power.toFixed(1)}<span class="text-2xl text-gray-400">W</span></div>
+                        <div class="text-center text-gray-500 text-sm">Current Usage</div>
+                    </div>
+
+                    <!-- Schedule -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 30})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-clock text-2xl mb-2"></i>
+                            <div class="text-sm">30 min</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 60})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-clock text-2xl mb-2"></i>
+                            <div class="text-sm">1 hour</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 120})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-clock text-2xl mb-2"></i>
+                            <div class="text-sm">2 hours</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 240})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-clock text-2xl mb-2"></i>
+                            <div class="text-sm">4 hours</div>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCameraRemote(device, container) {
+            const isOn = device.state === 'on';
+            
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Camera Feed Preview -->
+                    <div class="bg-gray-800 rounded-3xl overflow-hidden mb-6" style="aspect-ratio: 16/9;">
+                        <div class="w-full h-full flex items-center justify-center bg-gray-900">
+                            <i class="fas fa-video text-6xl text-gray-600"></i>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="text-center mb-6">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full ${isOn ? 'bg-red-500' : 'bg-gray-700'}">
+                            ${isOn ? '<span class="w-3 h-3 bg-white rounded-full animate-pulse"></span>' : ''}
+                            <span class="font-bold">${isOn ? 'RECORDING' : 'OFF'}</span>
+                        </div>
+                    </div>
+
+                    <!-- Power Button -->
+                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                        class="w-20 h-20 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-6">
+                        <i class="fas fa-power-off text-3xl"></i>
+                    </button>
+
+                    <!-- PTZ Controls -->
+                    <div class="bg-gray-800 rounded-3xl p-6 mb-6">
+                        <div class="text-sm text-gray-400 mb-4 text-center">Camera Control</div>
+                        <div class="relative w-48 h-48 mx-auto">
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'pan_tilt', {direction: 'up'})" 
+                                class="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'pan_tilt', {direction: 'down'})" 
+                                class="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'pan_tilt', {direction: 'left'})" 
+                                class="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'pan_tilt', {direction: 'right'})" 
+                                class="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'home')" 
+                                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-home"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'snapshot')" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-camera text-2xl mb-2"></i>
+                            <div class="text-sm">Snapshot</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'record')" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-circle text-2xl mb-2 text-red-500"></i>
+                            <div class="text-sm">Record</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'night_vision')" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-moon text-2xl mb-2"></i>
+                            <div class="text-sm">Night</div>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDoorRemote(device, container) {
+            const isLocked = device.state === 'locked' || device.state === 'off';
+            
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Door Icon -->
+                    <div class="text-center mb-8">
+                        <div class="w-40 h-40 mx-auto rounded-full ${isLocked ? 'bg-red-500' : 'bg-green-500'} flex items-center justify-center mb-4 transition-all">
+                            <i class="fas ${isLocked ? 'fa-lock' : 'fa-lock-open'} text-7xl text-white"></i>
+                        </div>
+                        <div class="text-4xl font-bold mb-2">${isLocked ? 'LOCKED' : 'UNLOCKED'}</div>
+                        <div class="text-gray-400">${device.name}</div>
+                    </div>
+
+                    <!-- Lock/Unlock Button -->
+                    <button onclick="sendRemoteCommand('${device.device_id}', '${isLocked ? 'unlock' : 'lock'}')" 
+                        class="w-32 h-32 mx-auto flex items-center justify-center rounded-full ${isLocked ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'} transition-all mb-8">
+                        <div class="text-center">
+                            <i class="fas ${isLocked ? 'fa-lock-open' : 'fa-lock'} text-4xl mb-2"></i>
+                            <div class="text-sm font-bold">${isLocked ? 'UNLOCK' : 'LOCK'}</div>
+                        </div>
+                    </button>
+
+                    <!-- Status Info -->
+                    <div class="bg-gray-800 rounded-3xl p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Status</span>
+                            <span class="font-bold ${isLocked ? 'text-red-500' : 'text-green-500'}">${isLocked ? 'Secured' : 'Open'}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Last Activity</span>
+                            <span class="font-bold">Just now</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Battery</span>
+                            <span class="font-bold">85%</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'auto_lock', {timer: 30})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-clock text-2xl mb-2"></i>
+                            <div class="text-sm">Auto Lock</div>
+                            <div class="text-xs text-gray-500">30s</div>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'unlock', {temporary: true})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-6 rounded-2xl transition-all">
+                            <i class="fas fa-user-clock text-2xl mb-2"></i>
+                            <div class="text-sm">Temp Access</div>
+                            <div class="text-xs text-gray-500">1 hour</div>
+                        </button>
+                    </div>
+
+                    <!-- Access Log -->
+                    <button onclick="showToast('Access log coming soon', 'info')" 
+                        class="w-full bg-gray-800 hover:bg-gray-700 py-4 rounded-2xl transition-all">
+                        <i class="fas fa-history text-xl mr-2"></i>
+                        <span>View Access Log</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderCookerRemote(device, container) {
+            const isOn = device.state === 'on';
+            const mode = device.mode || 'cook';
+            
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Cooker Icon -->
+                    <div class="text-center mb-8">
+                        <div class="w-40 h-40 mx-auto rounded-full ${isOn ? 'bg-orange-500' : 'bg-gray-700'} flex items-center justify-center mb-4 transition-all">
+                            <i class="fas fa-bowl-rice text-7xl text-white"></i>
+                        </div>
+                        <div class="text-4xl font-bold mb-2">${isOn ? 'COOKING' : 'OFF'}</div>
+                        <div class="text-gray-400">${mode.toUpperCase()}</div>
+                    </div>
+
+                    <!-- Power Button -->
+                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                        class="w-24 h-24 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-8">
+                        <i class="fas fa-power-off text-4xl"></i>
+                    </button>
+
+                    <!-- Cooking Modes -->
+                    <div class="bg-gray-800 rounded-3xl p-6 mb-6">
+                        <div class="text-sm text-gray-400 mb-4">Cooking Mode</div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {mode: 'cook'})" 
+                                class="${mode === 'cook' ? 'bg-orange-500' : 'bg-gray-700 hover:bg-gray-600'} py-4 rounded-xl transition-all">
+                                <i class="fas fa-fire text-xl mb-1"></i>
+                                <div class="text-sm font-bold">Cook</div>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {mode: 'warm'})" 
+                                class="${mode === 'warm' ? 'bg-orange-500' : 'bg-gray-700 hover:bg-gray-600'} py-4 rounded-xl transition-all">
+                                <i class="fas fa-sun text-xl mb-1"></i>
+                                <div class="text-sm font-bold">Keep Warm</div>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {mode: 'steam'})" 
+                                class="${mode === 'steam' ? 'bg-orange-500' : 'bg-gray-700 hover:bg-gray-600'} py-4 rounded-xl transition-all">
+                                <i class="fas fa-cloud text-xl mb-1"></i>
+                                <div class="text-sm font-bold">Steam</div>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {mode: 'porridge'})" 
+                                class="${mode === 'porridge' ? 'bg-orange-500' : 'bg-gray-700 hover:bg-gray-600'} py-4 rounded-xl transition-all">
+                                <i class="fas fa-bowl-food text-xl mb-1"></i>
+                                <div class="text-sm font-bold">Porridge</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Timer -->
+                    <div class="bg-gray-800 rounded-3xl p-6">
+                        <div class="text-sm text-gray-400 mb-4">Cook Timer</div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 15})" 
+                                class="bg-gray-700 hover:bg-gray-600 py-6 rounded-xl transition-all">
+                                <div class="text-2xl font-bold mb-1">15</div>
+                                <div class="text-xs text-gray-400">minutes</div>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 30})" 
+                                class="bg-gray-700 hover:bg-gray-600 py-6 rounded-xl transition-all">
+                                <div class="text-2xl font-bold mb-1">30</div>
+                                <div class="text-xs text-gray-400">minutes</div>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 45})" 
+                                class="bg-gray-700 hover:bg-gray-600 py-6 rounded-xl transition-all">
+                                <div class="text-2xl font-bold mb-1">45</div>
+                                <div class="text-xs text-gray-400">minutes</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'cancel')" 
+                            class="bg-red-900 hover:bg-red-800 py-4 rounded-2xl transition-all">
+                            <i class="fas fa-times text-xl mr-2"></i>
+                            <span>Cancel</span>
+                        </button>
+                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {preset: 'quick'})" 
+                            class="bg-gray-800 hover:bg-gray-700 py-4 rounded-2xl transition-all">
+                            <i class="fas fa-bolt text-xl mr-2"></i>
+                            <span>Quick Cook</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGenericRemote(device, container) {
+            const isOn = device.state === 'on';
+            
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Generic Icon -->
+                    <div class="text-center mb-8">
+                        <div class="w-40 h-40 mx-auto rounded-full ${isOn ? 'bg-blue-500' : 'bg-gray-700'} flex items-center justify-center mb-4 transition-all">
+                            <i class="fas fa-microchip text-7xl text-white"></i>
+                        </div>
+                        <div class="text-4xl font-bold mb-2">${isOn ? 'ON' : 'OFF'}</div>
+                        <div class="text-gray-400">${device.device_type}</div>
+                    </div>
+
+                    <!-- Power Button -->
+                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                        class="w-32 h-32 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-8">
+                        <i class="fas fa-power-off text-5xl"></i>
+                    </button>
+
+                    <!-- Device Info -->
+                    <div class="bg-gray-800 rounded-3xl p-6 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Device ID</span>
+                            <span class="font-mono text-sm">${device.device_id}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Type</span>
+                            <span class="font-bold">${device.device_type}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Status</span>
+                            <span class="font-bold ${isOn ? 'text-green-500' : 'text-gray-500'}">${isOn ? 'Active' : 'Inactive'}</span>
+                        </div>
+                    </div>
+
+                    <!-- Basic Controls -->
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-tools text-4xl mb-3"></i>
+                        <div>Advanced controls for this device type</div>
+                        <div class="text-sm">will be available soon</div>
+                    </div>
+                </div>
+            `;
+        }
+
         // ── Modals ─────────────────────────────────────────────
         function openModal(id) {
             const modal = document.getElementById(id);
@@ -2244,6 +3373,32 @@
         }
 
         // Open add device modal with room pre-selected
+        async function openAddDeviceModal() {
+            // Auto-create default room if none exists
+            if (!state.rooms || state.rooms.length === 0) {
+                try {
+                    const res = await api('POST', '/rooms', {
+                        name: 'My Room',
+                        slug: 'my-room',
+                        room_type: 'bedroom',
+                        icon: null,
+                        description: 'Default room'
+                    });
+                    if (res.ok || res.status === 201) {
+                        const newRoom = await res.json();
+                        state.currentRoomUUID = newRoom.id;
+                        await loadRooms();
+                    }
+                } catch (e) {
+                    showToast('Failed to create default room', 'error');
+                    return;
+                }
+            } else {
+                state.currentRoomUUID = state.rooms[0].id;
+            }
+            openModal('modal-add-device');
+        }
+
         function openAddDeviceForRoom(roomId) {
             state.currentRoomUUID = roomId;
             openModal('modal-add-device');
@@ -2425,6 +3580,150 @@
             }
         }
 
+        // ── Calendar Management ──────────────────────────────────
+        let currentCalendarDate = new Date();
+        let selectedCalendarDate = new Date();
+
+        function renderCalendar() {
+            const monthYearEl = document.getElementById('calendar-month-year');
+            const daysContainer = document.getElementById('calendar-days-container');
+            
+            if (!monthYearEl || !daysContainer) return;
+
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            monthYearEl.textContent = currentCalendarDate.toLocaleDateString('id-ID', options);
+
+            // Get 5 days centered around selected date
+            const days = [];
+            const centerDate = new Date(selectedCalendarDate);
+            
+            for (let i = -2; i <= 2; i++) {
+                const date = new Date(centerDate);
+                date.setDate(centerDate.getDate() + i);
+                days.push(date);
+            }
+
+            const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+            
+            daysContainer.innerHTML = days.map(date => {
+                const isSelected = date.toDateString() === selectedCalendarDate.toDateString();
+                const isToday = date.toDateString() === new Date().toDateString();
+                
+                return `
+                    <div onclick="selectCalendarDate('${date.toISOString()}')"
+                        class="flex flex-col items-center justify-center cursor-pointer group py-1 px-1 sm:px-2 ${isSelected ? 'bg-white dark:bg-gray-700 rounded-xl shadow-sm' : ''}">
+                        <span class="text-[10px] sm:text-xs ${isSelected ? 'font-bold text-[#7fbbdd] dark:text-blue-400' : 'text-blue-100 dark:text-blue-300'} font-medium mb-1 group-hover:text-white transition-colors">
+                            ${dayNames[date.getDay()]}
+                        </span>
+                        <span class="text-base sm:text-lg font-bold ${isSelected ? 'text-[#7fbbdd] dark:text-blue-400 font-extrabold scale-110' : 'text-white'} transition-colors">
+                            ${date.getDate()}${isToday ? '<span class="text-green-400 text-xs">•</span>' : ''}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectCalendarDate(isoDate) {
+            selectedCalendarDate = new Date(isoDate);
+            renderCalendar();
+            filterSchedulesByDate(selectedCalendarDate);
+        }
+
+        function changeCalendarMonth(offset) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+            selectedCalendarDate = new Date(currentCalendarDate);
+            renderCalendar();
+            filterSchedulesByDate(selectedCalendarDate);
+        }
+
+        function filterSchedulesByDate(date) {
+            // Filter schedules and show only those matching the selected date
+            const schedules = state.schedules || [];
+            const dateStr = date.toISOString().split('T')[0];
+            
+            // Show schedules that:
+            // 1. Have specific_date matching selected date
+            // 2. Are daily schedules
+            // 3. Match weekday rules (Mon-Fri or Sat-Sun)
+            
+            const filtered = schedules.filter(s => {
+                if (s.specific_date) {
+                    return s.specific_date === dateStr;
+                }
+                // Daily schedules always show
+                return true;
+            });
+
+            renderFilteredSchedules(filtered);
+        }
+
+        function renderFilteredSchedules(schedules) {
+            const container = document.getElementById('routines-list');
+            if (!container) return;
+
+            if (schedules.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 text-center border border-gray-100 dark:border-gray-700">
+                        <i class="fas fa-calendar-times text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400">Tidak ada jadwal untuk tanggal ini</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            schedules.forEach(s => {
+                const room = state.rooms.find(r => r.id === s.room_id);
+                const device = room?.devices?.find(d => d.id === s.device_id);
+                const actionText = s.action === 'turn_on' ? 'Nyalakan' : 'Matikan';
+                const endTimeText = s.end_time ? ` - ${s.end_time}` : '';
+                
+                const routineHTML = `
+                    <div class="routine-card bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center hover:shadow-md transition-shadow">
+                        <div class="flex items-start gap-4 flex-1">
+                            <div class="mt-1 font-bold text-xl text-gray-800 dark:text-gray-100">${s.start_time}${endTimeText}</div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">${s.name}</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${room?.name || 'Unknown'} • ${actionText} ${device?.name || 'Device'}</p>
+                                ${s.specific_date ? `<p class="text-xs text-blue-500 dark:text-blue-400 mt-1"><i class="fas fa-calendar-day"></i> ${new Date(s.specific_date).toLocaleDateString('id-ID')}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
+                                onclick="event.stopPropagation(); toggleSchedule('${s.id}', ${s.is_active})">
+                                <input type="checkbox" ${s.is_active ? 'checked' : ''}
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-700 border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
+                                <label class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
+                            </div>
+                            <button onclick="deleteSchedule('${s.id}')"
+                                class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Hapus">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += routineHTML;
+            });
+        }
+
+        function toggleScheduleOptions(type) {
+            const specificDateContainer = document.getElementById('specific-date-container');
+            const dateInput = document.getElementById('new-routine-date');
+            
+            if (type === 'specific') {
+                specificDateContainer.classList.remove('hidden');
+                dateInput.required = true;
+                // Set min date to today
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.min = today;
+                dateInput.value = selectedCalendarDate.toISOString().split('T')[0];
+            } else {
+                specificDateContainer.classList.add('hidden');
+                dateInput.required = false;
+                dateInput.value = '';
+            }
+        }
+
         function openScheduleDetail(scheduleId) {
             // TODO: Open modal with schedule details
             showToast('Schedule detail modal coming soon', 'info');
@@ -2436,12 +3735,29 @@
             const roomId = document.getElementById('new-routine-room').value;
             const startTime = document.getElementById('new-routine-time').value;
             const endTime = document.getElementById('new-routine-end-time')?.value || null;
+            const scheduleType = document.getElementById('new-routine-schedule-type').value;
+            const specificDate = document.getElementById('new-routine-date')?.value || null;
 
             const deviceCheckboxes = document.querySelectorAll('input[name="routine-devices"]:checked');
             
             if (!name || !startTime || deviceCheckboxes.length === 0) {
                 showToast('Please fill all fields and select at least one device action', 'error');
                 return;
+            }
+
+            if (scheduleType === 'specific' && !specificDate) {
+                showToast('Please select a specific date', 'error');
+                return;
+            }
+
+            // Determine days based on schedule type
+            let days = '1,2,3,4,5,6,7'; // Default: every day
+            if (scheduleType === 'weekdays') {
+                days = '1,2,3,4,5'; // Monday to Friday
+            } else if (scheduleType === 'weekend') {
+                days = '6,7'; // Saturday and Sunday
+            } else if (scheduleType === 'specific') {
+                days = null; // No recurring days for specific date
             }
 
             // Create schedule for each selected device action
@@ -2454,16 +3770,24 @@
                 const device = state.currentRoomDevices?.find(d => d.name === deviceName);
                 if (!device) return;
 
+                const payload = {
+                    name,
+                    room_id: roomId,
+                    device_id: device.device_id,
+                    action,
+                    start_time: startTime,
+                    end_time: endTime,
+                };
+
+                // Add either specific_date or days
+                if (scheduleType === 'specific' && specificDate) {
+                    payload.specific_date = specificDate;
+                } else if (days) {
+                    payload.days = days;
+                }
+
                 try {
-                    await api('POST', '/schedules', {
-                        name,
-                        room_id: roomId,
-                        device_id: device.device_id,
-                        action,
-                        start_time: startTime,
-                        end_time: endTime,
-                        days: '1,2,3,4,5,6,7'
-                    });
+                    await api('POST', '/schedules', payload);
                 } catch (e) {
                     console.error('Failed to create schedule', e);
                 }
@@ -2473,6 +3797,7 @@
                 showToast('Routines created!', 'success');
                 closeModal('modal-add-routine');
                 loadSchedules();
+                renderCalendar();
             }).catch(() => {
                 showToast('Some routines failed to create', 'error');
             });
@@ -2485,7 +3810,9 @@
             const type = document.getElementById('new-device-type').value;
             if (!name || !state.currentRoomUUID) return;
 
-            const deviceId = type.toLowerCase() + '_' + name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') + '_' + Math.random().toString(36).substr(2, 4);
+            const timestamp = Date.now().toString(36);
+            const random = Math.random().toString(36).substr(2, 4);
+            const deviceId = type.toLowerCase() + '_' + name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') + '_' + timestamp + random;
 
             try {
                 const res = await api('POST', '/devices', {
@@ -2498,8 +3825,7 @@
                 if (res.ok || res.status === 201) {
                     showToast('Device added!', 'success');
                     closeModal('modal-add-device');
-                    await loadRoomDevices(state.currentRoomUUID);
-                    loadRooms();
+                    await loadRooms();
                 } else {
                     const err = await res.json().catch(() => ({}));
                     showToast(err.detail || 'Failed to add device', 'error');
@@ -2759,6 +4085,65 @@
             }
         }
 
+        // ── Dark Mode Toggle ────────────────────────────────────
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            
+            if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                // Update all toggle buttons
+                document.querySelectorAll('.dark-hide').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.light-hide').forEach(el => el.classList.add('hidden'));
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                // Update all toggle buttons
+                document.querySelectorAll('.dark-hide').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.light-hide').forEach(el => el.classList.remove('hidden'));
+            }
+        }
+
+        // Initialize theme on page load
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                document.querySelectorAll('.dark-hide').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.light-hide').forEach(el => el.classList.remove('hidden'));
+            } else {
+                document.querySelectorAll('.dark-hide').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.light-hide').forEach(el => el.classList.add('hidden'));
+            }
+        }
+
+        // Call initTheme immediately when script loads
+        initTheme();
+
+        // Initialize page on load
+        function initPage() {
+            // Check if user is authenticated
+            const token = localStorage.getItem('auth_token');
+            const currentPath = window.location.hash || '#splash';
+            
+            // Default to splash if no token
+            if (!token) {
+                navigate('splash');
+            } else {
+                // If authenticated, show home
+                navigate('home');
+            }
+        }
+
+        // Call initPage on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPage);
+        } else {
+            initPage();
+        }
 
 
     </script>

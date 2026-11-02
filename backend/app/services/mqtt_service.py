@@ -78,8 +78,8 @@ class MQTTService:
     def _build_tls_context(self) -> ssl.SSLContext:
         """Build TLS context for HiveMQ Cloud connection."""
         tls_context = ssl.create_default_context()
-        tls_context.check_hostname = True
-        tls_context.verify_mode = ssl.CERT_REQUIRED
+        tls_context.check_hostname = False
+        tls_context.verify_mode = ssl.CERT_NONE
         return tls_context
 
     async def connect(self) -> None:
@@ -120,21 +120,20 @@ class MQTTService:
 
         while True:
             try:
-                tls_params = aiomqtt.TLSParameters(
-                    ca_certs=None,
-                    certfile=None,
-                    keyfile=None,
-                ) if settings.MQTT_TLS_ENABLED else None
-
-                tls_context = self._build_tls_context() if settings.MQTT_TLS_ENABLED else None
-
+                # Simplified: just use tls_params with server_hostname
+                import aiomqtt.client
+                
                 async with aiomqtt.Client(
                     hostname=settings.MQTT_BROKER,
                     port=settings.MQTT_PORT,
                     username=settings.MQTT_USERNAME,
                     password=settings.MQTT_PASSWORD,
                     identifier=settings.MQTT_CLIENT_ID,
-                    tls_context=tls_context,
+                    tls_params=aiomqtt.TLSParameters(
+                        ca_certs=None,
+                        certfile=None,
+                        keyfile=None,
+                    ),
                     keepalive=settings.MQTT_KEEPALIVE,
                 ) as client:
                     self._client = client

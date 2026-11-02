@@ -21,7 +21,7 @@ from app.services.seed_service import seed_user_default_data
 router = APIRouter()
 
 
-@router.get("", response_model=PaginatedResponse[RoomResponse])
+@router.get("", response_model=PaginatedResponse[RoomWithDevices])
 async def list_rooms(
     page: int = Query(1, ge=1),
     page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
