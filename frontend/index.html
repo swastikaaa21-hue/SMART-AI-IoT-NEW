@@ -571,6 +571,11 @@
                     </div>
 
                     <div class="flex items-center gap-2">
+                        <!-- Indikator Waktu Real-Time -->
+                        <div class="header-time-indicator hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs shadow-sm">
+                            <i class="far fa-clock text-brand-blue dark:text-blue-400"></i>
+                            <span class="live-clock-text">--:--</span>
+                        </div>
                         <button id="theme-toggle" onclick="toggleTheme()"
                             class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
                             <i class="fas fa-moon text-xl dark-hide"></i>
@@ -643,6 +648,11 @@
                     </div>
 
                     <div class="flex items-center gap-2">
+                        <!-- Indikator Waktu Real-Time -->
+                        <div class="header-time-indicator hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs shadow-sm">
+                            <i class="far fa-clock text-brand-blue dark:text-blue-400"></i>
+                            <span class="live-clock-text">--:--</span>
+                        </div>
                         <button id="theme-toggle-schedule" onclick="toggleTheme()"
                             class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
                             <i class="fas fa-moon text-xl dark-hide"></i>
@@ -691,7 +701,7 @@
                                 data-i18n="sched_subtitle1">Otomatiskan rumah Anda dengan mudah.</p>
                             <p class="text-[10px] sm:text-xs text-gray-700/80 dark:text-gray-300/80 mb-4" data-i18n="sched_subtitle2">Atur
                                 jadwal untuk perangkat pintar Anda.</p>
-                            <button onclick="openAddRoutineModal()"
+                            <button onclick="navigate('create-schedule')"
                                 class="bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-medium px-5 py-2.5 rounded-full text-xs sm:text-sm shadow-md hover:bg-black dark:hover:bg-gray-100 transition-all w-fit mt-auto">
                                 <span data-i18n="sched_create_btn">Buat Sekarang</span>
                             </button>
@@ -704,88 +714,98 @@
                 </div>
 
                 <div id="routines-list" class="space-y-4">
-                    <div class="routine-card bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
-                        onclick="this.querySelector('.toggle-checkbox').click()">
-                        <div class="flex items-start gap-4">
-                            <div class="mt-1 font-bold text-xl text-gray-800 dark:text-gray-100">22:00</div>
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100" data-i18n="sched_night">Mode Tidur Malam
-                                </h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1" data-i18n="sched_night_desc">Rumah Anda.
-                                    Lebih Pintar. Lebih Aman.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
-                                onclick="event.stopPropagation()">
-                                <input type="checkbox" checked
-                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-700 border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
-                                <label
-                                    class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
-                            </div>
-                            <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
-                                class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Hapus">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="routine-card bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
-                        onclick="this.querySelector('.toggle-checkbox').click()">
-                        <div class="flex items-start gap-4">
-                            <div class="mt-1 font-bold text-xl text-gray-800 dark:text-gray-100">13:00</div>
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100" data-i18n="sched_studio">Pendinginan Studio
-                                </h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1" data-i18n="sched_studio_desc">Set AC Sharp
-                                    ke Mode Dingin 24°C</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
-                                onclick="event.stopPropagation()">
-                                <input type="checkbox" checked
-                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-700 border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
-                                <label
-                                    class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
-                            </div>
-                            <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
-                                class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Hapus">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="routine-card bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
-                        onclick="this.querySelector('.toggle-checkbox').click()">
-                        <div class="flex items-start gap-4">
-                            <div class="mt-1 font-bold text-xl text-gray-800 dark:text-gray-100">07:00</div>
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100" data-i18n="sched_morning">Rutinitas Pagi
-                                </h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2" data-i18n="sched_morning_desc">Nyalakan
-                                    lampu ruang tamu & atur AC ke 24°C
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in"
-                                onclick="event.stopPropagation()">
-                                <input type="checkbox"
-                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-700 border-4 appearance-none cursor-pointer transition-all duration-300 z-10 top-0" />
-                                <label
-                                    class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300"></label>
-                            </div>
-                            <button onclick="event.stopPropagation(); this.closest('.routine-card').remove();"
-                                class="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1" title="Hapus">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <!-- Schedules will be dynamically loaded here -->
                 </div>
             </div>
 
         </div>
+
+        <!-- ================= PAGE: CREATE SCHEDULE ================= -->
+        <div id="page-create-schedule"
+            class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+            <div class="absolute inset-0 bg-gradient-to-b from-sky-100/40 to-sky-200/40 dark:from-gray-900/60 dark:to-gray-800/60"></div>
+            <div class="relative z-10">
+                <!-- Header -->
+                <header class="flex justify-between items-center mb-8 pt-4">
+                    <button onclick="navigate('schedule')"
+                        class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+                    <h2 class="text-brand-blue dark:text-blue-400 font-bold text-xl tracking-wide uppercase">BUAT JADWAL</h2>
+                    <div class="flex items-center gap-2">
+                        <!-- Indikator Waktu Real-Time -->
+                        <div class="header-time-indicator hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs shadow-sm">
+                            <i class="far fa-clock text-brand-blue dark:text-blue-400"></i>
+                            <span class="live-clock-text">--:--</span>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Form Container -->
+                <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 space-y-6">
+                    <!-- Nama Rutinitas -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nama Rutinitas</label>
+                        <input type="text" id="create-schedule-name" placeholder="mis., Pagi Hari"
+                            class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border-0 ring-1 ring-gray-200 dark:ring-gray-600 focus:ring-2 focus:ring-brand-blue text-gray-800 dark:text-gray-100 font-medium placeholder-gray-400">
+                    </div>
+
+                    <!-- Tipe Jadwal -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tipe Jadwal</label>
+                        <select id="create-schedule-type" onchange="toggleCreateScheduleDate(this.value)"
+                            class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border-0 ring-1 ring-gray-200 dark:ring-gray-600 focus:ring-2 focus:ring-brand-blue text-gray-800 dark:text-gray-100 font-medium">
+                            <option value="daily">Setiap Hari</option>
+                            <option value="specific">Tanggal Tertentu</option>
+                            <option value="weekdays">Hari Kerja (Senin-Jumat)</option>
+                            <option value="weekend">Akhir Pekan (Sabtu-Minggu)</option>
+                        </select>
+                    </div>
+
+                    <!-- Tanggal Tertentu (hidden by default) -->
+                    <div id="create-schedule-date-container" class="hidden">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Pilih Tanggal</label>
+                        <input type="date" id="create-schedule-date"
+                            class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border-0 ring-1 ring-gray-200 dark:ring-gray-600 focus:ring-2 focus:ring-brand-blue text-gray-800 dark:text-gray-100 font-medium">
+                    </div>
+
+                    <!-- Jam -->
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Jam Mulai</label>
+                            <input type="time" id="create-schedule-time" value="07:00"
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border-0 ring-1 ring-gray-200 dark:ring-gray-600 focus:ring-2 focus:ring-brand-blue text-gray-800 dark:text-gray-100 font-medium">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Jam Selesai (Opsional)</label>
+                            <input type="time" id="create-schedule-end-time"
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border-0 ring-1 ring-gray-200 dark:ring-gray-600 focus:ring-2 focus:ring-brand-blue text-gray-800 dark:text-gray-100 font-medium">
+                        </div>
+                    </div>
+
+                    <!-- Perangkat & Aksi -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Pilih Perangkat & Aksi</label>
+                        <div id="create-schedule-devices" class="space-y-3 max-h-96 overflow-y-auto no-scrollbar">
+                            <!-- Devices akan di-generate oleh JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3 pt-4">
+                        <button onclick="navigate('schedule')"
+                            class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-4 rounded-2xl font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
+                            Batal
+                        </button>
+                        <button onclick="submitCreateSchedule()"
+                            class="flex-1 bg-gradient-to-r from-blue-600 to-brand-blue text-white py-4 rounded-2xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-xl shadow-blue-500/30">
+                            Simpan Jadwal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ================= PAGE: SETTINGS ================= -->
         <div id="page-settings"
             class="page hidden p-6 pb-24 md:pb-6 max-w-7xl mx-auto relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -804,6 +824,11 @@
                     </div>
 
                     <div class="flex items-center gap-2">
+                        <!-- Indikator Waktu Real-Time -->
+                        <div class="header-time-indicator hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs shadow-sm">
+                            <i class="far fa-clock text-brand-blue dark:text-blue-400"></i>
+                            <span class="live-clock-text">--:--</span>
+                        </div>
                         <button id="theme-toggle-settings" onclick="toggleTheme()"
                             class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
                             <i class="fas fa-moon text-xl dark-hide"></i>
@@ -944,6 +969,11 @@
                             Living Room</h2>
                     </div>
                     <div class="flex items-center gap-2">
+                        <!-- Indikator Waktu Real-Time -->
+                        <div class="header-time-indicator hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs shadow-sm">
+                            <i class="far fa-clock text-brand-blue dark:text-blue-400"></i>
+                            <span class="live-clock-text">--:--</span>
+                        </div>
                         <button id="theme-toggle-room" onclick="toggleTheme()"
                             class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-brand-blue dark:hover:text-blue-400 shadow-sm transition-colors flex-shrink-0">
                             <i class="fas fa-moon text-xl dark-hide"></i>
@@ -992,23 +1022,49 @@
 
         <!-- ================= PAGE: DEVICE REMOTE ================= -->
         <div id="page-device-remote"
-            class="page hidden p-4 md:p-6 pb-24 md:pb-6 h-full flex flex-col bg-gray-900 dark:bg-black text-white overflow-y-auto no-scrollbar">
-            <div class="max-w-md lg:max-w-2xl mx-auto w-full flex-1 flex flex-col">
+            class="page hidden fixed inset-0 md:left-64 bg-gray-900 dark:bg-black text-white overflow-hidden">
+            <div class="h-full flex flex-col">
                 <!-- Header -->
-                <header class="flex justify-between items-center mb-6 md:mb-8 pt-2 md:pt-4">
+                <header class="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
                     <button onclick="backToRoom()"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
                         <i class="fas fa-arrow-left text-lg md:text-xl"></i>
                     </button>
-                    <h2 class="text-lg md:text-xl font-bold" id="device-remote-title">Device Name</h2>
-                    <button onclick="openDeviceMenu()"
-                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
-                        <i class="fas fa-ellipsis-v text-lg md:text-xl"></i>
-                    </button>
+                    <h2 class="text-base md:text-xl font-bold" id="device-remote-title">Device Name</h2>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-header-learn" onclick="openLearnMode(currentDevice?.device_id || currentDevice?.id)"
+                            class="px-3 md:px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-1.5 transition-colors text-xs md:text-sm font-semibold shadow-md shadow-blue-600/30">
+                            <i class="fas fa-wave-square"></i>
+                            <span>Frekuensi</span>
+                        </button>
+                        <button onclick="deleteCurrentDevice()"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center transition-colors"
+                            title="Hapus Perangkat">
+                            <i class="fas fa-trash text-base md:text-xl"></i>
+                        </button>
+                        <button onclick="openDeviceMenu()"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
+                            <i class="fas fa-ellipsis-v text-base md:text-xl"></i>
+                        </button>
+                    </div>
                 </header>
 
+                <!-- Banner Petunjuk Mode Memilih Tombol -->
+                <div id="ir-learning-mode-banner" class="hidden mx-4 md:mx-6 mb-2 p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-between shadow-lg animate-pulse">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                            <i class="fas fa-hand-pointer text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-white">Mode Memilih Tombol Aktif</div>
+                            <div class="text-[11px] text-blue-100" id="ir-banner-text">Tekan tombol pada remote di bawah untuk mengasosiasikan frekuensi.</div>
+                        </div>
+                    </div>
+                    <button onclick="cancelIRSelectionMode()" class="px-3 py-1 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs font-bold transition">Batal</button>
+                </div>
+
                 <!-- Remote Content (Dynamic based on device type) -->
-                <div id="remote-content" class="flex-1 flex flex-col justify-center"></div>
+                <div id="remote-content" class="flex-1 overflow-y-auto no-scrollbar md:overflow-hidden px-4 md:px-6 pb-4"></div>
             </div>
         </div>
     </main>
@@ -1196,6 +1252,60 @@
         </div>
     </div>
 
+    <!-- Modal IR Learning -->
+    <div id="modal-ir-learn"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                        <i class="fas fa-satellite-dish text-base"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">IR Learning Mode</h3>
+                </div>
+                <button onclick="closeModal('modal-ir-learn')"
+                    class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <!-- Instructions -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-2xl p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-info-circle text-xl text-blue-500 mt-0.5"></i>
+                        <div>
+                            <h4 class="font-bold text-blue-900 dark:text-blue-300 text-sm mb-1">Cara Kerja:</h4>
+                            <ol class="text-xs text-blue-800 dark:text-blue-400 space-y-1 list-decimal list-inside">
+                                <li>Arahkan remote fisik ke sensor receiver (TSOP38238) alat IoT.</li>
+                                <li>Tekan tombol remote asli yang ingin direkam.</li>
+                                <li>Frekuensi akan otomatis muncul di bawah ini.</li>
+                                <li>Klik tombol <b>Pilih Tombol</b> untuk menentukan tombol target di remote virtual.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Capture Display -->
+                <div id="ir-captured-display" class="min-h-[140px] flex items-center justify-center bg-gray-50 dark:bg-gray-900/40 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 p-4">
+                    <div class="text-center text-gray-400">
+                        <i class="fas fa-wifi text-4xl mb-2 animate-pulse text-blue-500"></i>
+                        <p class="text-base font-bold text-gray-700 dark:text-gray-200">Menunggu Sinyal Infrared...</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Tembakkan remote asli ke alat sensor sekarang</p>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button onclick="closeModal('modal-ir-learn')" class="w-full py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all text-sm">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Show Password -->
     <div id="modal-show-password"
         class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 transition-opacity">
@@ -1246,6 +1356,30 @@
             </div>
             <div class="p-6 space-y-4" id="schedule-detail-content">
                 <!-- Content populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirm Delete Device -->
+    <div id="modal-confirm-delete"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden transform scale-95 transition-transform">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-red-100 mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-trash text-red-500 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Hapus Perangkat?</h3>
+                <p class="text-gray-600 mb-6" id="delete-device-name">Anda yakin ingin menghapus perangkat ini?</p>
+                <div class="flex gap-3">
+                    <button onclick="closeModal('modal-confirm-delete')"
+                        class="flex-1 py-3 rounded-xl font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all">
+                        Batal
+                    </button>
+                    <button onclick="confirmDeleteDevice()"
+                        class="flex-1 py-3 rounded-xl font-semibold bg-red-500 text-white hover:bg-red-600 transition-all shadow-lg shadow-red-500/30">
+                        Hapus
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1345,8 +1479,9 @@
         const DEFAULT_PROD_BACKEND_URL = 'https://smart-ai-iot-backend.onrender.com';
         const RENDER_BACKEND_URL = localStorage.getItem('custom_backend_url') || DEFAULT_PROD_BACKEND_URL;
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('10.') || window.location.hostname.startsWith('192.168.');
+        const LOCAL_BACKEND = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:8000' : `http://${window.location.hostname}:8000`;
         const API_BASE = isLocal
-            ? 'http://localhost:8000/api/v1'
+            ? LOCAL_BACKEND + '/api/v1'
             : RENDER_BACKEND_URL.replace(/\/+$/, '') + '/api/v1';
 
         function initBackendUrlSetting() {
@@ -1925,6 +2060,9 @@
                     loadSchedules();
                     renderCalendar();
                 }
+                if (pageId === 'create-schedule') {
+                    renderCreateScheduleDevices();
+                }
             }
             window.scrollTo(0, 0);
         }
@@ -2113,33 +2251,29 @@
         // ── Load Rooms from Backend ────────────────────────────
         async function loadRooms() {
             try {
-                const res = await api('GET', '/rooms?page_size=50');
-                if (!res.ok) return;
-                const data = await res.json();
-                state.rooms = data.items || [];
-                
-                console.log('[DEBUG] Rooms loaded:', state.rooms);
-                
-                // Flatten devices from all rooms
-                state.allDevices = [];
-                state.rooms.forEach(room => {
-                    console.log('[DEBUG] Room:', room.name, 'Devices:', room.devices);
-                    if (room.devices && room.devices.length > 0) {
-                        room.devices.forEach(device => {
-                            state.allDevices.push({
-                                ...device,
-                                room_name: room.name,
-                                room_id: room.id
-                            });
-                        });
-                    }
-                });
-                
-                console.log('[DEBUG] All devices flattened:', state.allDevices);
-                
+                // Ambil daftar room (untuk dropdown saat tambah device)
+                const resRooms = await api('GET', '/rooms?page_size=50');
+                if (resRooms.ok) {
+                    const dataRooms = await resRooms.json();
+                    state.rooms = dataRooms.items || [];
+                }
+
+                // Ambil semua device LANGSUNG dari /devices (tidak bergantung pada nested room)
+                const resDevs = await api('GET', '/devices?page_size=100');
+                if (resDevs.ok) {
+                    const dataDevs = await resDevs.json();
+                    state.allDevices = (dataDevs.items || []).map(d => ({
+                        ...d,
+                        room_id: d.room_id || null
+                    }));
+                } else {
+                    state.allDevices = [];
+                }
+
+                console.log('[DEBUG] Direct devices loaded:', state.allDevices);
                 renderDashboardDevices();
                 updateBadgeCounters();
-            } catch (e) { 
+            } catch (e) {
                 console.error('[ERROR] loadRooms failed:', e);
             }
         }
@@ -2178,7 +2312,7 @@
                 const q = searchQuery.toLowerCase();
                 filtered = filtered.filter(d => 
                     d.name.toLowerCase().includes(q) || 
-                    (d.room_name && d.room_name.toLowerCase().includes(q))
+                    (d.device_type && d.device_type.toLowerCase().includes(q))
                 );
             }
             
@@ -2221,7 +2355,7 @@
                 const cardHTML = `
                     <div class="device-card card-stagger rounded-3xl p-6 border cursor-pointer transition-all duration-300 ${cardClass} relative overflow-hidden group" 
                          style="animation-delay: ${index * 0.05}s"
-                         onclick="openDeviceRemote('${device.id}', '${device.device_type}', '${device.name}', ${device.room_id ? `'${device.room_id}'` : 'null'})">
+                         onclick="openDeviceRemote('${device.id}')">
                         <div class="flex items-start justify-between mb-4">
                             <div class="w-14 h-14 rounded-2xl flex items-center justify-center ${deviceMeta.color} group-hover:scale-110 transition-transform">
                                 <i class="fas ${deviceMeta.icon} text-2xl"></i>
@@ -2229,10 +2363,7 @@
                             <span class="status-dot ${isOn ? 'active' : 'inactive'}"></span>
                         </div>
                         
-                        <h3 class="font-bold text-xl leading-tight mb-2 transition-colors group-hover:text-brand-blue dark:group-hover:text-blue-400">${device.name}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                            <i class="fas fa-door-open text-xs mr-1"></i>${device.room_name || 'No Room'}
-                        </p>
+                        <h3 class="font-bold text-xl leading-tight mb-4 transition-colors group-hover:text-brand-blue dark:group-hover:text-blue-400">${device.name}</h3>
                         
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-semibold uppercase tracking-wide ${isOn ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}">${isOn ? 'AKTIF' : 'MATI'}</span>
@@ -2397,12 +2528,12 @@
                                     <div class="flex gap-1">
                                         <button onclick="event.stopPropagation(); sendTvCommand('${device.device_id}', 'ch_down')" class="w-7 h-7 bg-white shadow-xs rounded-lg hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700"><i class="fas fa-chevron-down text-[10px]"></i></button>
                                         <button onclick="event.stopPropagation(); sendTvCommand('${device.device_id}', 'ch_up')" class="w-7 h-7 bg-white shadow-xs rounded-lg hover:bg-gray-100 flex items-center justify-center font-bold text-gray-700"><i class="fas fa-chevron-up text-[10px]"></i></button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                    `;
-                }
+                    </div>
+                </div>
+            `;
+        }
 
                 container.innerHTML += `
                     <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md cursor-pointer" data-device-id="${device.device_id}" onclick="openDeviceRemote('${device.device_id}')">
@@ -2444,25 +2575,75 @@
                 event.stopPropagation();
             }
             const action = currentlyOn ? 'turn_off' : 'turn_on';
-            // Optimistic UI update
-            const card = document.querySelector(`[data-device-id="${deviceId}"]`);
-            if (card) card.style.opacity = '0.6';
-
-            try {
-                const res = await api('POST', `/commands/${deviceId}`, { action });
-                if (res.ok) {
-                    showToast(`${deviceId} ${action === 'turn_on' ? 'turned on' : 'turned off'}`, 'success');
-                } else {
-                    const err = await res.json().catch(() => ({}));
-                    showToast(err.detail || 'Command failed', 'error');
+            const newState = !currentlyOn;
+            
+            // Optimistic update: update state immediately
+            const deviceInState = state.allDevices.find(d => d.device_id === deviceId);
+            if (deviceInState) {
+                deviceInState.state = newState ? 'on' : 'off';
+            }
+            if (state.currentRoomDevices) {
+                const roomDevice = state.currentRoomDevices.find(d => d.device_id === deviceId);
+                if (roomDevice) {
+                    roomDevice.state = newState ? 'on' : 'off';
                 }
-            } catch (e) {
-                showToast('Connection error', 'error');
+            }
+            
+            // Re-render immediately with new state
+            if (state.activePage === 'home') {
+                renderDashboardDevices();
+            } else if (state.activePage === 'room') {
+                renderDevices();
             }
 
-            // Reload room data
-            if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
-            loadRooms();
+            // Fire backend command in background with 3s timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            
+            (async () => {
+                try {
+                    const url = `${API_BASE}/commands/${deviceId}`;
+                    const options = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ action }),
+                        signal: controller.signal
+                    };
+                    
+                    const res = await fetch(url, options);
+                    clearTimeout(timeoutId);
+                    
+                    if (res.ok) {
+                        showToast(`Device ${newState ? 'ON' : 'OFF'}`, 'success');
+                        // Sync from backend after delay
+                        setTimeout(() => {
+                            if (state.currentRoomUUID) loadRoomDevices(state.currentRoomUUID);
+                            loadRooms();
+                        }, 800);
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        showToast(err.detail || 'Command failed', 'error');
+                        // Revert on error
+                        if (deviceInState) deviceInState.state = currentlyOn ? 'on' : 'off';
+                        if (state.activePage === 'home') renderDashboardDevices();
+                        else if (state.activePage === 'room') renderDevices();
+                    }
+                } catch (e) {
+                    clearTimeout(timeoutId);
+                    if (e.name === 'AbortError') {
+                        showToast('Command timeout', 'warning');
+                    } else {
+                        showToast('Connection error', 'error');
+                        // Revert on error
+                        if (deviceInState) deviceInState.state = currentlyOn ? 'on' : 'off';
+                        if (state.activePage === 'home') renderDashboardDevices();
+                        else if (state.activePage === 'room') renderDevices();
+                    }
+                }
+            })();
         }
 
         // Device control functions
@@ -2473,6 +2654,12 @@
                     action: 'turn_on', 
                     target_temperature: newTemp 
                 });
+                // Update currentDevice state and re-render
+                if (currentDevice && currentDevice.device_id === deviceId) {
+                    currentDevice.target_temperature = newTemp;
+                    currentDevice.state = 'on';
+                    renderDeviceRemote(currentDevice);
+                }
                 if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
             } catch (e) {
                 showToast('Failed to adjust temperature', 'error');
@@ -2485,6 +2672,12 @@
                     action: 'turn_on', 
                     ac_mode: mode 
                 });
+                // Update currentDevice state and re-render
+                if (currentDevice && currentDevice.device_id === deviceId) {
+                    currentDevice.ac_mode = mode;
+                    currentDevice.state = 'on';
+                    renderDeviceRemote(currentDevice);
+                }
                 if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
             } catch (e) {
                 showToast('Failed to change AC mode', 'error');
@@ -2497,6 +2690,12 @@
                     action: 'turn_on', 
                     fan_speed: parseInt(speed) 
                 });
+                // Update currentDevice state and re-render
+                if (currentDevice && currentDevice.device_id === deviceId) {
+                    currentDevice.fan_speed = parseInt(speed);
+                    currentDevice.state = 'on';
+                    renderDeviceRemote(currentDevice);
+                }
                 if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
             } catch (e) {
                 showToast('Failed to adjust fan speed', 'error');
@@ -2509,6 +2708,12 @@
                     action: 'turn_on', 
                     value: parseInt(brightness) 
                 });
+                // Update currentDevice state and re-render
+                if (currentDevice && currentDevice.device_id === deviceId) {
+                    currentDevice.brightness = parseInt(brightness);
+                    currentDevice.state = 'on';
+                    renderDeviceRemote(currentDevice);
+                }
                 if (state.currentRoomUUID) await loadRoomDevices(state.currentRoomUUID);
             } catch (e) {
                 showToast('Failed to adjust brightness', 'error');
@@ -2535,11 +2740,17 @@
         // ── Device Remote Functions ────────────────────────────
         let currentDevice = null;
 
-        function openDeviceRemote(deviceId) {
-            const device = state.currentRoomDevices.find(d => d.device_id === deviceId);
-            if (!device) return;
+        async function openDeviceRemote(identifier) {
+            // Cari berdasarkan id atau device_id di allDevices maupun currentRoomDevices
+            const pool = (state.allDevices && state.allDevices.length > 0) 
+                ? state.allDevices 
+                : (state.currentRoomDevices || []);
+            let device = pool.find(d => d.id === identifier || d.device_id === identifier);
+            if (!device) {
+                console.warn('[REMOTE] Device not found for identifier:', identifier);
+                return;
+            }
             
-            currentDevice = device;
             state.activePage = 'device-remote';
             
             document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
@@ -2547,14 +2758,67 @@
             if (remotePage) {
                 remotePage.classList.remove('hidden');
                 document.getElementById('device-remote-title').textContent = device.name;
-                renderDeviceRemote(device);
+                
+                // Show loading, fetch fresh state
+                const container = document.getElementById('remote-content');
+                container.innerHTML = '<div class="flex items-center justify-center h-full"><i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i></div>';
+                
+                // Fetch latest device state
+                try {
+                    const deviceId = device.device_id || device.id;
+                    const res = await api('GET', `/devices/${deviceId}`);
+                    if (res.ok) {
+                        device = await res.json();
+                    }
+                } catch (e) {
+                    console.warn('[REMOTE] Failed to refresh device state', e);
+                }
+                
+                currentDevice = device;
+                requestAnimationFrame(() => {
+                    renderDeviceRemote(device);
+                });
             }
         }
 
-        function backToRoom() {
-            if (state.currentRoomUUID) {
-                navigate('room-detail');
-                loadRoomDevices(state.currentRoomUUID);
+        async function backToRoom() {
+            navigate('home');
+            // Refresh devices to show latest state
+            await loadRooms();
+        }
+
+        async function deleteCurrentDevice() {
+            if (!currentDevice) {
+                showToast('Tidak ada perangkat yang dipilih', 'error');
+                return;
+            }
+
+            // Tampilkan custom modal konfirmasi
+            document.getElementById('delete-device-name').textContent = 
+                `Anda yakin ingin menghapus perangkat "${currentDevice.name}"?`;
+            openModal('modal-confirm-delete');
+        }
+
+        async function confirmDeleteDevice() {
+            if (!currentDevice) return;
+
+            try {
+                const deviceId = currentDevice.device_id || currentDevice.id;
+                const res = await api('DELETE', `/devices/${deviceId}`);
+                
+                if (res.ok) {
+                    closeModal('modal-confirm-delete');
+                    showToast('Perangkat berhasil dihapus', 'success');
+                    currentDevice = null;
+                    await loadRooms();
+                    navigate('home');
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.detail || 'Gagal menghapus perangkat', 'error');
+                }
+            } catch (e) {
+                console.error('Delete device error:', e);
+                showToast('Kesalahan koneksi', 'error');
             }
         }
 
@@ -2563,31 +2827,327 @@
             showToast('Device menu coming soon', 'info');
         }
 
-        async function sendRemoteCommand(deviceId, action, params = {}) {
+        async function sendRemoteCommand(deviceId, action, params = {}, el = null) {
+            console.log('[REMOTE] Button clicked:', action, 'device:', deviceId, 'currentDevice:', currentDevice);
+            
+            // Jika sedang dalam mode memilih tombol untuk mengasosiasikan frekuensi IR
+            if (isSelectingIRButton && capturedIRData) {
+                await handleRemoteButtonClick(deviceId, action, params, el);
+                return;
+            }
+
             try {
+                console.log('[REMOTE] Sending command to backend...');
                 const res = await api('POST', `/commands/${deviceId}`, { action, ...params });
+                console.log('[REMOTE] Backend response:', res.status);
+                
                 if (res.ok) {
-                    // Refresh device state
-                    if (state.currentRoomUUID) {
-                        const roomRes = await api('GET', `/rooms/${state.currentRoomUUID}`);
-                        if (roomRes.ok) {
-                            const room = await roomRes.json();
-                            state.currentRoomDevices = room.devices || [];
-                            currentDevice = state.currentRoomDevices.find(d => d.device_id === deviceId);
-                            if (currentDevice) renderDeviceRemote(currentDevice);
+                    showToast(`Command sent: ${action}`, 'success');
+                    
+                    // Ensure currentDevice exists
+                    if (!currentDevice || currentDevice.device_id !== deviceId) {
+                        console.warn('[REMOTE] currentDevice not set, fetching...');
+                        try {
+                            const fetchRes = await api('GET', `/devices/${deviceId}`);
+                            if (fetchRes.ok) {
+                                currentDevice = await fetchRes.json();
+                            }
+                        } catch (e) {
+                            console.error('[REMOTE] Failed to fetch device:', e);
                         }
                     }
+                    
+                    // Update state lokal untuk power/toggle actions
+                    if (currentDevice) {
+                        console.log('[REMOTE] Current state before update:', currentDevice.state);
+                        
+                        // TV/remote power button toggles state
+                        if (action === 'power') {
+                            currentDevice.state = (currentDevice.state === 'on') ? 'off' : 'on';
+                        } else if (action === 'turn_on' || action === 'on') {
+                            currentDevice.state = 'on';
+                        } else if (action === 'turn_off' || action === 'off') {
+                            currentDevice.state = 'off';
+                        } else if (action === 'toggle') {
+                            currentDevice.state = (currentDevice.state === 'on') ? 'off' : 'on';
+                        }
+                        
+                        // Update other properties
+                        if (params.temperature !== undefined) currentDevice.temperature = params.temperature;
+                        if (params.target_temperature !== undefined) currentDevice.target_temperature = params.target_temperature;
+                        if (params.ac_mode !== undefined) currentDevice.ac_mode = params.ac_mode;
+                        if (params.fan_speed !== undefined) currentDevice.fan_speed = params.fan_speed;
+                        
+                        // Re-render remote with updated state
+                        console.log('[REMOTE] Re-rendering with state:', currentDevice.state);
+                        renderDeviceRemote(currentDevice);
+                    } else {
+                        console.error('[REMOTE] currentDevice still null after fetch');
+                    }
+                    
+                    // Also refresh from backend after delay (give backend time to update)
+                    setTimeout(async () => {
+                        if (currentDevice && currentDevice.device_id) {
+                            try {
+                                const refreshRes = await api('GET', `/devices/${currentDevice.device_id}`);
+                                if (refreshRes.ok) {
+                                    const freshDevice = await refreshRes.json();
+                                    // Only update if state actually changed in backend
+                                    if (freshDevice.state !== currentDevice.state) {
+                                        console.log('[REMOTE] Backend state differs, updating:', freshDevice.state);
+                                        currentDevice = freshDevice;
+                                        renderDeviceRemote(currentDevice);
+                                    } else {
+                                        console.log('[REMOTE] Backend confirms state:', freshDevice.state);
+                                        // Update other fields but keep state
+                                        Object.assign(currentDevice, freshDevice);
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn('[REMOTE] Refresh failed:', e);
+                            }
+                        }
+                    }, 1500);
                 } else {
                     const err = await res.json().catch(() => ({}));
                     showToast(err.detail || 'Command failed', 'error');
                 }
             } catch (e) {
+                console.error('[REMOTE] Error:', e);
                 showToast('Connection error', 'error');
             }
         }
 
-        // Learn Mode Function
+        // Helper: Generate Learn Button HTML
+        function getLearnButton(deviceId) {
+            return `
+                <button onclick="openLearnMode('${deviceId}')" 
+                    class="bg-blue-600 hover:bg-blue-700 py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-wave-square text-sm"></i>
+                    <span class="text-sm font-medium">Frekuensi</span>
+                </button>
+            `;
+        }
+
+        // ── IR Learning Functions ──────────────────────────────────
+        let currentIRDevice = null;
+        let capturedIRData = null;
+        let isSelectingIRButton = false;
+
         async function openLearnMode(deviceId) {
+            if (!deviceId) {
+                showToast('Perangkat tidak ditemukan', 'error');
+                return;
+            }
+            currentIRDevice = deviceId;
+            capturedIRData = null;
+            cancelIRSelectionMode();
+            
+            const displayEl = document.getElementById('ir-captured-display');
+            if (displayEl) {
+                displayEl.innerHTML = `
+                    <div class="text-center text-gray-400">
+                        <i class="fas fa-wifi text-4xl mb-2 animate-pulse text-blue-500"></i>
+                        <p class="text-base font-bold text-gray-700 dark:text-gray-200">Menunggu Sinyal Infrared...</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Tembakkan remote asli ke sensor penerima alat sekarang</p>
+                    </div>
+                `;
+            }
+            openModal('modal-ir-learn');
+            
+            // Start IR capture on hardware via backend
+            try {
+                const res = await api('POST', `/devices/${deviceId}/ir/start-capture`);
+                if (res.ok) {
+                    showToast('Silakan tembakkan remote asli ke sensor alat', 'info');
+                }
+            } catch (e) {
+                console.warn('[IR] Start capture request:', e);
+            }
+        }
+
+        function displayCapturedIR(data) {
+            capturedIRData = data;
+            const container = document.getElementById('ir-captured-display');
+            if (!container) return;
+            
+            const freqPreview = data.ir_frequency ? (data.ir_frequency.length > 30 ? data.ir_frequency.substring(0, 30) + '...' : data.ir_frequency) : '0xUNKNOWN';
+            const protocol = data.protocol || 'RAW';
+            
+            container.innerHTML = `
+                <div class="w-full space-y-3">
+                    <div class="bg-green-500/10 border-2 border-green-500/40 rounded-2xl p-4 text-center">
+                        <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 text-green-500 mb-2">
+                            <i class="fas fa-check text-xl"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-green-600 dark:text-green-400">Sinyal Frekuensi Terdeteksi!</h4>
+                        <div class="bg-black/20 dark:bg-black/40 rounded-xl p-2.5 mt-2 text-left font-mono text-xs text-gray-800 dark:text-gray-200 break-all border border-green-500/20">
+                            <div><span class="text-gray-400">Protocol:</span> <b class="text-blue-500">${protocol}</b></div>
+                            <div class="mt-1"><span class="text-gray-400">Frekuensi:</span> <b class="text-green-400">${freqPreview}</b></div>
+                        </div>
+                    </div>
+                    <button onclick="startSelectingButton()" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fas fa-hand-pointer"></i>
+                        <span>Pilih Tombol</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function startSelectingButton() {
+            if (!capturedIRData) {
+                showToast('Belum ada sinyal yang ditangkap', 'error');
+                return;
+            }
+            closeModal('modal-ir-learn');
+            isSelectingIRButton = true;
+            
+            const banner = document.getElementById('ir-learning-mode-banner');
+            const bannerText = document.getElementById('ir-banner-text');
+            if (banner) {
+                const freqShort = capturedIRData.ir_frequency.substring(0, 16) + '...';
+                if (bannerText) {
+                    bannerText.textContent = `Frekuensi: [${freqShort}] - Tekan tombol pada remote untuk memilih.`;
+                }
+                banner.classList.remove('hidden');
+            }
+            showToast('Silakan klik tombol di remote yang ingin dipasangkan!', 'info');
+        }
+
+        function cancelIRSelectionMode() {
+            isSelectingIRButton = false;
+            const banner = document.getElementById('ir-learning-mode-banner');
+            if (banner) banner.classList.add('hidden');
+        }
+
+        async function handleRemoteButtonClick(deviceId, action, params = {}, buttonElement = null) {
+            // Mode memilih tombol untuk frekuensi IR:
+            if (isSelectingIRButton && capturedIRData) {
+                const buttonLabel = getReadableButtonLabel(action, params, buttonElement);
+                const buttonSymbol = getButtonSymbol(action, buttonElement);
+                const freqStr = capturedIRData.ir_frequency;
+                
+                // Format template persis sesuai instruksi:
+                // frekuensi 'frekuensi yang didapatkan' untuk tombol 'simbol tombol'
+                const templateMsg = `frekuensi '${freqStr}' untuk tombol '${buttonSymbol} ${buttonLabel}'`;
+                
+                const confirmed = confirm(`${templateMsg}\n\nApakah Anda yakin ingin menghubungkan frekuensi ini ke tombol tersebut?`);
+                if (!confirmed) {
+                    return;
+                }
+                
+                try {
+                    const res = await api('POST', `/devices/${deviceId}/ir/save`, {
+                        device_id: deviceId,
+                        button_name: action,
+                        button_label: `${buttonSymbol} ${buttonLabel}`,
+                        ir_frequency: freqStr,
+                        protocol: capturedIRData.protocol,
+                        raw_data: capturedIRData.raw_data
+                    });
+                    
+                    if (res.ok) {
+                        showToast(`Tersimpan: ${templateMsg}`, 'success');
+                        cancelIRSelectionMode();
+                        capturedIRData = null;
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        showToast(err.detail || 'Gagal menyimpan frekuensi', 'error');
+                    }
+                } catch (e) {
+                    showToast('Gagal terhubung ke database/backend', 'error');
+                }
+            }
+        }
+
+        function getReadableButtonLabel(action, params = {}, el = null) {
+            if (params.target_temperature !== undefined) {
+                return `Temp ${params.target_temperature}°C`;
+            }
+            if (params.fan_speed !== undefined) {
+                return `Speed ${params.fan_speed}`;
+            }
+            if (params.ac_mode !== undefined) {
+                return `Mode ${params.ac_mode}`;
+            }
+            const map = {
+                'power': 'ON/OFF',
+                'turn_on': 'ON',
+                'turn_off': 'OFF',
+                'vol_up': 'Volume Up',
+                'vol_down': 'Volume Down',
+                'ch_up': 'Channel Up',
+                'ch_down': 'Channel Down',
+                'mute': 'Mute',
+                'menu': 'Menu',
+                'ok': 'OK',
+                'up': 'Up',
+                'down': 'Down',
+                'left': 'Left',
+                'right': 'Right',
+                'home': 'Home',
+                'back': 'Back',
+                'source': 'Source'
+            };
+            if (map[action]) return map[action];
+            if (el && el.innerText) return el.innerText.trim().replace(/\s+/g, ' ');
+            return action.toUpperCase();
+        }
+
+        function getButtonSymbol(action, el = null) {
+            const iconMap = {
+                'power': '⏻',
+                'turn_on': '⏻',
+                'turn_off': '⏻',
+                'vol_up': '🔊+',
+                'vol_down': '🔉-',
+                'ch_up': '▲',
+                'ch_down': '▼',
+                'mute': '🔇',
+                'menu': '☰',
+                'ok': '✔',
+                'up': '▲',
+                'down': '▼',
+                'left': '◀',
+                'right': '▶',
+                'home': '🏠',
+                'back': '↩',
+                'source': '📺'
+            };
+            if (iconMap[action]) return iconMap[action];
+            if (el) {
+                const icon = el.querySelector('i');
+                if (icon) {
+                    if (icon.className.includes('power')) return '⏻';
+                    if (icon.className.includes('plus')) return '➕';
+                    if (icon.className.includes('minus')) return '➖';
+                    if (icon.className.includes('volume')) return '🔊';
+                    if (icon.className.includes('wind')) return '💨';
+                    if (icon.className.includes('snowflake')) return '❄';
+                }
+            }
+            return '🔘';
+        }
+
+        // Listen for IR capture via WebSocket
+        function setupIRWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const originalOnMessage = ws.onmessage;
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'ir_captured') {
+                            displayCapturedIR(data);
+                        }
+                    } catch (e) {}
+                    if (originalOnMessage) originalOnMessage(event);
+                };
+            }
+        }
+        setTimeout(setupIRWebSocket, 2000);
+
+        // Learn Mode Function (old - keep for compatibility)
+        async function openLearnModeOld(deviceId) {
             const buttons = ['power', 'vol_up', 'vol_down', 'ch_up', 'ch_down', 'mute', 'source', 'menu', 'ok', 'up', 'down', 'left', 'right', 'home', 'back'];
             
             showToast('Learn Mode: Arahkan remote ke ESP32 dan tekan tombol', 'info');
@@ -2650,96 +3210,103 @@
             const currentTemp = device.temperature || temp;
             
             container.innerHTML = `
-                <div class="space-y-4 md:space-y-6">
-                    <!-- Temperature Display -->
-                    <div class="text-center mb-4 md:mb-8">
-                        <div class="text-6xl md:text-8xl lg:text-9xl font-bold mb-2">${temp}<span class="text-3xl md:text-5xl lg:text-6xl">°C</span></div>
-                        <div class="flex items-center justify-center gap-2 md:gap-3 text-gray-400">
-                            <i class="fas fa-snowflake text-xl md:text-2xl"></i>
-                            <span class="text-lg md:text-xl font-semibold">${mode.charAt(0).toUpperCase() + mode.slice(1)}</span>
+                <div class="h-full flex items-center justify-center py-3 md:py-4">
+                    <div class="w-full max-w-5xl mx-auto px-2">
+                        <div class="grid md:grid-cols-[1fr_auto_1fr] gap-3 md:gap-4 items-center">
+                            <!-- Left: Status & Controls -->
+                            <div class="space-y-2 order-2 md:order-1">
+                                <!-- Status Indicators -->
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="bg-gray-800 rounded-xl p-2 text-center">
+                                        <i class="fas fa-wind text-sm mb-1 text-gray-400"></i>
+                                        <div class="text-xs text-gray-500">Speed</div>
+                                        <div class="font-bold text-xs">${fanSpeed === 1 ? 'Low' : fanSpeed === 5 ? 'High' : 'Mid'}</div>
+                                    </div>
+                                    <div class="bg-gray-800 rounded-xl p-2 text-center">
+                                        <i class="fas fa-compass text-sm mb-1 text-gray-400"></i>
+                                        <div class="text-xs text-gray-500">Direction</div>
+                                        <div class="font-bold text-xs">Fixed</div>
+                                    </div>
+                                    <div class="bg-gray-800 rounded-xl p-2 text-center">
+                                        <i class="fas fa-certificate text-sm mb-1 text-gray-400"></i>
+                                        <div class="text-xs text-gray-500">Swing</div>
+                                        <div class="font-bold text-xs">Off</div>
+                                    </div>
+                                </div>
+
+                                <!-- Mode Button -->
+                                <button onclick="cycleACMode('${device.device_id}', '${mode}')" 
+                                    class="w-full bg-gray-800 hover:bg-gray-700 py-3 rounded-xl font-bold text-sm transition-colors">
+                                    Mode: ${mode.charAt(0).toUpperCase() + mode.slice(1)}
+                                </button>
+
+                                <!-- Control Buttons -->
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="adjustACSpeed('${device.device_id}', ${fanSpeed})" 
+                                        class="bg-gray-800 hover:bg-gray-700 py-4 rounded-xl transition-colors flex flex-col items-center justify-center">
+                                        <i class="fas fa-wind mb-1 text-sm"></i>
+                                        <div class="text-xs">Speed</div>
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {swing: true})" 
+                                        class="bg-gray-800 hover:bg-gray-700 py-4 rounded-xl transition-colors flex flex-col items-center justify-center">
+                                        <i class="fas fa-compass mb-1 text-sm"></i>
+                                        <div class="text-xs">Direction</div>
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {swing: true})" 
+                                        class="bg-gray-800 hover:bg-gray-700 py-4 rounded-xl transition-colors flex flex-col items-center justify-center">
+                                        <i class="fas fa-certificate mb-1 text-sm"></i>
+                                        <div class="text-xs">Swing</div>
+                                    </button>
+                                </div>
+
+                                <!-- Extra Controls -->
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 60})" 
+                                        class="bg-gray-800 hover:bg-gray-700 py-2 rounded-xl transition-colors text-xs">
+                                        Timer
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {sleep_mode: true})" 
+                                        class="bg-gray-800 hover:bg-gray-700 py-2 rounded-xl transition-colors text-xs">
+                                        Sleep
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on')" 
+                                        class="bg-gray-800 hover:bg-gray-700 py-2 rounded-xl transition-colors text-xs">
+                                        ···
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Center: Temperature Display & Power -->
+                            <div class="text-center order-1 md:order-2">
+                                <div class="text-5xl md:text-6xl font-bold mb-2">${temp}<span class="text-2xl md:text-3xl">°C</span></div>
+                                <div class="flex items-center justify-center gap-2 text-gray-400 mb-2">
+                                    <i class="fas fa-snowflake text-base"></i>
+                                    <span class="text-sm font-semibold">${mode.charAt(0).toUpperCase() + mode.slice(1)}</span>
+                                </div>
+                                ${currentTemp !== temp ? `<div class="text-gray-500 text-xs mb-3">Current: ${currentTemp.toFixed(1)}°C</div>` : '<div class="mb-3"></div>'}
+                                
+                                <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                                    class="w-16 h-16 md:w-20 md:h-20 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all">
+                                    <i class="fas fa-power-off text-xl md:text-2xl"></i>
+                                </button>
+                            </div>
+
+                            <!-- Right: Temperature Control -->
+                            <div class="flex flex-col gap-2 order-3 justify-center">
+                                <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {target_temperature: ${Math.min(30, temp + 1)}})" 
+                                    class="w-full aspect-square max-w-[90px] md:max-w-[120px] mx-auto rounded-2xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-2xl md:text-3xl transition-colors">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <div class="text-center py-1">
+                                    <div class="text-xs text-gray-400 font-medium">Temperature</div>
+                                </div>
+                                <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {target_temperature: ${Math.max(16, temp - 1)}})" 
+                                    class="w-full aspect-square max-w-[90px] md:max-w-[120px] mx-auto rounded-2xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-2xl md:text-3xl transition-colors">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
                         </div>
-                        ${currentTemp !== temp ? `<div class="text-gray-500 mt-2 text-sm md:text-base">Current: ${currentTemp.toFixed(1)}°C</div>` : ''}
                     </div>
-
-                    <!-- Status Indicators -->
-                    <div class="grid grid-cols-3 gap-2 md:gap-3 mb-4 md:mb-6">
-                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-2 md:p-3 text-center">
-                            <i class="fas fa-wind text-base md:text-lg mb-1 text-gray-400"></i>
-                            <div class="text-xs text-gray-500">Speed</div>
-                            <div class="font-bold text-sm md:text-base">${fanSpeed === 1 ? 'Low' : fanSpeed === 5 ? 'High' : 'Mid'}</div>
-                        </div>
-                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-2 md:p-3 text-center">
-                            <i class="fas fa-compass text-base md:text-lg mb-1 text-gray-400"></i>
-                            <div class="text-xs text-gray-500">Direction</div>
-                            <div class="font-bold text-sm md:text-base">Fixed</div>
-                        </div>
-                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-2 md:p-3 text-center">
-                            <i class="fas fa-certificate text-base md:text-lg mb-1 text-gray-400"></i>
-                            <div class="text-xs text-gray-500">Swing</div>
-                            <div class="font-bold text-sm md:text-base">Off</div>
-                        </div>
-                    </div>
-
-                    <!-- Power Button -->
-                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
-                        class="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-4 md:mb-6">
-                        <i class="fas fa-power-off text-2xl md:text-3xl lg:text-4xl"></i>
-                    </button>
-
-                    <!-- Mode Button -->
-                    <button onclick="cycleACMode('${device.device_id}', '${mode}')" 
-                        class="w-full bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg transition-colors">
-                        Mode
-                    </button>
-
-                    <!-- Control Grid -->
-                    <div class="grid grid-cols-3 gap-2 md:gap-3">
-                        <button onclick="adjustACSpeed('${device.device_id}', ${fanSpeed})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-6 md:py-8 rounded-xl md:rounded-2xl transition-colors">
-                            <div class="text-xs md:text-sm text-gray-400 mb-1">Speed</div>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {swing: true})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-6 md:py-8 rounded-xl md:rounded-2xl transition-colors">
-                            <div class="text-xs md:text-sm text-gray-400 mb-1">Direction</div>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {swing: true})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-6 md:py-8 rounded-xl md:rounded-2xl transition-colors">
-                            <div class="text-xs md:text-sm text-gray-400 mb-1">Swing</div>
-                        </button>
-                    </div>
-
-                    <!-- Temperature Control -->
-                    <div class="flex items-center justify-between bg-gray-800 rounded-xl md:rounded-2xl p-3 md:p-4">
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {target_temperature: ${Math.max(16, temp - 1)}})" 
-                            class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg md:rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-2xl md:text-3xl transition-colors">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <div class="text-center">
-                            <div class="text-xs md:text-sm text-gray-400">Temp</div>
-                        </div>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {target_temperature: ${Math.min(30, temp + 1)}})" 
-                            class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg md:rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-2xl md:text-3xl transition-colors">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-
-                    <!-- Extra Controls -->
-                    <div class="grid grid-cols-3 gap-2 md:gap-3">
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {timer: 60})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-colors">
-                            <div class="text-xs md:text-sm">Timer</div>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {sleep_mode: true})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-colors">
-                            <div class="text-xs md:text-sm">Sleep</div>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on')" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-colors">
-                            <div class="text-xs md:text-sm">···</div>
-                        </button>
-                    </div>
-
-                    <div class="text-center text-xs md:text-sm text-gray-600 mt-4">1 of 2</div>
                 </div>
             `;
         }
@@ -2760,121 +3327,111 @@
             const isOn = device.state === 'on';
             
             container.innerHTML = `
-                <div class="space-y-4 md:space-y-6">
-                    <!-- Top Buttons -->
-                    <div class="grid grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-8">
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'power')" 
-                            class="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 mx-auto rounded-full ${isOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 hover:bg-gray-600'} flex items-center justify-center transition-all">
-                            <i class="fas fa-power-off text-xl md:text-2xl lg:text-3xl"></i>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'source')" 
-                            class="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
-                            <i class="fas fa-tv text-xl md:text-2xl lg:text-3xl"></i>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'menu')" 
-                            class="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
-                            <i class="fas fa-bars text-xl md:text-2xl lg:text-3xl"></i>
-                        </button>
-                    </div>
+                <div class="h-full flex items-center justify-center py-2">
+                    <div class="w-full max-w-2xl mx-auto px-2">
+                        <div class="grid grid-cols-2 gap-2 items-start">
+                            <!-- Left: Navigation Controls -->
+                            <div class="space-y-2">
+                                <!-- Top Buttons Row -->
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'power')" 
+                                        class="aspect-square rounded-full ${isOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 hover:bg-gray-600'} flex items-center justify-center transition-all">
+                                        <i class="fas fa-power-off text-base"></i>
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'source')" 
+                                        class="aspect-square rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                                        <i class="fas fa-tv text-base"></i>
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'menu')" 
+                                        class="aspect-square rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                                        <i class="fas fa-bars text-base"></i>
+                                    </button>
+                                </div>
 
-                    <div class="grid grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'home')" 
-                            class="w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
-                            <i class="fas fa-home text-lg md:text-xl"></i>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'info')" 
-                            class="w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
-                            <i class="fas fa-info-circle text-lg md:text-xl"></i>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'back')" 
-                            class="w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
-                            <i class="fas fa-undo text-lg md:text-xl"></i>
-                        </button>
-                    </div>
+                                <!-- Quick Action Buttons -->
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'home')" 
+                                        class="aspect-square rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                                        <i class="fas fa-home text-sm"></i>
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'info')" 
+                                        class="aspect-square rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                                        <i class="fas fa-info-circle text-sm"></i>
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'back')" 
+                                        class="aspect-square rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all">
+                                        <i class="fas fa-undo text-sm"></i>
+                                    </button>
+                                </div>
 
-                    <!-- D-Pad -->
-                    <div class="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 mx-auto mb-4 md:mb-8">
-                        <div class="absolute inset-0 bg-gray-800 rounded-full flex items-center justify-center">
-                            <!-- Center OK Button -->
-                            <button onclick="sendRemoteCommand('${device.device_id}', 'ok')" 
-                                class="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-lg md:text-xl font-bold transition-all z-10">
-                                OK
-                            </button>
-                            
-                            <!-- Up -->
-                            <button onclick="sendRemoteCommand('${device.device_id}', 'up')" 
-                                class="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
-                                <i class="fas fa-chevron-up text-lg md:text-xl"></i>
-                            </button>
-                            
-                            <!-- Down -->
-                            <button onclick="sendRemoteCommand('${device.device_id}', 'down')" 
-                                class="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
-                                <i class="fas fa-chevron-down text-lg md:text-xl"></i>
-                            </button>
-                            
-                            <!-- Left -->
-                            <button onclick="sendRemoteCommand('${device.device_id}', 'left')" 
-                                class="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
-                                <i class="fas fa-chevron-left text-lg md:text-xl"></i>
-                            </button>
-                            
-                            <!-- Right -->
-                            <button onclick="sendRemoteCommand('${device.device_id}', 'right')" 
-                                class="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
-                                <i class="fas fa-chevron-right text-lg md:text-xl"></i>
-                            </button>
-                        </div>
-                    </div>
+                                <!-- D-Pad Navigation -->
+                                <div class="relative aspect-square max-w-[180px] mx-auto">
+                                    <div class="absolute inset-0 bg-gray-800 rounded-full flex items-center justify-center">
+                                        <button onclick="sendRemoteCommand('${device.device_id}', 'ok')" 
+                                            class="w-[35%] h-[35%] rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-xs font-bold transition-all z-10">
+                                            OK
+                                        </button>
+                                        <button onclick="sendRemoteCommand('${device.device_id}', 'up')" 
+                                            class="absolute top-2 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                            <i class="fas fa-chevron-up text-xs"></i>
+                                        </button>
+                                        <button onclick="sendRemoteCommand('${device.device_id}', 'down')" 
+                                            class="absolute bottom-2 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                            <i class="fas fa-chevron-down text-xs"></i>
+                                        </button>
+                                        <button onclick="sendRemoteCommand('${device.device_id}', 'left')" 
+                                            class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                            <i class="fas fa-chevron-left text-xs"></i>
+                                        </button>
+                                        <button onclick="sendRemoteCommand('${device.device_id}', 'right')" 
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
+                                            <i class="fas fa-chevron-right text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Volume & Channel -->
-                    <div class="grid grid-cols-2 gap-3 md:gap-4">
-                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-3 md:p-4">
-                            <div class="flex flex-col items-center gap-2">
-                                <button onclick="sendRemoteCommand('${device.device_id}', 'vol_up')" 
-                                    class="w-full py-4 md:py-6 rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
-                                    <i class="fas fa-plus text-xl md:text-2xl"></i>
-                                </button>
-                                <div class="text-center text-xs md:text-sm text-gray-400 py-1">Volume</div>
-                                <button onclick="sendRemoteCommand('${device.device_id}', 'vol_down')" 
-                                    class="w-full py-4 md:py-6 rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
-                                    <i class="fas fa-minus text-xl md:text-2xl"></i>
-                                </button>
+                            <!-- Right: Volume & Channel Controls -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="bg-gray-800 rounded-2xl p-2 flex flex-col">
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'vol_up')" 
+                                        class="w-full aspect-square rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all mb-1">
+                                        <i class="fas fa-plus text-base"></i>
+                                    </button>
+                                    <div class="text-center text-[10px] text-gray-400 py-1 font-medium">Volume</div>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'vol_down')" 
+                                        class="w-full aspect-square rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all mt-1">
+                                        <i class="fas fa-minus text-base"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="bg-gray-800 rounded-2xl p-2 flex flex-col">
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'ch_up')" 
+                                        class="w-full aspect-square rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all mb-1">
+                                        <i class="fas fa-chevron-up text-base"></i>
+                                    </button>
+                                    <div class="text-center text-[10px] text-gray-400 py-1 font-medium">Channel</div>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'ch_down')" 
+                                        class="w-full aspect-square rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all mt-1">
+                                        <i class="fas fa-chevron-down text-base"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="bg-gray-800 rounded-xl md:rounded-2xl p-3 md:p-4">
-                            <div class="flex flex-col items-center gap-2">
-                                <button onclick="sendRemoteCommand('${device.device_id}', 'ch_up')" 
-                                    class="w-full py-4 md:py-6 rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
-                                    <i class="fas fa-chevron-up text-xl md:text-2xl"></i>
-                                </button>
-                                <div class="text-center text-xs md:text-sm text-gray-400 py-1">Channel</div>
-                                <button onclick="sendRemoteCommand('${device.device_id}', 'ch_down')" 
-                                    class="w-full py-4 md:py-6 rounded-xl bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all">
-                                    <i class="fas fa-chevron-down text-xl md:text-2xl"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Bottom Controls -->
-                    <div class="grid grid-cols-3 gap-3 md:gap-4 mt-3 md:mt-4">
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'mute')" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-volume-mute text-lg md:text-xl"></i>
-                            <span class="text-sm md:text-base">Mute</span>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'settings')" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-cog text-lg md:text-xl"></i>
-                            <span class="text-sm md:text-base">···</span>
-                        </button>
-                        <button onclick="openLearnMode('${device.device_id}')" 
-                            class="bg-blue-600 hover:bg-blue-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-graduation-cap text-lg md:text-xl"></i>
-                            <span class="text-sm md:text-base">Learn</span>
-                        </button>
+                        <!-- Bottom Controls -->
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'mute')" 
+                                class="bg-gray-800 hover:bg-gray-700 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-1">
+                                <i class="fas fa-volume-mute text-xs"></i>
+                                <span class="text-xs font-medium">Mute</span>
+                            </button>
+                            <button onclick="sendRemoteCommand('${device.device_id}', 'settings')" 
+                                class="bg-gray-800 hover:bg-gray-700 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-1">
+                                <i class="fas fa-cog text-xs"></i>
+                                <span class="text-xs font-medium">Settings</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2885,69 +3442,53 @@
             const brightness = device.brightness || 100;
             
             container.innerHTML = `
-                <div class="space-y-4 md:space-y-6">
-                    <!-- Light Icon -->
-                    <div class="text-center mb-4 md:mb-8">
-                        <div class="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mx-auto rounded-full ${isOn ? 'bg-yellow-500' : 'bg-gray-700'} flex items-center justify-center mb-4 transition-all">
-                            <i class="fas fa-lightbulb text-5xl md:text-7xl lg:text-8xl ${isOn ? 'text-white' : 'text-gray-500'}"></i>
-                        </div>
-                        <div class="text-4xl md:text-6xl font-bold mb-2">${brightness}<span class="text-2xl md:text-3xl">%</span></div>
-                        <div class="text-gray-400 text-sm md:text-base">Brightness</div>
-                    </div>
-
-                    <!-- Power Button -->
-                    <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
-                        class="w-20 h-20 md:w-24 md:h-24 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mb-4 md:mb-8">
-                        <i class="fas fa-power-off text-3xl md:text-4xl"></i>
-                    </button>
-
-                    <!-- Brightness Slider -->
-                    <div class="bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-6">
-                        <label class="text-xs md:text-sm text-gray-400 mb-3 md:mb-4 block">Brightness</label>
-                        <input type="range" min="0" max="100" value="${brightness}" 
-                            oninput="this.nextElementSibling.textContent = this.value + '%'"
-                            onchange="sendRemoteCommand('${device.device_id}', 'turn_on', {value: parseInt(this.value)})" 
-                            class="w-full h-2 md:h-3 bg-gray-700 rounded-full appearance-none cursor-pointer accent-yellow-500">
-                        <div class="text-right text-xl md:text-2xl font-bold mt-3 md:mt-4">${brightness}%</div>
-                    </div>
-
-                    <!-- Color Temperature -->
-                    <div class="bg-gray-800 rounded-2xl md:rounded-3xl p-4 md:p-6">
-                        <label class="text-xs md:text-sm text-gray-400 mb-3 md:mb-4 block">Color Temperature</label>
-                        <div class="grid grid-cols-3 gap-2 md:gap-3">
-                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'warm'})" 
-                                class="bg-orange-200 hover:bg-orange-300 text-orange-900 py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all">
-                                Warm
-                            </button>
-                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'neutral'})" 
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-900 py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all">
-                                Neutral
-                            </button>
-                            <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'cool'})" 
-                                class="bg-blue-200 hover:bg-blue-300 text-blue-900 py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all">
-                                Cool
+                <div class="h-full flex flex-col justify-center max-w-2xl mx-auto">
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <!-- Left: Light Visual -->
+                        <div class="text-center">
+                            <div class="w-40 h-40 md:w-48 md:h-48 mx-auto rounded-full ${isOn ? 'bg-yellow-500' : 'bg-gray-700'} flex items-center justify-center mb-4 transition-all shadow-lg ${isOn ? 'shadow-yellow-500/50' : ''}">
+                                <i class="fas fa-lightbulb text-6xl md:text-7xl ${isOn ? 'text-white' : 'text-gray-500'}"></i>
+                            </div>
+                            <div class="text-5xl md:text-6xl font-bold mb-2">${brightness}<span class="text-2xl md:text-3xl">%</span></div>
+                            <div class="text-gray-400 text-sm">Brightness</div>
+                            
+                            <button onclick="sendRemoteCommand('${device.device_id}', '${isOn ? 'turn_off' : 'turn_on'}')" 
+                                class="w-20 h-20 md:w-24 md:h-24 mx-auto flex items-center justify-center rounded-full ${isOn ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-700 hover:bg-gray-600'} transition-all mt-6">
+                                <i class="fas fa-power-off text-2xl md:text-3xl"></i>
                             </button>
                         </div>
-                    </div>
 
-                    <!-- Presets -->
-                    <div class="grid grid-cols-2 gap-2 md:gap-3">
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {value: 25})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all">
-                            <div class="text-xs md:text-sm">Night (25%)</div>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {value: 50})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all">
-                            <div class="text-xs md:text-sm">Relax (50%)</div>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {value: 75})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all">
-                            <div class="text-xs md:text-sm">Work (75%)</div>
-                        </button>
-                        <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {value: 100})" 
-                            class="bg-gray-800 hover:bg-gray-700 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all">
-                            <div class="text-xs md:text-sm">Max (100%)</div>
-                        </button>
+                        <!-- Right: Controls -->
+                        <div class="space-y-4">
+                            <!-- Brightness Slider -->
+                            <div class="bg-gray-800 rounded-2xl p-5">
+                                <label class="text-sm text-gray-400 mb-4 block font-medium">Brightness Control</label>
+                                <input type="range" min="0" max="100" value="${brightness}" 
+                                    oninput="this.nextElementSibling.textContent = this.value + '%'"
+                                    onchange="sendRemoteCommand('${device.device_id}', 'turn_on', {value: parseInt(this.value)})" 
+                                    class="w-full h-3 bg-gray-700 rounded-full appearance-none cursor-pointer accent-yellow-500">
+                                <div class="text-right text-2xl font-bold mt-4">${brightness}%</div>
+                            </div>
+
+                            <!-- Color Temperature -->
+                            <div class="bg-gray-800 rounded-2xl p-5">
+                                <label class="text-sm text-gray-400 mb-4 block font-medium">Color Temperature</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'warm'})" 
+                                        class="bg-orange-200 hover:bg-orange-300 text-orange-900 py-4 rounded-xl font-bold text-sm transition-all">
+                                        Warm
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'neutral'})" 
+                                        class="bg-gray-300 hover:bg-gray-400 text-gray-900 py-4 rounded-xl font-bold text-sm transition-all">
+                                        Neutral
+                                    </button>
+                                    <button onclick="sendRemoteCommand('${device.device_id}', 'turn_on', {color_temp: 'cool'})" 
+                                        class="bg-blue-200 hover:bg-blue-300 text-blue-900 py-4 rounded-xl font-bold text-sm transition-all">
+                                        Cool
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -3025,6 +3566,7 @@
                             <div class="text-sm">Timer</div>
                         </button>
                     </div>
+                    
                 </div>
             `;
         }
@@ -3080,6 +3622,7 @@
                             <div class="text-sm">4 hours</div>
                         </button>
                     </div>
+                    
                 </div>
             `;
         }
@@ -3155,6 +3698,7 @@
                             <div class="text-sm">Night</div>
                         </button>
                     </div>
+                    
                 </div>
             `;
         }
@@ -3220,6 +3764,7 @@
                         <i class="fas fa-history text-xl mr-2"></i>
                         <span>View Access Log</span>
                     </button>
+                    
                 </div>
             `;
         }
@@ -3307,6 +3852,7 @@
                             <span>Quick Cook</span>
                         </button>
                     </div>
+                    
                 </div>
             `;
         }
@@ -3353,6 +3899,7 @@
                         <div>Advanced controls for this device type</div>
                         <div class="text-sm">will be available soon</div>
                     </div>
+                    
                 </div>
             `;
         }
@@ -3433,8 +3980,167 @@
             }
         }
 
-        // ── Add Routine ──────────────
+        // ── Create Schedule Page Functions ──────────────────────
+        function renderCreateScheduleDevices() {
+            const container = document.getElementById('create-schedule-devices');
+            if (!state.allDevices || state.allDevices.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500 p-4 text-center">Tidak ada perangkat tersedia. Tambahkan perangkat terlebih dahulu.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            state.allDevices.forEach(device => {
+                const deviceIdentifier = device.device_id || device.id;
+                const deviceMeta = getDeviceMeta(device.device_type);
+                const roomName = device.room_name || 'My Room';
+
+                // Device card dengan toggle ON/OFF
+                const targetRoomId = device.room_id || (state.rooms && state.rooms.length > 0 ? state.rooms[0].id : '');
+                const deviceCard = `
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 border border-gray-200 dark:border-gray-600">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl ${deviceMeta.color} flex items-center justify-center">
+                                    <i class="fas ${deviceMeta.icon} text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 dark:text-gray-100">${device.name}</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">${roomName}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <label class="flex-1 relative cursor-pointer">
+                                <input type="checkbox" name="schedule-device-on" value="turn_on|${deviceIdentifier}|${device.name}|${targetRoomId}" class="peer sr-only">
+                                <div class="peer-checked:bg-green-500 peer-checked:text-white bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 peer-checked:border-green-500 rounded-xl py-3 text-center font-bold text-gray-600 dark:text-gray-300 transition-all">
+                                    <i class="fas fa-power-off mr-1"></i> ON
+                                </div>
+                            </label>
+                            <label class="flex-1 relative cursor-pointer">
+                                <input type="checkbox" name="schedule-device-off" value="turn_off|${deviceIdentifier}|${device.name}|${targetRoomId}" class="peer sr-only">
+                                <div class="peer-checked:bg-red-500 peer-checked:text-white bg-white dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 peer-checked:border-red-500 rounded-xl py-3 text-center font-bold text-gray-600 dark:text-gray-300 transition-all">
+                                    <i class="fas fa-power-off mr-1"></i> OFF
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', deviceCard);
+            });
+        }
+
+        function toggleCreateScheduleDate(type) {
+            const container = document.getElementById('create-schedule-date-container');
+            const dateInput = document.getElementById('create-schedule-date');
+            
+            if (type === 'specific') {
+                container.classList.remove('hidden');
+                dateInput.required = true;
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.min = today;
+            } else {
+                container.classList.add('hidden');
+                dateInput.required = false;
+                dateInput.value = '';
+            }
+        }
+
+        async function submitCreateSchedule() {
+            const name = document.getElementById('create-schedule-name').value.trim();
+            const scheduleType = document.getElementById('create-schedule-type').value;
+            const specificDate = document.getElementById('create-schedule-date')?.value || null;
+            const startTime = document.getElementById('create-schedule-time').value;
+            const endTime = document.getElementById('create-schedule-end-time')?.value || null;
+
+            if (!name || !startTime) {
+                showToast('Mohon isi nama dan jam mulai', 'error');
+                return;
+            }
+
+            // Ambil semua device yang dipilih (ON atau OFF)
+            const selectedDevices = [];
+            document.querySelectorAll('input[name="schedule-device-on"]:checked, input[name="schedule-device-off"]:checked').forEach(input => {
+                const [action, deviceId, deviceName, roomId] = input.value.split('|');
+                selectedDevices.push({ action, deviceId, deviceName, roomId });
+            });
+
+            if (selectedDevices.length === 0) {
+                showToast('Pilih minimal satu perangkat dan aksi (ON/OFF)', 'error');
+                return;
+            }
+
+            if (scheduleType === 'specific' && !specificDate) {
+                showToast('Mohon pilih tanggal tertentu', 'error');
+                return;
+            }
+
+            // Determine days
+            let days = '1,2,3,4,5,6,7';
+            if (scheduleType === 'weekdays') days = '1,2,3,4,5';
+            else if (scheduleType === 'weekend') days = '6,7';
+            else if (scheduleType === 'specific') days = null;
+
+            // Create schedules
+            const promises = selectedDevices.map(async (dev) => {
+                // Pastikan room_id valid, jika null ambil dari room pertama yang ada
+                const finalRoomId = (dev.roomId && dev.roomId !== 'null' && dev.roomId !== 'undefined') 
+                    ? dev.roomId 
+                    : (state.rooms && state.rooms.length > 0 ? state.rooms[0].id : '');
+
+                const payload = {
+                    name: `${name} - ${dev.deviceName}`,
+                    room_id: finalRoomId,
+                    device_id: dev.deviceId,
+                    action: dev.action,
+                    start_time: startTime,
+                };
+
+                if (endTime && endTime.trim() !== '') {
+                    payload.end_time = endTime;
+                }
+
+                if (scheduleType === 'specific' && specificDate) {
+                    payload.specific_date = specificDate;
+                    payload.days = '';  // Send empty string instead of null
+                } else {
+                    payload.days = days || '1,2,3,4,5,6,7';  // Ensure days is always a string
+                }
+
+                try {
+                    const res = await api('POST', '/schedules', payload);
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.detail || 'Failed to create schedule');
+                    }
+                } catch (e) {
+                    console.error('Failed to create schedule:', e);
+                    throw e;
+                }
+            });
+
+            try {
+                await Promise.all(promises);
+                showToast('Jadwal berhasil dibuat!', 'success');
+                
+                // Reset form
+                document.getElementById('create-schedule-name').value = '';
+                document.getElementById('create-schedule-time').value = '07:00';
+                document.getElementById('create-schedule-end-time').value = '';
+                document.querySelectorAll('input[name="schedule-device-on"]:checked, input[name="schedule-device-off"]:checked').forEach(cb => cb.checked = false);
+                
+                navigate('schedule');
+            } catch (e) {
+                showToast('Gagal membuat beberapa jadwal', 'error');
+            }
+        }
+
+        // ── Add Routine (Modal - kept for compatibility) ──────────────────────
         async function openAddRoutineModal() {
+            // Pastikan data devices sudah dimuat
+            if (!state.allDevices || state.allDevices.length === 0) {
+                await loadRooms();
+            }
+
             const roomSelect = document.getElementById('new-routine-room');
             roomSelect.innerHTML = '';
 
@@ -3467,10 +4173,8 @@
             container.innerHTML = '<div class="text-sm text-gray-500 p-2">Memuat perangkat...</div>';
 
             try {
-                const res = await api('GET', `/rooms/${roomId}`);
-                if (!res.ok) throw new Error('Failed');
-                const room = await res.json();
-                const devices = room.devices || [];
+                // Ambil devices dari state.allDevices yang sudah difilter berdasarkan roomId
+                const devices = state.allDevices.filter(d => d.room_id === roomId);
 
                 if (devices.length === 0) {
                     container.innerHTML = '<p class="text-sm text-gray-500 p-2">Kamar ini belum memiliki perangkat.</p>';
@@ -3479,10 +4183,12 @@
 
                 container.innerHTML = '';
                 devices.forEach(d => {
+                    // Simpan device_id dan id untuk referensi
+                    const deviceIdentifier = d.device_id || d.id;
                     // Turn On option
                     container.insertAdjacentHTML('beforeend', `
                         <label class="group relative flex items-center justify-between p-4 bg-white border border-gray-100 shadow-sm rounded-2xl cursor-pointer hover:shadow-md hover:border-brand-blue/30 transition-all">
-                            <input type="checkbox" name="routine-devices" value="Nyalakan ${d.name}" class="peer sr-only">
+                            <input type="checkbox" name="routine-devices" value="turn_on|${deviceIdentifier}|${d.name}" class="peer sr-only">
                             <div class="absolute inset-0 bg-brand-blue/5 opacity-0 peer-checked:opacity-100 rounded-2xl transition-all"></div>
                             <div class="absolute inset-0 border-2 border-transparent peer-checked:border-brand-blue rounded-2xl transition-all"></div>
                             <span class="relative z-10 font-bold text-gray-700 peer-checked:text-brand-blue transition-colors">Nyalakan ${d.name}</span>
@@ -3494,7 +4200,7 @@
                     // Turn Off option
                     container.insertAdjacentHTML('beforeend', `
                         <label class="group relative flex items-center justify-between p-4 bg-white border border-gray-100 shadow-sm rounded-2xl cursor-pointer hover:shadow-md hover:border-brand-blue/30 transition-all">
-                            <input type="checkbox" name="routine-devices" value="Matikan ${d.name}" class="peer sr-only">
+                            <input type="checkbox" name="routine-devices" value="turn_off|${deviceIdentifier}|${d.name}" class="peer sr-only">
                             <div class="absolute inset-0 bg-brand-blue/5 opacity-0 peer-checked:opacity-100 rounded-2xl transition-all"></div>
                             <div class="absolute inset-0 border-2 border-transparent peer-checked:border-brand-blue rounded-2xl transition-all"></div>
                             <span class="relative z-10 font-bold text-gray-700 peer-checked:text-brand-blue transition-colors">Matikan ${d.name}</span>
@@ -3526,6 +4232,16 @@
             const container = document.getElementById('routines-list');
             if (!container) return;
             container.innerHTML = '';
+
+            if (!schedules || schedules.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-calendar-times text-4xl mb-3"></i>
+                        <p>Belum ada jadwal</p>
+                    </div>
+                `;
+                return;
+            }
 
             schedules.forEach(schedule => {
                 const time = schedule.start_time;
@@ -3729,7 +4445,7 @@
             showToast('Schedule detail modal coming soon', 'info');
         }
 
-        function submitAddRoutine(e) {
+        async function submitAddRoutine(e) {
             e.preventDefault();
             const name = document.getElementById('new-routine-name').value.trim();
             const roomId = document.getElementById('new-routine-room').value;
@@ -3741,12 +4457,12 @@
             const deviceCheckboxes = document.querySelectorAll('input[name="routine-devices"]:checked');
             
             if (!name || !startTime || deviceCheckboxes.length === 0) {
-                showToast('Please fill all fields and select at least one device action', 'error');
+                showToast('Mohon isi semua field dan pilih minimal satu perangkat', 'error');
                 return;
             }
 
             if (scheduleType === 'specific' && !specificDate) {
-                showToast('Please select a specific date', 'error');
+                showToast('Mohon pilih tanggal tertentu', 'error');
                 return;
             }
 
@@ -3762,18 +4478,18 @@
 
             // Create schedule for each selected device action
             const promises = Array.from(deviceCheckboxes).map(async (cb) => {
-                const actionText = cb.value; // e.g., "Nyalakan lampu_1"
-                const action = actionText.startsWith('Nyalakan') ? 'turn_on' : 'turn_off';
-                const deviceName = actionText.replace('Nyalakan ', '').replace('Matikan ', '');
+                // Parse format: "turn_on|device_id|device_name"
+                const [action, deviceId, deviceName] = cb.value.split('|');
                 
-                // Find device ID from name
-                const device = state.currentRoomDevices?.find(d => d.name === deviceName);
-                if (!device) return;
+                if (!deviceId) {
+                    console.error('Invalid device ID for', deviceName);
+                    return;
+                }
 
                 const payload = {
-                    name,
+                    name: `${name} - ${deviceName}`,
                     room_id: roomId,
-                    device_id: device.device_id,
+                    device_id: deviceId,
                     action,
                     start_time: startTime,
                     end_time: endTime,
@@ -3787,20 +4503,26 @@
                 }
 
                 try {
-                    await api('POST', '/schedules', payload);
+                    const res = await api('POST', '/schedules', payload);
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.detail || 'Failed to create schedule');
+                    }
                 } catch (e) {
-                    console.error('Failed to create schedule', e);
+                    console.error('Failed to create schedule:', e);
+                    throw e;
                 }
             });
 
-            Promise.all(promises).then(() => {
-                showToast('Routines created!', 'success');
+            try {
+                await Promise.all(promises);
+                showToast('Jadwal berhasil dibuat!', 'success');
                 closeModal('modal-add-routine');
-                loadSchedules();
+                await loadSchedules();
                 renderCalendar();
-            }).catch(() => {
-                showToast('Some routines failed to create', 'error');
-            });
+            } catch (e) {
+                showToast('Gagal membuat beberapa jadwal', 'error');
+            }
         }
 
         // ── Add Device (Backend) ───────────────────────────────
@@ -3808,7 +4530,11 @@
             e.preventDefault();
             const name = document.getElementById('new-device-name').value.trim();
             const type = document.getElementById('new-device-type').value;
-            if (!name || !state.currentRoomUUID) return;
+            const targetRoomId = state.currentRoomUUID || (state.rooms && state.rooms[0]?.id);
+            if (!name || !targetRoomId) {
+                showToast('Pilih ruangan terlebih dahulu', 'error');
+                return;
+            }
 
             const timestamp = Date.now().toString(36);
             const random = Math.random().toString(36).substr(2, 4);
@@ -3819,11 +4545,12 @@
                     device_id: deviceId,
                     name,
                     device_type: type.toLowerCase(),
-                    room_id: state.currentRoomUUID,
+                    room_id: targetRoomId,
                     state: 'off'
                 });
                 if (res.ok || res.status === 201) {
-                    showToast('Device added!', 'success');
+                    showToast('Perangkat berhasil ditambahkan!', 'success');
+                    document.getElementById('new-device-name').value = '';
                     closeModal('modal-add-device');
                     await loadRooms();
                 } else {
@@ -4104,6 +4831,20 @@
                 document.querySelectorAll('.light-hide').forEach(el => el.classList.remove('hidden'));
             }
         }
+
+        // Live Clock Indicator
+        function updateLiveClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeStr = `${hours}:${minutes}:${seconds}`;
+            document.querySelectorAll('.live-clock-text').forEach(el => {
+                el.textContent = timeStr;
+            });
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
 
         // Initialize theme on page load
         function initTheme() {

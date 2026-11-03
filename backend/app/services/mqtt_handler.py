@@ -1,5 +1,5 @@
 """
-MQTT message handler bridge — Supabase primary.
+MQTT message handler bridge — MySQL primary.
 
 Connects incoming MQTT status/telemetry messages to the device manager.
 No longer needs SQLAlchemy sessions.
@@ -69,3 +69,36 @@ async def handle_device_telemetry(topic: str, payload: dict[str, Any]) -> None:
         logger.info("mqtt_telemetry_processed", device_id=device_id)
     except Exception as exc:
         logger.exception("mqtt_telemetry_processing_error", device_id=device_id, error=str(exc))
+
+
+async def handle_ir_capture(topic: str, payload: dict[str, Any]) -> None:
+    """Handle IR frequency capture from hardware sensor."""
+    parsed = parse_mqtt_topic(topic)
+    if not parsed:
+        logger.warning("mqtt_handler_invalid_ir_topic", topic=topic)
+        return
+
+    device_id = parsed["device_id"]
+    ir_frequency = payload.get("ir_frequency") or payload.get("frequency")
+    protocol = payload.get("protocol")
+    raw_data = payload.get("raw_data")
+
+    if not ir_frequency:
+        logger.warning("mqtt_ir_capture_missing_frequency", device_id=device_id)
+        return
+
+    try:
+        # Store captured IR data temporarily in WebSocket broadcast
+        # Frontend will receive this via WebSocket and display in modal
+        from app.services.websocket_manager import ws_manager
+        await ws_manager.broadcast_json({
+            "type": "ir_captured",
+            "device_id": device_id,
+            "ir_frequency": ir_frequency,
+            "protocol": protocol,
+            "raw_data": raw_data,
+            "timestamp": payload.get("timestamp")
+        })
+        logger.info("mqtt_ir_capture_processed", device_id=device_id, protocol=protocol)
+    except Exception as exc:
+        logger.exception("mqtt_ir_capture_error", device_id=device_id, error=str(exc))

@@ -2,7 +2,7 @@
 Authentication dependency for FastAPI.
 
 Extracts and validates JWT tokens from the Authorization header.
-Now using Supabase as the primary database.
+Using MySQL/TiDB as the primary database.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from jose import JWTError
 
 from app.core.security import decode_token
 from app.db.session import get_db
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 from app.utils.exceptions import UnauthorizedError
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -53,7 +53,7 @@ async def get_current_user(
     if not user_id_str:
         raise UnauthorizedError("Token missing subject claim")
 
-    user = await supabase_service.get_user_by_id(user_id_str)
+    user = await mysql_service.get_user_by_id(user_id_str)
 
     if not user:
         raise UnauthorizedError("User not found")

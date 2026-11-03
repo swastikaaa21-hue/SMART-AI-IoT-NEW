@@ -1,6 +1,6 @@
 """
 Voice endpoints for Indonesian Speech-to-Text, Text-to-Speech, and Voice AI Chat.
-Supabase primary.
+MySQL primary.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from app.schemas.voice import (
     VoiceTranscribeResponse,
 )
 from app.services.gemini_service import gemini_service
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 from app.services.voice_service import voice_service
 from app.utils.exceptions import NotFoundError
 
@@ -89,20 +89,20 @@ async def voice_chat(
 
     # 2. Get or create chat session
     if session_id:
-        session = await supabase_service.get_chat_session(session_id, user_id)
+        session = await mysql_service.get_chat_session(session_id, user_id)
         if not session:
             raise NotFoundError("ChatSession", session_id)
         sid = session["id"]
     else:
         sid = _gen_id()
-        session = await supabase_service.create_chat_session({
+        session = await mysql_service.create_chat_session({
             "id": sid, "user_id": user_id,
             "title": f"🎙️ {transcript[:45]}" + ("..." if len(transcript) > 45 else ""),
             "is_active": True, "created_at": now, "updated_at": now,
         })
 
     # 3. Save user message
-    await supabase_service.create_chat_message({
+    await mysql_service.create_chat_message({
         "id": _gen_id(), "session_id": sid, "role": "user", "content": transcript, "created_at": now,
     })
 
@@ -114,7 +114,7 @@ async def voice_chat(
     reply_text = ai_result.get("reply", "")
 
     # 5. Save assistant message
-    await supabase_service.create_chat_message({
+    await mysql_service.create_chat_message({
         "id": _gen_id(), "session_id": sid, "role": "assistant", "content": reply_text,
         "function_call": ai_result.get("function_called"),
         "function_response": json.dumps(ai_result.get("function_result")) if ai_result.get("function_result") else None,

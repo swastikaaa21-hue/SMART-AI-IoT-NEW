@@ -1,0 +1,163 @@
+/* 
+╔══════════════════════════════════════════════════════════════════╗
+║                    CUSTOM STYLES & ANIMATIONS                     ║
+╚══════════════════════════════════════════════════════════════════╝
+*/
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Smooth transition for page changes */
+.page-transition {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUpBottom {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Custom Toggle Switch styling - CSS Only Interactive */
+.toggle-checkbox {
+    right: 1.5rem;
+    border-color: #d1d5db;
+}
+
+.dark .toggle-checkbox {
+    border-color: #4b5563;
+}
+
+.toggle-checkbox:checked {
+    right: 0;
+    border-color: #2563EB;
+}
+
+.toggle-label {
+    background-color: #d1d5db;
+}
+
+.dark .toggle-label {
+    background-color: #4b5563;
+}
+
+.toggle-checkbox:checked+.toggle-label {
+    background-color: #2563EB;
+}
+
+.dark .toggle-checkbox:checked+.toggle-label {
+    background-color: #3b82f6;
+}
+
+/* Connection Status Dot */
+.connection-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+}
+
+.connection-dot.connected {
+    background-color: #10b981;
+}
+
+.connection-dot.disconnected {
+    background-color: #ef4444;
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+/* Dark mode theme switcher icons */
+.dark-hide {
+    display: inline;
+}
+
+.light-hide {
+    display: none;
+}
+
+.dark .dark-hide {
+    display: none;
+}
+
+.dark .light-hide {
+    display: inline;
+}
+
+/* Carousel banner smooth scroll */
+.carousel-container {
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+}
+
+.carousel-item {
+    scroll-snap-align: start;
+}
+
+/* Custom scrollbar for chat */
+#chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 3px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Smooth rotate for fan icon */
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+}

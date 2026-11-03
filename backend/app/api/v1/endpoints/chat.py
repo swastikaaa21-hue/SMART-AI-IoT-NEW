@@ -1,5 +1,5 @@
 """
-AI Chat endpoints with Gemini Function Calling — Supabase primary.
+AI Chat endpoints with Gemini Function Calling — MySQL primary.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from app.schemas.chat import (
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.services.device_manager import device_manager
 from app.services.gemini_service import gemini_service
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 from app.utils.exceptions import NotFoundError
 
 logger = get_logger("chat")
@@ -83,7 +83,7 @@ async def _execute_function(name: str, args: dict[str, Any]) -> dict[str, Any]:
         room_id = None
         if room_slug:
             # Find room by slug across all owners
-            all_rooms = await supabase_service.client.table("rooms").select("*").eq("slug", room_slug).execute()
+            all_rooms = await mysql_service.client.table("rooms").select("*").eq("slug", room_slug).execute()
             if all_rooms.data:
                 room_id = all_rooms.data[0]["id"]
 
@@ -127,19 +127,19 @@ async def _execute_function(name: str, args: dict[str, Any]) -> dict[str, Any]:
         room = None
         # Try slug
         if room_slug:
-            resp = supabase_service.client.table("rooms").select("*").eq("slug", room_slug).execute()
+            resp = mysql_service.client.table("rooms").select("*").eq("slug", room_slug).execute()
             if resp.data:
                 room = resp.data[0]
         # Try name (case-insensitive)
         if not room:
-            resp = supabase_service.client.table("rooms").select("*").ilike("name", str(raw_room).strip()).execute()
+            resp = mysql_service.client.table("rooms").select("*").ilike("name", str(raw_room).strip()).execute()
             if resp.data:
                 room = resp.data[0]
         if not room:
             return {"success": False, "error": f"Room '{raw_room}' not found"}
 
         # Get devices in room
-        devices = await supabase_service.get_devices_by_room(room["id"])
+        devices = await mysql_service.get_devices_by_room(room["id"])
         if dtype:
             devices = [d for d in devices if d.get("device_type") == dtype]
         if not devices:
@@ -182,11 +182,11 @@ async def send_chat_message(
     # Get or create chat session (fallback seamlessly if session_id is stale/invalid)
     session = None
     if body.session_id:
-        session = await supabase_service.get_chat_session(str(body.session_id), user_id)
+        session = await mysql_service.get_chat_session(str(body.session_id), user_id)
 
     if not session:
         session_id = _gen_id()
-        session = await supabase_service.create_chat_session({
+        session = await mysql_service.create_chat_session({
             "id": session_id,
             "user_id": user_id,
             "title": body.message[:50] + ("..." if len(body.message) > 50 else ""),
@@ -198,7 +198,7 @@ async def send_chat_message(
     sid = session["id"]
 
     # Save user message
-    await supabase_service.create_chat_message({
+    await mysql_service.create_chat_message({
         "id": _gen_id(),
         "session_id": sid,
         "role": "user",
@@ -222,7 +222,7 @@ async def send_chat_message(
     )
 
     # Save assistant message
-    await supabase_service.create_chat_message({
+    await mysql_service.create_chat_message({
         "id": _gen_id(),
         "session_id": sid,
         "role": "assistant",
@@ -252,7 +252,7 @@ async def list_sessions(
 ):
     """List all chat sessions for the current user."""
     offset = (page - 1) * page_size
-    sessions, total = await supabase_service.get_chat_sessions(
+    sessions, total = await mysql_service.get_chat_sessions(
         str(user["id"]), limit=page_size, offset=offset,
     )
     return PaginatedResponse.create(
@@ -269,7 +269,7 @@ async def create_session(
 ):
     """Create a new chat session."""
     now = datetime.now(timezone.utc).isoformat()
-    session = await supabase_service.create_chat_session({
+    session = await mysql_service.create_chat_session({
         "id": _gen_id(),
         "user_id": str(user["id"]),
         "title": body.title,
@@ -287,10 +287,10 @@ async def get_session_messages(
     db=Depends(get_db),
 ):
     """Get all messages in a chat session."""
-    session = await supabase_service.get_chat_session(session_id, str(user["id"]))
+    session = await mysql_service.get_chat_session(session_id, str(user["id"]))
     if not session:
         raise NotFoundError("ChatSession", session_id)
-    messages = await supabase_service.get_chat_messages(session_id)
+    messages = await mysql_service.get_chat_messages(session_id)
     return [ChatMessageResponse(**m) for m in messages]
 
 
@@ -301,10 +301,10 @@ async def delete_session(
     db=Depends(get_db),
 ):
     """Delete a chat session and all its messages."""
-    session = await supabase_service.get_chat_session(session_id, str(user["id"]))
+    session = await mysql_service.get_chat_session(session_id, str(user["id"]))
     if not session:
         raise NotFoundError("ChatSession", session_id)
 
     gemini_service.clear_session(session_id)
-    await supabase_service.delete_chat_session(session_id)
+    await mysql_service.delete_chat_session(session_id)
     return SuccessResponse(message="Chat session deleted successfully")

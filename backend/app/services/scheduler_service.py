@@ -4,7 +4,7 @@ import asyncio
 from datetime import datetime, time
 from typing import Dict, Set
 from app.core.logging import get_logger
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 from app.services.device_manager import device_manager
 
 logger = get_logger("scheduler_service")
@@ -52,9 +52,9 @@ class SchedulerService:
         current_time = now.time()
         current_day = now.isoweekday()  # 1=Mon, 7=Sun
 
-        # Get all active schedules from Supabase
+        # Get all active schedules from MySQL
         try:
-            schedules = await supabase_service.get_all_schedules()
+            schedules = await mysql_service.get_all_schedules()
         except Exception as e:
             logger.warning("failed_to_fetch_schedules", error=str(e))
             return

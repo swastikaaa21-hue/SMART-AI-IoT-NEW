@@ -1,5 +1,5 @@
 """
-System and configuration endpoints — Supabase primary.
+System and configuration endpoints — MySQL primary.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from app.schemas.system import (
 from app.services.gemini_service import gemini_service
 from app.services.mqtt_service import mqtt_service
 from app.services.seed_service import seed_user_default_data
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 from app.services.websocket_manager import ws_manager
 from app.utils.exceptions import ForbiddenError
 
@@ -118,7 +118,7 @@ async def get_system_status(
     user: dict | None = Depends(get_current_user_optional),
 ) -> SystemStatusResponse:
     """Get aggregated system statistics."""
-    stats = await supabase_service.get_system_stats()
+    stats = await mysql_service.get_system_stats()
 
     return SystemStatusResponse(
         status="ok",
@@ -143,14 +143,14 @@ async def get_system_topics(
     user: dict = Depends(get_current_user),
 ) -> SystemTopicsResponse:
     """List all MQTT topics for registered devices."""
-    devices = await supabase_service.get_all_devices()
+    devices = await mysql_service.get_all_devices()
     rooms_cache: dict[str, dict] = {}
 
     topic_items: list[SystemTopicItem] = []
     for d in devices:
         rid = d.get("room_id", "")
         if rid and rid not in rooms_cache:
-            rooms_cache[rid] = await supabase_service.get_room_by_id(rid) or {}
+            rooms_cache[rid] = await mysql_service.get_room_by_id(rid) or {}
         room = rooms_cache.get(rid, {})
         r_slug = room.get("slug", "unknown")
 

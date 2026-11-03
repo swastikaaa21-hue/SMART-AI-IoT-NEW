@@ -1,8 +1,7 @@
 """
 MySQL Service — Primary Database Operations via SQLAlchemy async.
 
-Drop-in replacement for the old Supabase service. Same interface,
-backed by MySQL (XAMPP) through async SQLAlchemy.
+Backed by MySQL/TiDB through async SQLAlchemy.
 """
 
 from __future__ import annotations
@@ -629,6 +628,73 @@ class MySQLService:
             logger.error("get_all_schedules_failed", error=str(e))
             return []
 
+    # ── IR Codes ─────────────────────────────────────────────
+
+    async def create_ir_code(self, code_data: Dict[str, Any]) -> Dict[str, Any]:
+        from app.models.ir_code import IRCode
+        async with AsyncSessionLocal() as db:
+            code = IRCode(**{k: v for k, v in code_data.items() if hasattr(IRCode, k)})
+            db.add(code)
+            await db.commit()
+            await db.refresh(code)
+            logger.info("ir_code_created", code_id=code_data.get("id"))
+            return _row_to_dict(code)
+
+    async def get_ir_codes_by_device(self, device_id: str) -> List[Dict[str, Any]]:
+        from app.models.ir_code import IRCode
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(
+                    select(IRCode).where(IRCode.device_id == device_id).order_by(IRCode.created_at)
+                )
+                return [_row_to_dict(c) for c in result.scalars().all()]
+        except Exception as e:
+            logger.error("ir_codes_get_failed", error=str(e), device_id=device_id)
+            return []
+
+    async def get_ir_code_by_button(self, device_id: str, button_name: str) -> Optional[Dict[str, Any]]:
+        from app.models.ir_code import IRCode
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(
+                    select(IRCode).where(
+                        and_(IRCode.device_id == device_id, IRCode.button_name == button_name)
+                    )
+                )
+                code = result.scalar_one_or_none()
+                return _row_to_dict(code) if code else None
+        except Exception as e:
+            logger.error("ir_code_get_failed", error=str(e), device_id=device_id, button=button_name)
+            return None
+
+    async def update_ir_code(self, code_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
+        from app.models.ir_code import IRCode
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(select(IRCode).where(IRCode.id == code_id))
+            code = result.scalar_one_or_none()
+            if not code:
+                return {}
+            for k, v in updates.items():
+                if hasattr(code, k) and k != "id":
+                    setattr(code, k, v)
+            await db.commit()
+            await db.refresh(code)
+            return _row_to_dict(code)
+
+    async def delete_ir_code(self, code_id: str) -> bool:
+        from app.models.ir_code import IRCode
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(select(IRCode).where(IRCode.id == code_id))
+                code = result.scalar_one_or_none()
+                if code:
+                    await db.delete(code)
+                    await db.commit()
+                return True
+        except Exception as e:
+            logger.error("ir_code_delete_failed", error=str(e), code_id=code_id)
+            return False
+
 
 # Singleton instance — same name as before so all imports still work
-supabase_service = MySQLService()
+mysql_service = MySQLService()

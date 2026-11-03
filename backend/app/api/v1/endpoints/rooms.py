@@ -1,5 +1,5 @@
 """
-Room management endpoints — Supabase primary.
+Room management endpoints — MySQL primary.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from app.middleware.auth import get_current_user
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.room import RoomCreate, RoomResponse, RoomUpdate, RoomWithDevices
 from app.utils.exceptions import AlreadyExistsError, NotFoundError
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 from app.services.seed_service import seed_user_default_data
 
 router = APIRouter()
@@ -30,12 +30,12 @@ async def list_rooms(
 ):
     """List all rooms belonging to the current user."""
     owner_id = str(user["id"])
-    rooms = await supabase_service.get_rooms_by_owner_with_devices(owner_id)
+    rooms = await mysql_service.get_rooms_by_owner_with_devices(owner_id)
 
     # Auto-seed if empty
     if not rooms:
         await seed_user_default_data(owner_id, reset=False)
-        rooms = await supabase_service.get_rooms_by_owner_with_devices(owner_id)
+    rooms = await mysql_service.get_rooms_by_owner_with_devices(owner_id)
 
     total = len(rooms)
     start = (page - 1) * page_size
@@ -69,11 +69,11 @@ async def get_room(
     db=Depends(get_db),
 ):
     """Get a single room with its devices."""
-    room = await supabase_service.get_room_by_id(room_id)
+    room = await mysql_service.get_room_by_id(room_id)
     if not room or room.get("owner_id") != str(user["id"]):
         raise NotFoundError("Room", room_id)
 
-    devices = await supabase_service.get_devices_by_room(room_id)
+    devices = await mysql_service.get_devices_by_room(room_id)
     room["devices"] = devices
     room["total_devices_count"] = len(devices)
     room["active_devices_count"] = sum(1 for d in devices if d.get("state") == "on")
@@ -88,13 +88,13 @@ async def create_room(
 ):
     """Create a new room."""
     owner_id = str(user["id"])
-    existing = await supabase_service.get_room_by_slug(body.slug, owner_id)
+    existing = await mysql_service.get_room_by_slug(body.slug, owner_id)
     if existing:
         raise AlreadyExistsError("Room", body.slug)
 
     now = datetime.now(timezone.utc).isoformat()
     room_id = str(uuid.uuid4()).replace("-", "")
-    room = await supabase_service.create_room({
+    room = await mysql_service.create_room({
         "id": room_id,
         "name": body.name,
         "slug": body.slug,
@@ -118,7 +118,7 @@ async def update_room(
     db=Depends(get_db),
 ):
     """Update an existing room."""
-    room = await supabase_service.get_room_by_id(room_id)
+    room = await mysql_service.get_room_by_id(room_id)
     if not room or room.get("owner_id") != str(user["id"]):
         raise NotFoundError("Room", room_id)
 
@@ -133,9 +133,9 @@ async def update_room(
         updates["icon"] = body.icon
 
     if updates:
-        room = await supabase_service.update_room(room_id, updates)
+        room = await mysql_service.update_room(room_id, updates)
 
-    devices = await supabase_service.get_devices_by_room(room_id)
+    devices = await mysql_service.get_devices_by_room(room_id)
     room["total_devices_count"] = len(devices)
     room["active_devices_count"] = sum(1 for d in devices if d.get("state") == "on")
     return room
@@ -148,9 +148,9 @@ async def delete_room(
     db=Depends(get_db),
 ):
     """Delete a room and all its associated devices."""
-    room = await supabase_service.get_room_by_id(room_id)
+    room = await mysql_service.get_room_by_id(room_id)
     if not room or room.get("owner_id") != str(user["id"]):
         raise NotFoundError("Room", room_id)
 
-    await supabase_service.delete_room(room_id)
+    await mysql_service.delete_room(room_id)
     return SuccessResponse(message=f"Room '{room.get('name', room_id)}' deleted successfully")

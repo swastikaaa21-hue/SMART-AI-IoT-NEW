@@ -1,5 +1,5 @@
 """
-Telemetry data endpoints — Supabase primary.
+Telemetry data endpoints — MySQL primary.
 """
 
 from __future__ import annotations

@@ -1,8 +1,8 @@
 """
-Device manager service — Supabase primary.
+Device manager service — MySQL primary.
 
 Central business logic for device state management. Bridges API requests,
-MQTT commands, Supabase persistence, and WebSocket notifications.
+MQTT commands, MySQL persistence, and WebSocket notifications.
 """
 
 from __future__ import annotations
@@ -16,13 +16,14 @@ from app.core.constants import CommandAction, DeviceState
 from app.core.logging import get_logger
 from app.services.mqtt_service import mqtt_service
 from app.services.websocket_manager import ws_manager
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
+from app.services.state_persistence import state_persistence
 
 logger = get_logger("device_manager")
 
 
 class DeviceManager:
-    """Handles all device-related business logic via Supabase."""
+    """Handles all device-related business logic via MySQL."""
 
     # ── Device CRUD ──────────────────────────────────────────
 
@@ -35,7 +36,7 @@ class DeviceManager:
         page_size: int = 20,
     ) -> tuple[list[dict], int]:
         """List devices with optional filters and pagination."""
-        all_devs = await supabase_service.get_all_devices(
+        all_devs = await mysql_service.get_all_devices(
             room_id=room_id, device_type=device_type, is_online=is_online
         )
         total = len(all_devs)
@@ -46,22 +47,22 @@ class DeviceManager:
         for d in all_devs:
             rid = d.get("room_id", "")
             if rid and rid not in rooms_cache:
-                rooms_cache[rid] = await supabase_service.get_room_by_id(rid) or {}
+                rooms_cache[rid] = await mysql_service.get_room_by_id(rid) or {}
             d["room"] = rooms_cache.get(rid, {})
         return all_devs[start:end], total
 
     async def get_device(self, device_id: str) -> dict | None:
         """Get a single device by device_id string or fuzzy match."""
-        dev = await supabase_service.resolve_device(device_id)
+        dev = await mysql_service.resolve_device(device_id)
         if dev and "room" not in dev:
-            room = await supabase_service.get_room_by_id(dev.get("room_id", ""))
+            room = await mysql_service.get_room_by_id(dev.get("room_id", ""))
             dev["room"] = room or {}
         return dev
 
     async def get_device_by_uuid(self, device_uuid: str) -> dict | None:
-        dev = await supabase_service.get_device_by_uuid(device_uuid)
+        dev = await mysql_service.get_device_by_uuid(device_uuid)
         if dev:
-            room = await supabase_service.get_room_by_id(dev.get("room_id", ""))
+            room = await mysql_service.get_room_by_id(dev.get("room_id", ""))
             dev["room"] = room or {}
         return dev
 
@@ -85,31 +86,94 @@ class DeviceManager:
             "created_at": now,
             "updated_at": now,
         }
-        result = await supabase_service.create_device(device_data)
+        result = await mysql_service.create_device(device_data)
         logger.info("device_created", device_id=kwargs["device_id"], name=kwargs["name"])
+        
+        # Initialize IR button templates for TV/AC devices
+        device_type = kwargs["device_type"].lower()
+        if device_type in ["tv", "ac"]:
+            await self._initialize_ir_templates(kwargs["device_id"], device_type)
+        
         # Attach room
         if result.get("room_id"):
-            result["room"] = await supabase_service.get_room_by_id(result["room_id"]) or {}
+            result["room"] = await mysql_service.get_room_by_id(result["room_id"]) or {}
         return result
+    
+    async def _initialize_ir_templates(self, device_id: str, device_type: str) -> None:
+        """Create empty IR button templates for new remote devices."""
+        templates = {
+            "tv": [
+                ("power", "Power ON/OFF"),
+                ("vol_up", "Volume Up"),
+                ("vol_down", "Volume Down"),
+                ("ch_up", "Channel Up"),
+                ("ch_down", "Channel Down"),
+                ("mute", "Mute"),
+                ("source", "Input Source"),
+                ("menu", "Menu"),
+                ("ok", "OK/Enter"),
+                ("up", "Navigate Up"),
+                ("down", "Navigate Down"),
+                ("left", "Navigate Left"),
+                ("right", "Navigate Right"),
+                ("home", "Home"),
+                ("back", "Back"),
+                ("info", "Info"),
+                ("settings", "Settings"),
+            ],
+            "ac": [
+                ("power", "Power ON/OFF"),
+                ("temp_up", "Temperature Up"),
+                ("temp_down", "Temperature Down"),
+                ("mode", "Mode (Cool/Heat/Fan)"),
+                ("fan_speed", "Fan Speed"),
+                ("swing", "Swing/Oscillate"),
+                ("timer", "Timer"),
+                ("sleep", "Sleep Mode"),
+            ],
+        }
+        
+        buttons = templates.get(device_type, [])
+        now = datetime.now(timezone.utc).isoformat()
+        
+        for button_name, button_label in buttons:
+            code_id = str(uuid.uuid4()).replace("-", "")
+            code_data = {
+                "id": code_id,
+                "device_id": device_id,
+                "button_name": button_name,
+                "button_label": button_label,
+                "ir_frequency": "",  # Empty, user will learn later
+                "protocol": None,
+                "raw_data": None,
+                "created_at": now,
+                "updated_at": now,
+            }
+            try:
+                await mysql_service.create_ir_code(code_data)
+            except Exception as e:
+                logger.warning("ir_template_creation_failed", device_id=device_id, button=button_name, error=str(e))
+        
+        logger.info("ir_templates_initialized", device_id=device_id, device_type=device_type, count=len(buttons))
 
     async def update_device(self, device_id: str, **kwargs: Any) -> dict | None:
-        device = await supabase_service.resolve_device(device_id)
+        device = await mysql_service.resolve_device(device_id)
         if not device:
             return None
         updates = {k: v for k, v in kwargs.items() if v is not None}
         if not updates:
             return device
-        result = await supabase_service.update_device_by_device_id(device["device_id"], updates)
+        result = await mysql_service.update_device_by_device_id(device["device_id"], updates)
         logger.info("device_updated", device_id=device_id)
         if result.get("room_id"):
-            result["room"] = await supabase_service.get_room_by_id(result["room_id"]) or {}
+            result["room"] = await mysql_service.get_room_by_id(result["room_id"]) or {}
         return result
 
     async def delete_device(self, device_id: str) -> bool:
-        device = await supabase_service.resolve_device(device_id)
+        device = await mysql_service.resolve_device(device_id)
         if not device:
             return False
-        ok = await supabase_service.delete_device(device["device_id"])
+        ok = await mysql_service.delete_device(device["device_id"])
         if ok:
             logger.info("device_deleted", device_id=device_id)
         return ok
@@ -142,7 +206,8 @@ class DeviceManager:
             target_state = DeviceState.ON.value
         elif action == CommandAction.TURN_OFF.value:
             target_state = DeviceState.OFF.value
-        elif action == CommandAction.TOGGLE.value:
+        elif action == CommandAction.TOGGLE.value or action == 'power':
+            # Toggle state for both 'toggle' and 'power' actions
             target_state = (
                 DeviceState.OFF.value
                 if device.get("state") == DeviceState.ON.value
@@ -160,7 +225,8 @@ class DeviceManager:
             }
         else:
             # Custom / TV Remote actions (e.g. vol_up, vol_down, mute, ch_up, ch_down, ir_send)
-            target_state = device.get("state", "on")
+            # Keep current state for other buttons
+            target_state = device.get("state", "off")
             extra["button"] = action
 
         if value is not None:
@@ -191,11 +257,11 @@ class DeviceManager:
         status = "sent" if published else "failed"
         error_msg = None if published else "MQTT publish failed"
 
-        # Log command to Supabase
+        # Log command to MySQL
         cmd_id = str(uuid.uuid4()).replace("-", "")
         now = datetime.now(timezone.utc).isoformat()
         try:
-            await supabase_service.log_command({
+            await mysql_service.log_command({
                 "id": cmd_id,
                 "device_id": device["device_id"],
                 "action": action,
@@ -208,7 +274,7 @@ class DeviceManager:
         except Exception:
             pass
 
-        # Update device state in Supabase
+        # Update device state in MySQL using state_persistence for reliability
         dev_updates: dict[str, Any] = {"state": target_state}
         if action == CommandAction.SET_VALUE.value and value is not None:
             try:
@@ -229,11 +295,17 @@ class DeviceManager:
             dev_updates["fan_speed"] = fan_speed
         if timer_minutes is not None:
             dev_updates["timer_minutes"] = timer_minutes
-            
-        try:
-            await supabase_service.update_device_by_device_id(device["device_id"], dev_updates)
-        except Exception:
-            pass
+        
+        # Use state_persistence to ensure data is saved reliably
+        extra_fields = {k: v for k, v in dev_updates.items() if k != "state"}
+        save_success, save_error = await state_persistence.save_device_state(
+            device["device_id"], 
+            target_state, 
+            extra_fields if extra_fields else None
+        )
+        
+        if not save_success:
+            logger.error("device_state_save_failed", device_id=device["device_id"], error=save_error)
 
         # Broadcast via WebSocket
         try:
@@ -269,7 +341,7 @@ class DeviceManager:
     async def handle_status_update(
         self, device_id: str, state: str, extra: dict[str, Any] | None = None,
     ) -> None:
-        device = await supabase_service.get_device_by_device_id(device_id)
+        device = await mysql_service.get_device_by_device_id(device_id)
         if not device:
             logger.warning("status_update_unknown_device", device_id=device_id)
             return
@@ -284,9 +356,9 @@ class DeviceManager:
                 if key in extra:
                     updates[key] = extra[key]
 
-        await supabase_service.update_device_by_device_id(device_id, updates)
+        await mysql_service.update_device_by_device_id(device_id, updates)
 
-        room = await supabase_service.get_room_by_id(device.get("room_id", ""))
+        room = await mysql_service.get_room_by_id(device.get("room_id", ""))
         room_slug = room.get("slug", "unknown") if room else "unknown"
         await ws_manager.broadcast_device_status(
             device_id=device_id, room_slug=room_slug, state=state, extra=extra
@@ -305,7 +377,7 @@ class DeviceManager:
         tel_id = str(uuid.uuid4()).replace("-", "")
         now = datetime.now(timezone.utc).isoformat()
 
-        log = await supabase_service.log_telemetry({
+        log = await mysql_service.log_telemetry({
             "id": tel_id,
             "device_id": device_id,
             "temperature": temperature,
@@ -317,7 +389,7 @@ class DeviceManager:
 
         # Update device sensor fields
         try:
-            await supabase_service.update_device_by_device_id(device_id, {
+            await mysql_service.update_device_by_device_id(device_id, {
                 "temperature": temperature,
                 "humidity": humidity,
                 "is_online": True,
@@ -344,7 +416,7 @@ class DeviceManager:
         limit: int = 100,
         offset: int = 0,
     ) -> tuple[list[dict], int]:
-        return await supabase_service.get_telemetry(device_id=device_id, limit=limit, offset=offset)
+        return await mysql_service.get_telemetry(device_id=device_id, limit=limit, offset=offset)
 
     # ── Command Logs ─────────────────────────────────────────
 
@@ -354,7 +426,7 @@ class DeviceManager:
         limit: int = 50,
         offset: int = 0,
     ) -> tuple[list[dict], int]:
-        return await supabase_service.get_commands(device_id=device_id, limit=limit, offset=offset)
+        return await mysql_service.get_commands(device_id=device_id, limit=limit, offset=offset)
 
 
 # Module-level singleton

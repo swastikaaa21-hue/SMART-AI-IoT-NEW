@@ -4,7 +4,3 @@
 from app.db.session import AsyncSessionLocal, Base, engine, get_db
 
 __all__ = ["AsyncSessionLocal", "Base", "engine", "get_db"]
-
-
-# Legacy compatibility alias
-get_supabase = get_db

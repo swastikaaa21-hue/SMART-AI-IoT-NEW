@@ -1,5 +1,5 @@
 """
-Device CRUD and status endpoints — Supabase primary.
+Device CRUD and status endpoints — MySQL primary.
 """
 
 from __future__ import annotations

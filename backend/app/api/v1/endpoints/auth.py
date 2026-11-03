@@ -1,6 +1,6 @@
 """
 Authentication endpoints: register, login, refresh, me.
-Now using Supabase as the primary database.
+Using MySQL/TiDB as the primary database.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ from app.utils.exceptions import (
     AlreadyExistsError,
     UnauthorizedError,
 )
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 
 router = APIRouter()
 
@@ -44,7 +44,7 @@ async def register(
 ):
     """Register a new user account."""
     # Check for existing email
-    existing = await supabase_service.get_user_by_email(body.email)
+    existing = await mysql_service.get_user_by_email(body.email)
     if existing:
         raise AlreadyExistsError("User", body.email)
 
@@ -62,7 +62,7 @@ async def register(
         "updated_at": now,
     }
     
-    created_user = await supabase_service.create_user(user_data)
+    created_user = await mysql_service.create_user(user_data)
     return UserResponse(**created_user)
 
 
@@ -72,7 +72,7 @@ async def login(
     db = Depends(get_db),
 ) -> dict:
     """Authenticate a user and return JWT tokens (Supports Swagger UI)."""
-    user = await supabase_service.get_user_by_email(form_data.username)
+    user = await mysql_service.get_user_by_email(form_data.username)
 
     if not user or not verify_password(form_data.password, user["hashed_password"]):
         raise UnauthorizedError("Invalid email or password")
@@ -112,7 +112,7 @@ async def refresh_token(
     if not user_id:
         raise UnauthorizedError("Invalid token payload")
 
-    user = await supabase_service.get_user_by_id(user_id)
+    user = await mysql_service.get_user_by_id(user_id)
 
     if not user or not user.get("is_active", True):
         raise UnauthorizedError("User not found or deactivated")
@@ -149,7 +149,7 @@ async def update_me(
     updates = {}
     
     if body.email and body.email != user["email"]:
-        existing = await supabase_service.get_user_by_email(body.email)
+        existing = await mysql_service.get_user_by_email(body.email)
         if existing:
             raise AlreadyExistsError("User", body.email)
         updates["email"] = body.email
@@ -161,7 +161,7 @@ async def update_me(
         updates["hashed_password"] = hash_password(body.password)
 
     if updates:
-        updated_user = await supabase_service.update_user(user["id"], updates)
+        updated_user = await mysql_service.update_user(user["id"], updates)
         return UserResponse(**updated_user)
     
     return UserResponse(**user)

@@ -1,4 +1,4 @@
-"""Schedule/Routine endpoints — Supabase primary."""
+"""Schedule/Routine endpoints — MySQL primary."""
 
 from __future__ import annotations
 
@@ -9,7 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.db.session import get_db
 from app.middleware.auth import get_current_user
 from app.schemas.schedule import ScheduleCreate, ScheduleResponse, ScheduleUpdate
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
+from app.services.state_persistence import state_persistence
 from app.utils.exceptions import NotFoundError
 
 router = APIRouter()
@@ -27,15 +28,15 @@ async def create_schedule(
     user: dict = Depends(get_current_user),
     db=Depends(get_db),
 ):
-    """Create new schedule/routine."""
+    """Create new schedule/routine with guaranteed persistence."""
     user_id = _get_user_id(user)
 
     # Verify room and device exist
-    room = await supabase_service.get_room_by_id(schedule_in.room_id)
+    room = await mysql_service.get_room_by_id(schedule_in.room_id)
     if not room:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
 
-    device = await supabase_service.get_device_by_device_id(schedule_in.device_id)
+    device = await mysql_service.get_device_by_device_id(schedule_in.device_id)
     if not device:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Device not found")
 
@@ -54,7 +55,15 @@ async def create_schedule(
         "user_id": user_id,
     }
 
-    created = await supabase_service.create_schedule(schedule_data)
+    # Use state_persistence for reliable saving
+    success, saved_id, error = await state_persistence.save_schedule(schedule_data)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to save schedule: {error}"
+        )
+
+    created = await mysql_service.get_schedule_by_id(saved_id or schedule_id)
     if not created:
         created = schedule_data
 
@@ -82,7 +91,7 @@ async def list_schedules(
 ):
     """List all schedules for current user."""
     user_id = _get_user_id(user)
-    schedules = await supabase_service.get_user_schedules(user_id)
+    schedules = await mysql_service.get_user_schedules(user_id)
 
     rooms_cache: dict[str, dict] = {}
     devices_cache: dict[str, dict] = {}
@@ -93,9 +102,9 @@ async def list_schedules(
         did = s.get("device_id", "")
 
         if rid and rid not in rooms_cache:
-            rooms_cache[rid] = await supabase_service.get_room_by_id(rid) or {}
+            rooms_cache[rid] = await mysql_service.get_room_by_id(rid) or {}
         if did and did not in devices_cache:
-            devices_cache[did] = await supabase_service.get_device_by_device_id(did) or {}
+            devices_cache[did] = await mysql_service.get_device_by_device_id(did) or {}
 
         room = rooms_cache.get(rid, {})
         device = devices_cache.get(did, {})
@@ -127,12 +136,12 @@ async def get_schedule(
 ):
     """Get schedule detail."""
     user_id = _get_user_id(user)
-    schedule = await supabase_service.get_schedule_by_id(schedule_id)
+    schedule = await mysql_service.get_schedule_by_id(schedule_id)
     if not schedule or str(schedule.get("user_id")) != user_id:
         raise NotFoundError("Schedule", schedule_id)
 
-    room = await supabase_service.get_room_by_id(schedule.get("room_id", "")) or {}
-    device = await supabase_service.get_device_by_device_id(schedule.get("device_id", "")) or {}
+    room = await mysql_service.get_room_by_id(schedule.get("room_id", "")) or {}
+    device = await mysql_service.get_device_by_device_id(schedule.get("device_id", "")) or {}
 
     return ScheduleResponse(
         id=schedule.get("id", schedule_id),
@@ -160,16 +169,16 @@ async def update_schedule(
 ):
     """Update schedule."""
     user_id = _get_user_id(user)
-    existing = await supabase_service.get_schedule_by_id(schedule_id)
+    existing = await mysql_service.get_schedule_by_id(schedule_id)
     if not existing or str(existing.get("user_id")) != user_id:
         raise NotFoundError("Schedule", schedule_id)
 
     updates = schedule_in.model_dump(exclude_unset=True)
-    updated = await supabase_service.update_schedule(schedule_id, updates)
+    updated = await mysql_service.update_schedule(schedule_id, updates)
     merged = {**existing, **updated, **updates}
 
-    room = await supabase_service.get_room_by_id(merged.get("room_id", "")) or {}
-    device = await supabase_service.get_device_by_device_id(merged.get("device_id", "")) or {}
+    room = await mysql_service.get_room_by_id(merged.get("room_id", "")) or {}
+    device = await mysql_service.get_device_by_device_id(merged.get("device_id", "")) or {}
 
     return ScheduleResponse(
         id=merged.get("id", schedule_id),
@@ -196,8 +205,8 @@ async def delete_schedule(
 ):
     """Delete schedule."""
     user_id = _get_user_id(user)
-    existing = await supabase_service.get_schedule_by_id(schedule_id)
+    existing = await mysql_service.get_schedule_by_id(schedule_id)
     if not existing or str(existing.get("user_id")) != user_id:
         raise NotFoundError("Schedule", schedule_id)
 
-    await supabase_service.delete_schedule(schedule_id)
+    await mysql_service.delete_schedule(schedule_id)

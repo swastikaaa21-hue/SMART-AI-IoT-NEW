@@ -1,5 +1,5 @@
 """
-Device command endpoints — Supabase primary.
+Device command endpoints — MySQL primary.
 """
 
 from __future__ import annotations

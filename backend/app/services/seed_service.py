@@ -1,5 +1,5 @@
 """
-Seed service to populate default Smart Home rooms and devices — Supabase primary.
+Seed service to populate default Smart Home rooms and devices — MySQL primary.
 """
 
 from __future__ import annotations
@@ -9,7 +9,7 @@ from typing import Any
 from datetime import datetime, timezone
 
 from app.core.logging import get_logger
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 
 logger = get_logger("seed_service")
 
@@ -90,7 +90,7 @@ def _gen_id() -> str:
 
 async def seed_user_default_data(owner_id: str, reset: bool = False) -> tuple[int, int]:
     """
-    Seed initial default rooms and devices for a user via Supabase.
+    Seed initial default rooms and devices for a user via MySQL.
     If reset is True, clears existing rooms/devices for this user first.
     """
     owner_id_str = str(owner_id)
@@ -98,20 +98,20 @@ async def seed_user_default_data(owner_id: str, reset: bool = False) -> tuple[in
 
     if reset:
         # Delete existing rooms (cascade deletes devices via FK)
-        existing = await supabase_service.get_rooms_by_owner(owner_id_str)
+        existing = await mysql_service.get_rooms_by_owner(owner_id_str)
         for r in existing:
-            await supabase_service.delete_room(r["id"])
+            await mysql_service.delete_room(r["id"])
 
     rooms_count = 0
     devices_count = 0
 
     for r_data in DEFAULT_ROOMS_DATA:
         # Check if room slug already exists for this owner
-        existing_room = await supabase_service.get_room_by_slug(r_data["slug"], owner_id_str)
+        existing_room = await mysql_service.get_room_by_slug(r_data["slug"], owner_id_str)
 
         if not existing_room:
             room_id = _gen_id()
-            room = await supabase_service.create_room({
+            room = await mysql_service.create_room({
                 "id": room_id,
                 "name": r_data["name"],
                 "slug": r_data["slug"],
@@ -128,9 +128,9 @@ async def seed_user_default_data(owner_id: str, reset: bool = False) -> tuple[in
             room_id = existing_room["id"]
 
         for d_data in r_data.get("devices", []):
-            existing_dev = await supabase_service.get_device_by_device_id(d_data["device_id"])
+            existing_dev = await mysql_service.get_device_by_device_id(d_data["device_id"])
             if not existing_dev:
-                await supabase_service.create_device({
+                await mysql_service.create_device({
                     "id": _gen_id(),
                     "device_id": d_data["device_id"],
                     "name": d_data["name"],

@@ -55,6 +55,7 @@ class MQTTService:
         self._connected: bool = False
         self._status_handlers: list[MessageHandler] = []
         self._telemetry_handlers: list[MessageHandler] = []
+        self._ir_handlers: list[MessageHandler] = []
         self._reconnect_interval: int = 5
         self._max_reconnect_interval: int = 60
         # Windows threading support
@@ -74,6 +75,12 @@ class MQTTService:
     def on_telemetry(self, handler: MessageHandler) -> None:
         """Register a handler for device telemetry messages."""
         self._telemetry_handlers.append(handler)
+
+    def on_ir_capture(self, handler: MessageHandler) -> None:
+        """Register a handler for IR capture messages."""
+        if not hasattr(self, '_ir_handlers'):
+            self._ir_handlers: list[MessageHandler] = []
+        self._ir_handlers.append(handler)
 
     def _build_tls_context(self) -> ssl.SSLContext:
         """Build TLS context for HiveMQ Cloud connection."""
@@ -142,13 +149,14 @@ class MQTTService:
 
                     logger.info("mqtt_connected", broker=settings.MQTT_BROKER)
 
-                    # Subscribe to status and telemetry wildcard topics
+                    # Subscribe to status, telemetry, and IR capture wildcard topics
                     await client.subscribe(MQTT_TOPIC_STATUS_WILDCARD, qos=1)
                     await client.subscribe(MQTT_TOPIC_TELEMETRY_WILDCARD, qos=1)
+                    await client.subscribe("smart-aiot/+/ir/captured", qos=1)
 
                     logger.info(
                         "mqtt_subscribed",
-                        topics=[MQTT_TOPIC_STATUS_WILDCARD, MQTT_TOPIC_TELEMETRY_WILDCARD],
+                        topics=[MQTT_TOPIC_STATUS_WILDCARD, MQTT_TOPIC_TELEMETRY_WILDCARD, "smart-aiot/+/ir/captured"],
                     )
 
                     # Listen for messages
@@ -286,6 +294,21 @@ class MQTTService:
         except aiomqtt.MqttError as exc:
             logger.error("mqtt_raw_publish_error", topic=topic, error=str(exc))
             return False
+
+    def publish(self, topic: str, payload: dict[str, Any]) -> None:
+        """Publish JSON payload to MQTT topic (synchronous wrapper)."""
+        if not self._client or not self._connected:
+            logger.error("mqtt_publish_failed", reason="not_connected")
+            return
+        
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                asyncio.create_task(self.publish_raw(topic, payload))
+            else:
+                loop.run_until_complete(self.publish_raw(topic, payload))
+        except Exception as exc:
+            logger.error("mqtt_publish_error", topic=topic, error=str(exc))
 
     async def disconnect(self) -> None:
         """Gracefully disconnect from the MQTT broker."""

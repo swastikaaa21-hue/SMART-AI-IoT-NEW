@@ -43,7 +43,7 @@ from app.services.mqtt_handler import handle_device_status, handle_device_teleme
 from app.services.mqtt_service import mqtt_service
 from app.services.websocket_manager import ws_manager
 from app.services.scheduler_service import scheduler_service
-from app.services.supabase_service import supabase_service
+from app.services.mysql_service import mysql_service
 
 logger = get_logger("main")
 
@@ -91,6 +91,9 @@ async def lifespan(app: FastAPI):
     # 2. Register MQTT message handlers
     mqtt_service.on_status(handle_device_status)
     mqtt_service.on_telemetry(handle_device_telemetry)
+    
+    from app.services.mqtt_handler import handle_ir_capture
+    mqtt_service.on_ir_capture(handle_ir_capture)
 
     # 4. Connect to MQTT broker (non-fatal if fails)
     try:
@@ -128,7 +131,7 @@ def create_app() -> FastAPI:
         version=settings.APP_VERSION,
         description=(
             "Central Orchestrator Backend for SMART AI IoT Platform. "
-            "Connects Frontend, Database (Supabase), "
+            "Connects Frontend, Database (MySQL/TiDB), "
             "Broker (HiveMQ Cloud MQTT TLS), and AI (Google Gemini Function Calling)."
         ),
         docs_url="/docs",
@@ -200,7 +203,7 @@ def create_app() -> FastAPI:
                 "mqtt": "connected" if mqtt_service.is_connected else "disconnected",
                 "gemini": "ready" if gemini_service._initialised else "not_configured",
                 "websocket": f"{ws_manager.active_count} connections",
-                "database": "connected" if supabase_service._initialized else "ready",
+                "database": "connected" if mysql_service._initialized else "ready",
             },
         )
 
